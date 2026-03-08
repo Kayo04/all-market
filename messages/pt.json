@@ -1,0 +1,162 @@
+{
+    "nav": {
+        "home": "Início",
+        "requests": "Ver Pedidos",
+        "postRequest": "Publicar Pedido",
+        "dashboard": "Painel",
+        "login": "Entrar",
+        "register": "Registar",
+        "logout": "Sair",
+        "profile": "Perfil"
+    },
+    "hero": {
+        "title": "O que precisas?",
+        "subtitle": "Publica o que procuras. Recebe propostas de profissionais verificados.",
+        "cta": "Publicar Pedido",
+        "ctaPro": "Registar como Profissional",
+        "searchPlaceholder": "Ex: Eletricista em Lisboa, PS4 até 400€..."
+    },
+    "howItWorks": {
+        "title": "Como Funciona",
+        "step1Title": "Publica o teu Pedido",
+        "step1Desc": "Descreve o que precisas, define o orçamento e escolhe a categoria.",
+        "step2Title": "Recebe Propostas",
+        "step2Desc": "Profissionais verificados enviam-te orçamentos e mensagens.",
+        "step3Title": "Escolhe o Melhor",
+        "step3Desc": "Compara propostas, vê avaliações e escolhe o mais adequado."
+    },
+    "categories": {
+        "title": "Explorar Categorias",
+        "subtitle": "Encontra exatamente o que precisas nas nossas categorias.",
+        "home-repairs": "Reparações Domésticas",
+        "tech-digital": "Tecnologia e Digital",
+        "tutoring": "Explicações e Línguas",
+        "events": "Eventos e Festas",
+        "wellness": "Bem-estar e Desporto",
+        "equipment": "Compra de Equipamentos"
+    },
+    "stats": {
+        "requests": "Pedidos Publicados",
+        "professionals": "Profissionais Verificados",
+        "categories": "Categorias de Serviço",
+        "satisfaction": "Taxa de Satisfação"
+    },
+    "cta": {
+        "title": "Pronto para começar?",
+        "subtitle": "Junta-te a milhares que já encontraram o que precisavam.",
+        "clientBtn": "Publicar o Primeiro Pedido",
+        "proBtn": "Registar como Profissional"
+    },
+    "auth": {
+        "loginTitle": "Bem-vindo de Volta",
+        "loginSubtitle": "Entra na tua conta",
+        "registerTitle": "Criar Conta",
+        "registerSubtitle": "Junta-te ao marketplace",
+        "email": "Email",
+        "password": "Palavra-passe",
+        "confirmPassword": "Confirmar Palavra-passe",
+        "name": "Nome Completo",
+        "roleSelect": "Eu quero...",
+        "roleClient": "Contratar um profissional",
+        "rolePro": "Oferecer os meus serviços",
+        "loginBtn": "Entrar",
+        "registerBtn": "Criar Conta",
+        "noAccount": "Não tens conta?",
+        "hasAccount": "Já tens conta?",
+        "orContinue": "Ou continuar com"
+    },
+    "request": {
+        "newTitle": "Criar Pedido",
+        "title": "Título",
+        "titlePlaceholder": "Ex: Preciso de eletricista para o meu apartamento",
+        "description": "Descrição",
+        "descriptionPlaceholder": "Descreve em detalhe o que precisas...",
+        "category": "Categoria",
+        "subcategory": "Subcategoria",
+        "budget": "Orçamento Máximo (€)",
+        "budgetPlaceholder": "Ex: 500",
+        "location": "Localização",
+        "locationPlaceholder": "Ex: Lisboa, Portugal",
+        "itemCondition": "Estado do Item",
+        "conditionNew": "Novo",
+        "conditionUsed": "Usado",
+        "conditionAny": "Qualquer",
+        "acceptsTrades": "Aceita trocas?",
+        "submit": "Publicar Pedido",
+        "statusOpen": "Aberto",
+        "statusInProgress": "Em Progresso",
+        "statusClosed": "Fechado",
+        "featured": "Destaque"
+    },
+    "proposal": {
+        "title": "Propostas",
+        "sendProposal": "Enviar Proposta",
+        "message": "A tua Mensagem",
+        "messagePlaceholder": "Explica porque és a pessoa certa...",
+        "price": "O teu Preço (€)",
+        "pricePlaceholder": "Ex: 350",
+        "useDraft": "Usar um modelo guardado",
+        "selectDraft": "Seleciona um modelo...",
+        "submit": "Submeter Proposta",
+        "accepted": "Aceite",
+        "pending": "Pendente",
+        "rejected": "Rejeitada"
+    },
+    "dashboard": {
+        "client": {
+            "title": "Os Meus Pedidos",
+            "subtitle": "Acompanha os teus pedidos e propostas recebidas",
+            "noRequests": "Ainda não fizeste nenhum pedido.",
+            "proposalsReceived": "propostas recebidas",
+            "viewProposals": "Ver Propostas",
+            "closeRequest": "Fechar Pedido"
+        },
+        "pro": {
+            "title": "Feed de Oportunidades",
+            "subtitle": "Encontra e responde a pedidos perto de ti",
+            "noOpportunities": "Sem oportunidades correspondentes de momento.",
+            "respond": "Responder",
+            "proposalsSent": "Propostas Enviadas",
+            "acceptanceRate": "Taxa de Aceitação",
+            "activeLeads": "Leads Ativos",
+            "drafts": "Os Meus Modelos",
+            "manageDrafts": "Gerir Modelos"
+        }
+    },
+    "drafts": {
+        "title": "Modelos de Proposta",
+        "subtitle": "Poupa tempo com modelos de resposta reutilizáveis",
+        "newDraft": "Novo Modelo",
+        "draftTitle": "Título do Modelo",
+        "draftTitlePlaceholder": "Ex: Orçamento Padrão de Canalização",
+        "draftMessage": "Mensagem do Modelo",
+        "defaultPrice": "Preço Padrão (€)",
+        "save": "Guardar Modelo",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "noDrafts": "Nenhum modelo guardado."
+    },
+    "common": {
+        "loading": "A carregar...",
+        "error": "Algo correu mal",
+        "save": "Guardar",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "edit": "Editar",
+        "back": "Voltar",
+        "next": "Seguinte",
+        "viewAll": "Ver Todos",
+        "noResults": "Sem resultados.",
+        "perMonth": "/mês",
+        "verified": "Verificado"
+    },
+    "footer": {
+        "tagline": "O marketplace que trabalha por ti.",
+        "links": "Links Rápidos",
+        "legal": "Legal",
+        "privacy": "Política de Privacidade",
+        "terms": "Termos de Serviço",
+        "contact": "Contacto",
+        "rights": "Todos os direitos reservados."
+    }
+}

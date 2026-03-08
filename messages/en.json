@@ -1,0 +1,162 @@
+{
+  "nav": {
+    "home": "Home",
+    "requests": "Browse Requests",
+    "postRequest": "Post a Request",
+    "dashboard": "Dashboard",
+    "login": "Sign In",
+    "register": "Sign Up",
+    "logout": "Sign Out",
+    "profile": "Profile"
+  },
+  "hero": {
+    "title": "What do you need?",
+    "subtitle": "Post what you're looking for. Receive proposals from trusted professionals.",
+    "cta": "Post Your Request",
+    "ctaPro": "Join as a Professional",
+    "searchPlaceholder": "E.g.: Electrician in Lisbon, PS4 up to 400€..."
+  },
+  "howItWorks": {
+    "title": "How It Works",
+    "step1Title": "Post Your Need",
+    "step1Desc": "Describe what you need, set your budget, and choose a category.",
+    "step2Title": "Receive Proposals",
+    "step2Desc": "Verified professionals send you quotes and messages.",
+    "step3Title": "Choose the Best",
+    "step3Desc": "Compare proposals, check ratings, and pick the right fit."
+  },
+  "categories": {
+    "title": "Explore Categories",
+    "subtitle": "Find exactly what you need across our service categories.",
+    "home-repairs": "Home Repairs",
+    "tech-digital": "Tech & Digital",
+    "tutoring": "Tutoring & Languages",
+    "events": "Events & Parties",
+    "wellness": "Wellness & Sports",
+    "equipment": "Buy Equipment"
+  },
+  "stats": {
+    "requests": "Requests Posted",
+    "professionals": "Verified Professionals",
+    "categories": "Service Categories",
+    "satisfaction": "Satisfaction Rate"
+  },
+  "cta": {
+    "title": "Ready to get started?",
+    "subtitle": "Join thousands who already found what they need.",
+    "clientBtn": "Post Your First Request",
+    "proBtn": "Register as a Professional"
+  },
+  "auth": {
+    "loginTitle": "Welcome Back",
+    "loginSubtitle": "Sign in to your account",
+    "registerTitle": "Create Account",
+    "registerSubtitle": "Join the marketplace",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "name": "Full Name",
+    "roleSelect": "I want to...",
+    "roleClient": "Hire a professional",
+    "rolePro": "Offer my services",
+    "loginBtn": "Sign In",
+    "registerBtn": "Create Account",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "orContinue": "Or continue with"
+  },
+  "request": {
+    "newTitle": "Create a Request",
+    "title": "Title",
+    "titlePlaceholder": "E.g.: Need an electrician for my apartment",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe in detail what you need...",
+    "category": "Category",
+    "subcategory": "Subcategory",
+    "budget": "Maximum Budget (€)",
+    "budgetPlaceholder": "E.g.: 500",
+    "location": "Location",
+    "locationPlaceholder": "E.g.: Lisbon, Portugal",
+    "itemCondition": "Item Condition",
+    "conditionNew": "New",
+    "conditionUsed": "Used",
+    "conditionAny": "Any",
+    "acceptsTrades": "Accepts trades?",
+    "submit": "Publish Request",
+    "statusOpen": "Open",
+    "statusInProgress": "In Progress",
+    "statusClosed": "Closed",
+    "featured": "Featured"
+  },
+  "proposal": {
+    "title": "Proposals",
+    "sendProposal": "Send Proposal",
+    "message": "Your Message",
+    "messagePlaceholder": "Explain why you're the right fit...",
+    "price": "Your Price (€)",
+    "pricePlaceholder": "E.g.: 350",
+    "useDraft": "Use a draft template",
+    "selectDraft": "Select a draft...",
+    "submit": "Submit Proposal",
+    "accepted": "Accepted",
+    "pending": "Pending",
+    "rejected": "Rejected"
+  },
+  "dashboard": {
+    "client": {
+      "title": "My Requests",
+      "subtitle": "Track your requests and received proposals",
+      "noRequests": "You haven't made any requests yet.",
+      "proposalsReceived": "proposals received",
+      "viewProposals": "View Proposals",
+      "closeRequest": "Close Request"
+    },
+    "pro": {
+      "title": "Opportunities Feed",
+      "subtitle": "Find and respond to requests near you",
+      "noOpportunities": "No matching opportunities right now.",
+      "respond": "Respond",
+      "proposalsSent": "Proposals Sent",
+      "acceptanceRate": "Acceptance Rate",
+      "activeLeads": "Active Leads",
+      "drafts": "My Draft Templates",
+      "manageDrafts": "Manage Drafts"
+    }
+  },
+  "drafts": {
+    "title": "Proposal Templates",
+    "subtitle": "Save time with reusable response templates",
+    "newDraft": "New Template",
+    "draftTitle": "Template Title",
+    "draftTitlePlaceholder": "E.g.: Standard Plumbing Quote",
+    "draftMessage": "Template Message",
+    "defaultPrice": "Default Price (€)",
+    "save": "Save Template",
+    "delete": "Delete",
+    "edit": "Edit",
+    "noDrafts": "No templates saved yet."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "next": "Next",
+    "viewAll": "View All",
+    "noResults": "No results found.",
+    "perMonth": "/month",
+    "verified": "Verified"
+  },
+  "footer": {
+    "tagline": "The marketplace that works for you.",
+    "links": "Quick Links",
+    "legal": "Legal",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact",
+    "rights": "All rights reserved."
+  }
+}
