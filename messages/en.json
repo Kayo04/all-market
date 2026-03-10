@@ -158,5 +158,17 @@
     "terms": "Terms of Service",
     "contact": "Contact",
     "rights": "All rights reserved."
+  },
+  "categoryBar": {
+    "trending": "Trending"
+  },
+  "popular": {
+    "title": "Popular Categories"
+  },
+  "recent": {
+    "title": "Recent Requests",
+    "empty": "No requests yet. Be the first to post!",
+    "viewAll": "View All",
+    "budget": "Budget"
   }
 }

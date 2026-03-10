@@ -158,5 +158,17 @@
         "terms": "Termos de Serviço",
         "contact": "Contacto",
         "rights": "Todos os direitos reservados."
+    },
+    "categoryBar": {
+        "trending": "Em Alta"
+    },
+    "popular": {
+        "title": "Categorias Populares"
+    },
+    "recent": {
+        "title": "Pedidos Recentes",
+        "empty": "Sem pedidos ainda. Sê o primeiro a publicar!",
+        "viewAll": "Ver Todos",
+        "budget": "Orçamento"
     }
 }

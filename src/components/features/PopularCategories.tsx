@@ -1,0 +1,197 @@
+'use client';
+
+import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/navigation';
+import { useRef } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { categories } from '@/lib/categories';
+
+const categoryColors: Record<string, { bg: string; text: string }> = {
+  'home-repairs': { bg: '#fef3c7', text: '#92400e' },
+  'tech-digital': { bg: '#dbeafe', text: '#1e40af' },
+  tutoring: { bg: '#d1fae5', text: '#065f46' },
+  events: { bg: '#fce7f3', text: '#9d174d' },
+  wellness: { bg: '#ede9fe', text: '#5b21b6' },
+  equipment: { bg: '#fee2e2', text: '#991b1b' },
+};
+
+const categoryColorsDark: Record<string, { bg: string; text: string }> = {
+  'home-repairs': { bg: '#78350f', text: '#fef3c7' },
+  'tech-digital': { bg: '#1e3a5f', text: '#bfdbfe' },
+  tutoring: { bg: '#064e3b', text: '#a7f3d0' },
+  events: { bg: '#831843', text: '#fbcfe8' },
+  wellness: { bg: '#4c1d95', text: '#ddd6fe' },
+  equipment: { bg: '#7f1d1d', text: '#fecaca' },
+};
+
+export default function PopularCategories() {
+  const t = useTranslations('popular');
+  const locale = useLocale();
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const amount = 300;
+      scrollRef.current.scrollBy({
+        left: direction === 'left' ? -amount : amount,
+        behavior: 'smooth',
+      });
+    }
+  };
+
+  return (
+    <section style={{ padding: '48px 0 32px', maxWidth: '1280px', margin: '0 auto' }}>
+      {/* Header */}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '0 24px',
+          marginBottom: '24px',
+        }}
+      >
+        <h2
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '24px',
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
+          }}
+        >
+          {t('title')}
+        </h2>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button
+            onClick={() => scroll('left')}
+            style={{
+              width: '36px',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-full)',
+              background: 'var(--bg-card)',
+              cursor: 'pointer',
+              color: 'var(--text-secondary)',
+              transition: 'border-color var(--transition-fast)',
+            }}
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
+            onClick={() => scroll('right')}
+            style={{
+              width: '36px',
+              height: '36px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius-full)',
+              background: 'var(--bg-card)',
+              cursor: 'pointer',
+              color: 'var(--text-secondary)',
+              transition: 'border-color var(--transition-fast)',
+            }}
+          >
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      </div>
+
+      {/* Scrollable cards */}
+      <div
+        ref={scrollRef}
+        style={{
+          display: 'flex',
+          gap: '16px',
+          overflowX: 'auto',
+          scrollbarWidth: 'none',
+          padding: '0 24px 8px',
+          scrollSnapType: 'x mandatory',
+        }}
+        className="popular-scroll"
+      >
+        {categories.map((cat) => {
+          const label = locale === 'pt' ? cat.labelPT : cat.labelEN;
+          const lightColors = categoryColors[cat.key] || { bg: '#f3f4f6', text: '#374151' };
+          const darkColors = categoryColorsDark[cat.key] || { bg: '#1f2937', text: '#e5e7eb' };
+          const subLabels = cat.subcategories
+            .slice(0, 3)
+            .map((s) => (locale === 'pt' ? s.labelPT : s.labelEN));
+
+          return (
+            <Link
+              key={cat.key}
+              href={`/requests?category=${cat.key}`}
+              style={{
+                minWidth: '220px',
+                maxWidth: '220px',
+                borderRadius: 'var(--radius-lg)',
+                padding: '24px 20px',
+                textDecoration: 'none',
+                scrollSnapAlign: 'start',
+                flexShrink: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+                transition: 'transform var(--transition-fast)',
+              }}
+              className={`popular-card popular-card-${cat.key}`}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+              }}
+            >
+              <h3
+                style={{
+                  fontFamily: 'var(--font-display)',
+                  fontSize: '16px',
+                  fontWeight: 700,
+                  lineHeight: 1.3,
+                }}
+              >
+                {label}
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                {subLabels.map((sub) => (
+                  <span
+                    key={sub}
+                    style={{
+                      fontSize: '12px',
+                      opacity: 0.8,
+                    }}
+                  >
+                    {sub}
+                  </span>
+                ))}
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      <style>{`
+        .popular-scroll::-webkit-scrollbar { display: none; }
+
+        [data-theme="light"] .popular-card-home-repairs { background: ${categoryColors['home-repairs'].bg}; color: ${categoryColors['home-repairs'].text}; }
+        [data-theme="light"] .popular-card-tech-digital { background: ${categoryColors['tech-digital'].bg}; color: ${categoryColors['tech-digital'].text}; }
+        [data-theme="light"] .popular-card-tutoring { background: ${categoryColors.tutoring.bg}; color: ${categoryColors.tutoring.text}; }
+        [data-theme="light"] .popular-card-events { background: ${categoryColors.events.bg}; color: ${categoryColors.events.text}; }
+        [data-theme="light"] .popular-card-wellness { background: ${categoryColors.wellness.bg}; color: ${categoryColors.wellness.text}; }
+        [data-theme="light"] .popular-card-equipment { background: ${categoryColors.equipment.bg}; color: ${categoryColors.equipment.text}; }
+
+        [data-theme="dark"] .popular-card-home-repairs { background: ${categoryColorsDark['home-repairs'].bg}; color: ${categoryColorsDark['home-repairs'].text}; }
+        [data-theme="dark"] .popular-card-tech-digital { background: ${categoryColorsDark['tech-digital'].bg}; color: ${categoryColorsDark['tech-digital'].text}; }
+        [data-theme="dark"] .popular-card-tutoring { background: ${categoryColorsDark.tutoring.bg}; color: ${categoryColorsDark.tutoring.text}; }
+        [data-theme="dark"] .popular-card-events { background: ${categoryColorsDark.events.bg}; color: ${categoryColorsDark.events.text}; }
+        [data-theme="dark"] .popular-card-wellness { background: ${categoryColorsDark.wellness.bg}; color: ${categoryColorsDark.wellness.text}; }
+        [data-theme="dark"] .popular-card-equipment { background: ${categoryColorsDark.equipment.bg}; color: ${categoryColorsDark.equipment.text}; }
+      `}</style>
+    </section>
+  );
+}
