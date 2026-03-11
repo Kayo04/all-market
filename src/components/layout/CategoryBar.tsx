@@ -1,17 +1,35 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { Link } from '@/i18n/navigation';
+import { Link, usePathname } from '@/i18n/navigation';
 import { Flame } from 'lucide-react';
 import { categories } from '@/lib/categories';
+import React, { useState, useEffect } from 'react';
 
 export default function CategoryBar() {
   const t = useTranslations('categoryBar');
   const locale = useLocale();
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
+
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    if (!isHomePage) return;
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isHomePage]);
+
+  const showCategoryBar = !isHomePage || scrollY > 800;
 
   return (
-    <div
-      style={{
+    <>
+      <div
+        style={{
         position: 'fixed',
         top: '56px',
         left: 0,
@@ -19,6 +37,10 @@ export default function CategoryBar() {
         zIndex: 999,
         background: 'var(--bg-primary)',
         borderBottom: '1px solid var(--border)',
+        transform: showCategoryBar ? 'translateY(0)' : 'translateY(-100%)',
+        opacity: showCategoryBar ? 1 : 0,
+        pointerEvents: showCategoryBar ? 'auto' : 'none',
+        transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
       }}
     >
       <div
@@ -108,6 +130,8 @@ export default function CategoryBar() {
       <style>{`
         .category-bar-scroll::-webkit-scrollbar { display: none; }
       `}</style>
-    </div>
+      </div>
+      {!isHomePage && <div style={{ height: '44px', flexShrink: 0 }} />}
+    </>
   );
 }

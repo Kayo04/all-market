@@ -18,6 +18,19 @@ export default function Navbar() {
   const { data: session } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const isHomePage = pathname === '/';
+  const showSearch = !isHomePage || scrollY > 300;
 
 
   const switchLocale = () => {
@@ -35,7 +48,8 @@ export default function Navbar() {
   const isLoggedIn = !!session?.user;
 
   return (
-    <header
+    <>
+      <header
       style={{
         position: 'fixed',
         top: 0,
@@ -87,7 +101,10 @@ export default function Navbar() {
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border)',
             overflow: 'hidden',
-            transition: 'border-color var(--transition-fast)',
+            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            opacity: showSearch ? 1 : 0,
+            pointerEvents: showSearch ? 'auto' : 'none',
+            transform: showSearch ? 'translateY(0)' : 'translateY(10px)',
           }}
           className="desktop-search"
           onFocus={(e) => {
@@ -419,5 +436,7 @@ export default function Navbar() {
         }
       `}</style>
     </header>
+      <div style={{ height: '56px', flexShrink: 0 }} />
+    </>
   );
 }

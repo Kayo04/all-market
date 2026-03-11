@@ -37,7 +37,7 @@ export default async function LocaleLayout({ children, params }: Props) {
               <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
                 <Navbar />
                 <CategoryBar />
-                <main style={{ flex: 1, paddingTop: '100px' }}>
+                <main style={{ flex: 1 }}>
                   {children}
                 </main>
                 <Footer />
