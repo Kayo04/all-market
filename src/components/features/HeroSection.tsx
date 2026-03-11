@@ -253,30 +253,7 @@ export default function HeroSection() {
         </div>
       </div>
 
-      {/* Video indicator dots */}
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '20px',
-          right: '24px',
-          zIndex: 3,
-          display: 'flex',
-          gap: '6px',
-        }}
-      >
-        {VIDEOS.map((_, i) => (
-          <div
-            key={i}
-            style={{
-              width: '6px',
-              height: '6px',
-              borderRadius: '50%',
-              background: i === currentIndex ? 'white' : 'rgba(255,255,255,0.35)',
-              transition: 'background 0.3s',
-            }}
-          />
-        ))}
-      </div>
+
     </section>
   );
 }
