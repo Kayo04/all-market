@@ -17,7 +17,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    const saved = localStorage.getItem('allmarket-theme') as Theme | null;
+    const saved = localStorage.getItem('needer-theme') as Theme | null;
     if (saved) {
       setTheme(saved);
       document.documentElement.setAttribute('data-theme', saved);
@@ -29,7 +29,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark';
     setTheme(next);
-    localStorage.setItem('allmarket-theme', next);
+    localStorage.setItem('needer-theme', next);
     document.documentElement.setAttribute('data-theme', next);
   };
 

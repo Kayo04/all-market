@@ -36,7 +36,7 @@ export default function Footer() {
               letterSpacing: '-0.02em',
             }}
           >
-            <span style={{ color: 'var(--accent)' }}>All</span>Market
+            <span style={{ color: 'var(--accent)' }}>NEED</span>ER
           </div>
           <p style={{ fontSize: '13px', color: 'var(--text-tertiary)', lineHeight: 1.6 }}>
             {t('tagline')}
@@ -82,7 +82,7 @@ export default function Footer() {
           color: 'var(--text-tertiary)',
         }}
       >
-        © {new Date().getFullYear()} AllMarket. {t('rights')}
+        © {new Date().getFullYear()} NEEDER. {t('rights')}
       </div>
     </footer>
   );

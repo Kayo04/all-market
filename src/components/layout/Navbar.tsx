@@ -86,8 +86,8 @@ export default function Navbar() {
             flexShrink: 0,
           }}
         >
-          <span style={{ color: 'var(--accent)' }}>All</span>
-          <span style={{ marginLeft: '1px' }}>Market</span>
+          <span style={{ color: 'var(--accent)' }}>NEED</span>
+          <span style={{ marginLeft: '1px' }}>ER</span>
         </Link>
 
         {/* Search Bar (desktop) */}
