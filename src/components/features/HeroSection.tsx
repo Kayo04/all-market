@@ -76,10 +76,11 @@ export default function HeroSection() {
       className="hero-section-container"
       style={{
         position: 'relative',
-        height: 'clamp(380px, 50vh, 500px)',
+        minHeight: '650px',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
+        padding: '120px 0',
       }}
     >
       {/* Video Layer A */}
@@ -148,7 +149,7 @@ export default function HeroSection() {
             className="hero-headline"
             style={{
               fontFamily: 'var(--font-sans)',
-              fontSize: 'clamp(40px, 6vw, 64px)',
+              fontSize: 'clamp(36px, 5vw, 56px)',
               fontWeight: 400,
               lineHeight: 1.1,
               marginBottom: '32px',
@@ -340,8 +341,8 @@ export default function HeroSection() {
           .hero-overlay { display: none !important; }
           .hero-section-container { 
             background: var(--accent-light) !important; 
-            height: auto !important;
-            padding: 64px 0 !important;
+            minHeight: auto !important;
+            padding: 80px 0 !important;
           }
           .hero-headline { 
             color: var(--text-primary) !important; 
