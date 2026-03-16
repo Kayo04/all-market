@@ -17,7 +17,7 @@ export default function Footer() {
     >
       <div
         style={{
-          maxWidth: '1536px',
+          maxWidth: '1280px',
           margin: '0 auto',
           display: 'flex',
           justifyContent: 'space-between',
@@ -74,7 +74,7 @@ export default function Footer() {
       {/* Copyright */}
       <div
         style={{
-          maxWidth: '1536px',
+          maxWidth: '1280px',
           margin: '32px auto 0',
           paddingTop: '16px',
           borderTop: '1px solid var(--border)',

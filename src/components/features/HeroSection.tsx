@@ -138,7 +138,7 @@ export default function HeroSection() {
           width: '100%',
         }}
       >
-        <div style={{ maxWidth: '850px' }}>
+        <div style={{ maxWidth: '850px', margin: '0 auto', textAlign: 'center' }}>
           {/* Headline */}
           <h1
             style={{
@@ -175,7 +175,7 @@ export default function HeroSection() {
               overflow: 'hidden',
               maxWidth: '100%',
               boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-              marginBottom: '20px',
+              margin: '0 auto 20px',
             }}
           >
             <input
@@ -214,6 +214,7 @@ export default function HeroSection() {
             style={{
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: '12px',
               flexWrap: 'wrap',
               marginBottom: '32px',
@@ -267,7 +268,7 @@ export default function HeroSection() {
           </div>
 
           {/* CTA Buttons */}
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <Link
               href="/requests/new"
               style={{

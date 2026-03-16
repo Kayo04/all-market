@@ -61,7 +61,7 @@ export default function RecentRequests() {
 
   if (loading) {
     return (
-      <section style={{ padding: '32px 24px 48px', maxWidth: '1536px', margin: '0 auto' }}>
+      <section style={{ padding: '32px 24px 48px', maxWidth: '1280px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <h2
             style={{
@@ -99,7 +99,7 @@ export default function RecentRequests() {
 
   if (requests.length === 0) {
     return (
-      <section style={{ padding: '32px 24px 48px', maxWidth: '1536px', margin: '0 auto' }}>
+      <section style={{ padding: '32px 24px 48px', maxWidth: '1280px', margin: '0 auto' }}>
         <h2
           style={{
             fontFamily: 'var(--font-display)',
@@ -107,6 +107,7 @@ export default function RecentRequests() {
             fontWeight: 700,
             letterSpacing: '-0.02em',
             marginBottom: '24px',
+            textAlign: 'center',
           }}
         >
           {t('title')}
@@ -128,14 +129,16 @@ export default function RecentRequests() {
   }
 
   return (
-    <section style={{ padding: '32px 24px 48px', maxWidth: '1536px', margin: '0 auto' }}>
+    <section style={{ padding: '32px 24px 48px', maxWidth: '1280px', margin: '0 auto' }}>
       {/* Header */}
       <div
         style={{
           display: 'flex',
-          justifyContent: 'space-between',
+          flexDirection: 'column',
           alignItems: 'center',
+          gap: '12px',
           marginBottom: '24px',
+          textAlign: 'center',
         }}
       >
         <h2

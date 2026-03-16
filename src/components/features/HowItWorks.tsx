@@ -16,7 +16,7 @@ export default function HowItWorks() {
     <section
       style={{
         padding: '80px 24px',
-        maxWidth: '1536px',
+        maxWidth: '1280px',
         margin: '0 auto',
       }}
     >
@@ -27,7 +27,7 @@ export default function HowItWorks() {
           fontWeight: 700,
           marginBottom: '48px',
           letterSpacing: '-0.02em',
-          textAlign: 'left',
+          textAlign: 'center',
         }}
       >
         {t('title')}

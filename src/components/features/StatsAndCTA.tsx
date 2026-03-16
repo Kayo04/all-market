@@ -27,16 +27,16 @@ export default function StatsAndCTA() {
       >
         <div
           style={{
-            maxWidth: '1536px',
+            maxWidth: '1280px',
             margin: '0 auto',
             display: 'flex',
-            justifyContent: 'flex-start',
+            justifyContent: 'center',
             flexWrap: 'wrap',
             gap: '48px',
           }}
         >
           {stats.map((stat) => (
-            <div key={stat.key} style={{ textAlign: 'left', flex: '0 1 auto' }}>
+            <div key={stat.key} style={{ textAlign: 'center', flex: '0 1 auto' }}>
               <div
                 style={{
                   fontFamily: 'var(--font-display)',
@@ -58,7 +58,7 @@ export default function StatsAndCTA() {
 
       {/* CTA */}
       <section style={{ padding: '80px 24px' }}>
-        <div style={{ maxWidth: '1536px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1280px', margin: '0 auto', textAlign: 'center' }}>
           <h2
             style={{
               fontFamily: 'var(--font-display)',
@@ -85,7 +85,7 @@ export default function StatsAndCTA() {
             style={{
               display: 'flex',
               gap: '12px',
-              justifyContent: 'flex-start',
+              justifyContent: 'center',
               flexWrap: 'wrap',
             }}
           >

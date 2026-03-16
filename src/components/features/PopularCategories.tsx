@@ -40,15 +40,17 @@ export default function PopularCategories() {
   };
 
   return (
-    <section style={{ padding: '48px 0 32px', maxWidth: '1536px', margin: '0 auto' }}>
+    <section style={{ padding: '48px 0 32px', maxWidth: '1280px', margin: '0 auto' }}>
       {/* Header */}
       <div
         style={{
           display: 'flex',
-          justifyContent: 'space-between',
+          flexDirection: 'column',
           alignItems: 'center',
+          gap: '16px',
           padding: '0 24px',
           marginBottom: '24px',
+          textAlign: 'center',
         }}
       >
         <h2
