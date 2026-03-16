@@ -34,6 +34,7 @@ export default function Footer() {
               fontSize: '16px',
               marginBottom: '8px',
               letterSpacing: '-0.02em',
+              color: '#404145',
             }}
           >
             <span>needer</span>

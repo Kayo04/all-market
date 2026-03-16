@@ -82,7 +82,7 @@ export default function Navbar() {
             fontFamily: 'var(--font-display)',
             fontWeight: 700,
             fontSize: '18px',
-            color: 'var(--text-primary)',
+            color: '#404145',
             letterSpacing: '-0.02em',
             flexShrink: 0,
           }}
