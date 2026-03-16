@@ -7,21 +7,21 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { categories } from '@/lib/categories';
 
 const categoryColors: Record<string, { bg: string; text: string }> = {
-  'home-repairs': { bg: '#fef3c7', text: '#92400e' },
-  'tech-digital': { bg: '#dbeafe', text: '#1e40af' },
-  tutoring: { bg: '#d1fae5', text: '#065f46' },
-  events: { bg: '#fce7f3', text: '#9d174d' },
-  wellness: { bg: '#ede9fe', text: '#5b21b6' },
-  equipment: { bg: '#fee2e2', text: '#991b1b' },
+  'home-repairs': { bg: '#00391b', text: '#ffffff' },
+  'tech-digital': { bg: '#00391b', text: '#ffffff' },
+  tutoring: { bg: '#00391b', text: '#ffffff' },
+  events: { bg: '#00391b', text: '#ffffff' },
+  wellness: { bg: '#00391b', text: '#ffffff' },
+  equipment: { bg: '#00391b', text: '#ffffff' },
 };
 
 const categoryColorsDark: Record<string, { bg: string; text: string }> = {
-  'home-repairs': { bg: '#78350f', text: '#fef3c7' },
-  'tech-digital': { bg: '#1e3a5f', text: '#bfdbfe' },
-  tutoring: { bg: '#064e3b', text: '#a7f3d0' },
-  events: { bg: '#831843', text: '#fbcfe8' },
-  wellness: { bg: '#4c1d95', text: '#ddd6fe' },
-  equipment: { bg: '#7f1d1d', text: '#fecaca' },
+  'home-repairs': { bg: '#00391b', text: '#ffffff' },
+  'tech-digital': { bg: '#00391b', text: '#ffffff' },
+  tutoring: { bg: '#00391b', text: '#ffffff' },
+  events: { bg: '#00391b', text: '#ffffff' },
+  wellness: { bg: '#00391b', text: '#ffffff' },
+  equipment: { bg: '#00391b', text: '#ffffff' },
 };
 
 export default function PopularCategories() {
@@ -162,19 +162,23 @@ export default function PopularCategories() {
               <div style={{ flex: 1 }} />
               <div
                 style={{
-                  margin: '12px -20px -24px -20px',
                   height: '140px',
                   position: 'relative',
+                  padding: '16px',
+                  margin: '0 -20px -24px -20px',
+                  background: 'transparent',
                 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={`/categories/${cat.key.replace('_', '-')}.png`}
+                  src={`/categories/${cat.key.replace('_', '-')}-3d.png`}
                   alt={label}
                   style={{
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                   }}
                 />
               </div>

@@ -138,34 +138,33 @@ export default function HeroSection() {
           width: '100%',
         }}
       >
-        <div style={{ maxWidth: '620px' }}>
+        <div style={{ maxWidth: '850px' }}>
           {/* Headline */}
           <h1
             style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(36px, 6vw, 56px)',
-              fontWeight: 700,
+              fontFamily: 'var(--font-sans)',
+              fontSize: 'clamp(40px, 6vw, 64px)',
+              fontWeight: 400,
               lineHeight: 1.1,
-              marginBottom: '16px',
+              marginBottom: '32px',
               color: '#ffffff',
-              letterSpacing: '-0.03em',
+              letterSpacing: '-0.02em',
             }}
           >
-            {t('title')}
+            {locale === 'pt' ? (
+              <>
+                Os nossos profissionais <br />
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>estão prontos para ti</span>
+              </>
+            ) : (
+              <>
+                Our freelancers <br />
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>will take it from here</span>
+              </>
+            )}
           </h1>
 
-          {/* Subtitle */}
-          <p
-            style={{
-              fontSize: 'clamp(16px, 2vw, 20px)',
-              color: 'rgba(255,255,255,0.8)',
-              marginBottom: '28px',
-              lineHeight: 1.6,
-              maxWidth: '480px',
-            }}
-          >
-            {t('subtitle')}
-          </p>
+
 
           {/* Search Bar */}
           <form
@@ -174,7 +173,7 @@ export default function HeroSection() {
               display: 'flex',
               borderRadius: 'var(--radius-md)',
               overflow: 'hidden',
-              maxWidth: '520px',
+              maxWidth: '100%',
               boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
               marginBottom: '20px',
             }}
@@ -185,8 +184,8 @@ export default function HeroSection() {
               placeholder={t('searchPlaceholder')}
               style={{
                 flex: 1,
-                padding: '14px 18px',
-                fontSize: '14px',
+                padding: '16px 20px',
+                fontSize: '15px',
                 fontFamily: 'var(--font-sans)',
                 background: '#ffffff',
                 border: 'none',
@@ -197,7 +196,7 @@ export default function HeroSection() {
             <button
               type="submit"
               style={{
-                padding: '14px 20px',
+                padding: '16px 24px',
                 background: '#1a1a1a',
                 border: 'none',
                 color: 'white',
@@ -206,7 +205,7 @@ export default function HeroSection() {
                 alignItems: 'center',
               }}
             >
-              <Search size={16} />
+              <Search size={20} />
             </button>
           </form>
 
@@ -224,10 +223,10 @@ export default function HeroSection() {
               style={{
                 fontSize: '14px',
                 fontWeight: 600,
-                color: 'rgba(255,255,255,0.7)',
+                color: 'rgba(255,255,255,0.9)',
               }}
             >
-              {locale === 'pt' ? 'Sugestões:' : 'Popular:'}
+              {locale === 'pt' ? 'Popular:' : 'Popular:'}
             </span>
             {(locale === 'pt'
               ? ['Criação de Websites', 'Remodelações', 'Gestão de Redes Sociais', 'Fotografia']
@@ -240,27 +239,29 @@ export default function HeroSection() {
                   router.push(`/requests?q=${encodeURIComponent(sug)}`);
                 }}
                 style={{
-                  padding: '6px 14px',
+                  padding: '8px 16px',
                   background: 'transparent',
-                  border: '1px solid rgba(255,255,255,0.3)',
+                  border: '1px solid rgba(255,255,255,0.8)',
                   borderRadius: 'var(--radius-full)',
                   color: 'white',
-                  fontSize: '13px',
+                  fontSize: '14px',
                   fontWeight: 500,
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease',
+                  transition: 'background 0.2s ease',
                   whiteSpace: 'nowrap',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)';
-                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.6)';
+                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.2)';
                 }}
                 onMouseLeave={(e) => {
                   (e.currentTarget as HTMLElement).style.background = 'transparent';
-                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.3)';
                 }}
               >
                 {sug}
+                <ArrowRight size={14} />
               </button>
             ))}
           </div>
