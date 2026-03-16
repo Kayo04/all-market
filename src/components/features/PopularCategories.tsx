@@ -40,7 +40,7 @@ export default function PopularCategories() {
   };
 
   return (
-    <section style={{ padding: '48px 0 32px', maxWidth: '1280px', margin: '0 auto' }}>
+    <section style={{ padding: '48px 0 32px', maxWidth: '1536px', margin: '0 auto' }}>
       {/* Header */}
       <div
         style={{
@@ -54,7 +54,7 @@ export default function PopularCategories() {
         <h2
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: '24px',
+            fontSize: '36px',
             fontWeight: 700,
             letterSpacing: '-0.02em',
           }}

@@ -27,16 +27,16 @@ export default function StatsAndCTA() {
       >
         <div
           style={{
-            maxWidth: '800px',
+            maxWidth: '1536px',
             margin: '0 auto',
             display: 'flex',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-start',
             flexWrap: 'wrap',
-            gap: '24px',
+            gap: '48px',
           }}
         >
           {stats.map((stat) => (
-            <div key={stat.key} style={{ textAlign: 'center', flex: '1 1 120px' }}>
+            <div key={stat.key} style={{ textAlign: 'left', flex: '0 1 auto' }}>
               <div
                 style={{
                   fontFamily: 'var(--font-display)',
@@ -57,14 +57,14 @@ export default function StatsAndCTA() {
       </section>
 
       {/* CTA */}
-      <section style={{ padding: '80px 24px', textAlign: 'center' }}>
-        <div style={{ maxWidth: '480px', margin: '0 auto' }}>
+      <section style={{ padding: '80px 24px' }}>
+        <div style={{ maxWidth: '1536px', margin: '0 auto' }}>
           <h2
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(22px, 3vw, 28px)',
+              fontSize: '36px',
               fontWeight: 700,
-              marginBottom: '12px',
+              marginBottom: '16px',
               letterSpacing: '-0.02em',
             }}
           >
@@ -84,8 +84,8 @@ export default function StatsAndCTA() {
           <div
             style={{
               display: 'flex',
-              gap: '10px',
-              justifyContent: 'center',
+              gap: '12px',
+              justifyContent: 'flex-start',
               flexWrap: 'wrap',
             }}
           >

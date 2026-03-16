@@ -16,18 +16,18 @@ export default function HowItWorks() {
     <section
       style={{
         padding: '80px 24px',
-        maxWidth: '960px',
+        maxWidth: '1536px',
         margin: '0 auto',
       }}
     >
       <h2
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: 'clamp(22px, 3vw, 28px)',
+          fontSize: '36px',
           fontWeight: 700,
           marginBottom: '48px',
           letterSpacing: '-0.02em',
-          textAlign: 'center',
+          textAlign: 'left',
         }}
       >
         {t('title')}

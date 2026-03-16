@@ -131,7 +131,7 @@ export default function HeroSection() {
         style={{
           position: 'relative',
           zIndex: 3,
-          maxWidth: '1280px',
+          maxWidth: '1536px',
           margin: '0 auto',
           padding: '0 24px',
           width: '100%',
@@ -142,7 +142,7 @@ export default function HeroSection() {
           <h1
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(30px, 5vw, 48px)',
+              fontSize: 'clamp(36px, 6vw, 56px)',
               fontWeight: 700,
               lineHeight: 1.1,
               marginBottom: '16px',
@@ -156,7 +156,7 @@ export default function HeroSection() {
           {/* Subtitle */}
           <p
             style={{
-              fontSize: 'clamp(14px, 1.8vw, 17px)',
+              fontSize: 'clamp(16px, 2vw, 20px)',
               color: 'rgba(255,255,255,0.8)',
               marginBottom: '28px',
               lineHeight: 1.6,

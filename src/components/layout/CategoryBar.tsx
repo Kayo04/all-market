@@ -45,7 +45,7 @@ export default function CategoryBar() {
     >
       <div
         style={{
-          maxWidth: '1280px',
+          maxWidth: '1536px',
           margin: '0 auto',
           padding: '0 24px',
           display: 'flex',
