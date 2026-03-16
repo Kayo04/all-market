@@ -30,8 +30,8 @@ export default function Footer() {
           <div
             style={{
               fontFamily: 'var(--font-display)',
-              fontWeight: 700,
-              fontSize: '16px',
+              fontWeight: 800,
+              fontSize: '24px',
               marginBottom: '8px',
               letterSpacing: '-0.02em',
               color: '#404145',
