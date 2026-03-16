@@ -40,8 +40,9 @@ export default function PopularCategories() {
   };
 
   return (
-    <section style={{ padding: '48px 0 32px', maxWidth: '1280px', margin: '0 auto' }}>
-      {/* Header */}
+    <section style={{ padding: '48px 0 32px', width: '100%', overflow: 'hidden' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+        {/* Header */}
       <div
         style={{
           display: 'flex',
@@ -102,6 +103,7 @@ export default function PopularCategories() {
           </button>
         </div>
       </div>
+      </div>
 
       {/* Scrollable cards */}
       <div
@@ -111,7 +113,6 @@ export default function PopularCategories() {
           gap: '16px',
           overflowX: 'auto',
           scrollbarWidth: 'none',
-          padding: '0 24px 8px',
           scrollSnapType: 'x mandatory',
         }}
         className="popular-scroll"
@@ -190,6 +191,11 @@ export default function PopularCategories() {
       </div>
 
       <style>{`
+        .popular-scroll {
+          padding-left: calc(max(24px, (100% - 1280px) / 2));
+          padding-right: calc(max(24px, (100% - 1280px) / 2));
+          padding-bottom: 8px;
+        }
         .popular-scroll::-webkit-scrollbar { display: none; }
 
         [data-theme="light"] .popular-card-home-repairs { background: ${categoryColors['home-repairs'].bg}; color: ${categoryColors['home-repairs'].text}; }
