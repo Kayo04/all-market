@@ -97,7 +97,7 @@ export default function ProDashboard() {
         }}
       >
         {[
-          { icon: Send, label: t('proposalsSent'), value: '0', color: '#3b82f6' },
+          { icon: Send, label: t('proposalsSent'), value: '0', color: '#1dbf73' },
           { icon: TrendingUp, label: t('acceptanceRate'), value: '—', color: '#22c55e' },
           { icon: Target, label: t('activeLeads'), value: '0', color: '#f59e0b' },
         ].map((stat) => {
@@ -154,7 +154,7 @@ export default function ProDashboard() {
                 width: '48px',
                 height: '48px',
                 borderRadius: 'var(--radius-md)',
-                background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                background: 'linear-gradient(135deg, #1dbf73, #10b981)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -174,7 +174,7 @@ export default function ProDashboard() {
               </div>
             </div>
             <Link href="/dashboard/pro/verify" style={{ textDecoration: 'none' }}>
-              <Button size="sm" style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)' }}>
+              <Button size="sm" style={{ background: 'linear-gradient(135deg, #1dbf73, #10b981)' }}>
                 {locale === 'pt' ? 'Começar' : 'Get Started'}
               </Button>
             </Link>

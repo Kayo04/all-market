@@ -204,7 +204,7 @@ export default function VerifyPage() {
                 disabled={!form.businessName || !form.taxId}
                 style={{
                   marginTop: '8px',
-                  background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                  background: 'linear-gradient(135deg, #1dbf73, #10b981)',
                 }}
               >
                 {locale === 'pt' ? 'Submeter Verificação' : 'Submit Verification'}

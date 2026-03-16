@@ -24,7 +24,7 @@ const typeIcons: Record<string, typeof Bell> = {
 };
 
 const typeColors: Record<string, string> = {
-  new_proposal: '#3b82f6',
+  new_proposal: '#1dbf73',
   proposal_accepted: '#22c55e',
   proposal_rejected: '#ef4444',
   new_message: '#8b5cf6',
