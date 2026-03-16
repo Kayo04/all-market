@@ -36,7 +36,7 @@ export default function Footer() {
               letterSpacing: '-0.02em',
             }}
           >
-            <span style={{ color: 'var(--accent)' }}>NEED</span>ER
+            <span>needer</span>
           </div>
           <p style={{ fontSize: '13px', color: 'var(--text-tertiary)', lineHeight: 1.6 }}>
             {t('tagline')}

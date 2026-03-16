@@ -273,8 +273,8 @@ export default function HeroSection() {
               href="/requests/new"
               style={{
                 padding: '10px 20px',
-                background: 'var(--accent)',
-                color: 'white',
+                background: 'var(--text-primary)',
+                color: 'var(--bg-primary)',
                 borderRadius: 'var(--radius-md)',
                 fontWeight: 500,
                 fontSize: '14px',
@@ -282,7 +282,13 @@ export default function HeroSection() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                transition: 'background 0.15s',
+                transition: 'background 0.2s ease, opacity 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.opacity = '0.9';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.opacity = '1';
               }}
             >
               {t('cta')}
@@ -292,17 +298,25 @@ export default function HeroSection() {
               href="/auth/register"
               style={{
                 padding: '10px 20px',
-                background: 'rgba(255,255,255,0.15)',
-                color: 'white',
+                background: '#ffffff',
+                color: '#000000',
                 borderRadius: 'var(--radius-md)',
                 fontWeight: 500,
                 fontSize: '14px',
                 textDecoration: 'none',
-                border: '1px solid rgba(255,255,255,0.3)',
+                border: '1px solid #000000',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                backdropFilter: 'blur(4px)',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = '#000000';
+                (e.currentTarget as HTMLElement).style.color = '#ffffff';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = '#ffffff';
+                (e.currentTarget as HTMLElement).style.color = '#000000';
               }}
             >
               {t('ctaPro')}

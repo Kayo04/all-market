@@ -93,8 +93,8 @@ export default function StatsAndCTA() {
               href="/requests/new"
               style={{
                 padding: '10px 20px',
-                background: 'var(--accent)',
-                color: 'white',
+                background: 'var(--text-primary)',
+                color: 'var(--bg-primary)',
                 borderRadius: 'var(--radius-md)',
                 fontWeight: 500,
                 fontSize: '14px',
@@ -102,6 +102,13 @@ export default function StatsAndCTA() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
+                transition: 'background 0.2s ease, opacity 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.opacity = '0.9';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.opacity = '1';
               }}
             >
               {tc('clientBtn')}
@@ -111,12 +118,25 @@ export default function StatsAndCTA() {
               href="/auth/register"
               style={{
                 padding: '10px 20px',
-                border: '1px solid var(--border)',
-                color: 'var(--text-secondary)',
+                background: '#ffffff',
+                color: '#000000',
                 borderRadius: 'var(--radius-md)',
                 fontWeight: 500,
                 fontSize: '14px',
                 textDecoration: 'none',
+                border: '1px solid #000000',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.background = '#000000';
+                (e.currentTarget as HTMLElement).style.color = '#ffffff';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.background = '#ffffff';
+                (e.currentTarget as HTMLElement).style.color = '#000000';
               }}
             >
               {tc('proBtn')}

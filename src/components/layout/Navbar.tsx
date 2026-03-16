@@ -87,8 +87,7 @@ export default function Navbar() {
             flexShrink: 0,
           }}
         >
-          <span style={{ color: 'var(--accent)' }}>NEED</span>
-          <span style={{ marginLeft: '1px' }}>ER</span>
+          <span>needer</span>
         </Link>
 
         {/* Search Bar (desktop) */}
@@ -147,9 +146,9 @@ export default function Navbar() {
             type="submit"
             style={{
               padding: '8px 14px',
-              background: 'var(--accent)',
+              background: 'var(--text-primary)',
+              color: 'var(--bg-primary)',
               border: 'none',
-              color: 'white',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -289,11 +288,20 @@ export default function Navbar() {
                   padding: '6px 12px',
                   fontSize: '13px',
                   fontWeight: 500,
-                  color: 'white',
-                  background: 'var(--accent)',
+                  color: '#000000',
+                  background: '#ffffff',
+                  border: '1px solid #000000',
                   borderRadius: 'var(--radius-md)',
                   textDecoration: 'none',
-                  transition: 'background var(--transition-fast)',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = '#000000';
+                  (e.currentTarget as HTMLElement).style.color = '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = '#ffffff';
+                  (e.currentTarget as HTMLElement).style.color = '#000000';
                 }}
               >
                 {t('register')}
@@ -365,9 +373,9 @@ export default function Navbar() {
               type="submit"
               style={{
                 padding: '10px 14px',
-                background: 'var(--accent)',
+                background: 'var(--text-primary)',
                 border: 'none',
-                color: 'white',
+                color: 'var(--bg-primary)',
                 cursor: 'pointer',
               }}
             >
@@ -408,7 +416,7 @@ export default function Navbar() {
 
           {isLoggedIn ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', background: 'var(--accent)', color: 'white', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontSize: '14px', fontWeight: 500, textAlign: 'center' }}>
+              <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', background: 'var(--text-primary)', color: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontSize: '14px', fontWeight: 500, textAlign: 'center' }}>
                 {t('dashboard')}
               </Link>
               <button onClick={() => { signOut({ callbackUrl: '/' }); setIsMenuOpen(false); }} style={{ padding: '8px 14px', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-secondary)', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontSize: '14px', fontWeight: 500 }}>
@@ -420,7 +428,7 @@ export default function Navbar() {
               <Link href="/auth/login" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', textDecoration: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: 'var(--radius-md)', fontSize: '14px', fontWeight: 500, textAlign: 'center' }}>
                 {t('login')}
               </Link>
-              <Link href="/auth/register" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', background: 'var(--accent)', color: 'white', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontSize: '14px', fontWeight: 500, textAlign: 'center' }}>
+              <Link href="/auth/register" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', background: '#ffffff', color: '#000000', border: '1px solid #000000', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontSize: '14px', fontWeight: 500, textAlign: 'center', transition: 'all 0.2s ease' }}>
                 {t('register')}
               </Link>
             </div>

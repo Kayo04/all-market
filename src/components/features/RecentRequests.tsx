@@ -154,13 +154,7 @@ export default function RecentRequests() {
         <Link
           href="/requests"
           style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '4px',
-            fontSize: '13px',
-            fontWeight: 500,
-            color: 'var(--accent)',
-            textDecoration: 'none',
+            color: 'var(--text-primary)',
           }}
         >
           {t('viewAll')}
