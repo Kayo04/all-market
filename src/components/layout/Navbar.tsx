@@ -68,7 +68,8 @@ export default function Navbar() {
           height: '56px',
           display: 'flex',
           alignItems: 'center',
-          gap: '16px',
+          justifyContent: 'center',
+          gap: '32px',
         }}
       >
         {/* Logo */}
@@ -94,7 +95,7 @@ export default function Navbar() {
         <form
           onSubmit={handleSearch}
           style={{
-            flex: 1,
+            width: '100%',
             maxWidth: '480px',
             display: 'flex',
             alignItems: 'center',
@@ -163,8 +164,7 @@ export default function Navbar() {
           style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '4px',
-            marginLeft: 'auto',
+            gap: '8px',
           }}
           className="desktop-nav"
         >
