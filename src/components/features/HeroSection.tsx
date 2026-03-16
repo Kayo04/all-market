@@ -159,12 +159,12 @@ export default function HeroSection() {
           >
             {locale === 'pt' ? (
               <>
-                Encontra os serviços freelance perfeitos <br />
+                Encontra os profissionais perfeitos <br />
                 <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>para o teu negócio</span>
               </>
             ) : (
               <>
-                Find the perfect freelance services <br />
+                Find the perfect professionals <br />
                 <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>for your business</span>
               </>
             )}
