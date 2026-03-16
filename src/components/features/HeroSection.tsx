@@ -73,6 +73,7 @@ export default function HeroSection() {
 
   return (
     <section
+      className="hero-section-container"
       style={{
         position: 'relative',
         height: 'clamp(380px, 50vh, 500px)',
@@ -84,6 +85,7 @@ export default function HeroSection() {
       {/* Video Layer A */}
       <video
         ref={videoARef}
+        className="hero-video-layer"
         muted
         playsInline
         loop
@@ -102,6 +104,7 @@ export default function HeroSection() {
       {/* Video Layer B */}
       <video
         ref={videoBRef}
+        className="hero-video-layer"
         muted
         playsInline
         loop
@@ -119,6 +122,7 @@ export default function HeroSection() {
 
       {/* Dark Overlay */}
       <div
+        className="hero-overlay"
         style={{
           position: 'absolute',
           inset: 0,
@@ -141,6 +145,7 @@ export default function HeroSection() {
         <div style={{ maxWidth: '850px', margin: '0 auto', textAlign: 'center' }}>
           {/* Headline */}
           <h1
+            className="hero-headline"
             style={{
               fontFamily: 'var(--font-sans)',
               fontSize: 'clamp(40px, 6vw, 64px)',
@@ -221,6 +226,7 @@ export default function HeroSection() {
             }}
           >
             <span
+              className="hero-suggestion-label"
               style={{
                 fontSize: '14px',
                 fontWeight: 600,
@@ -235,6 +241,7 @@ export default function HeroSection() {
             ).map((sug) => (
               <button
                 key={sug}
+                className="hero-suggestion-btn"
                 onClick={() => {
                   setSearchQuery(sug);
                   router.push(`/requests?q=${encodeURIComponent(sug)}`);
@@ -268,9 +275,10 @@ export default function HeroSection() {
           </div>
 
           {/* CTA Buttons */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <div className="hero-cta-container" style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <Link
               href="/requests/new"
+              className="hero-cta-btn"
               style={{
                 padding: '10px 20px',
                 background: 'var(--text-primary)',
@@ -296,6 +304,7 @@ export default function HeroSection() {
             </Link>
             <Link
               href="/auth/register"
+              className="hero-cta-btn"
               style={{
                 padding: '10px 20px',
                 background: '#ffffff',
@@ -325,7 +334,30 @@ export default function HeroSection() {
         </div>
       </div>
 
-
+      <style>{`
+        @media (max-width: 768px) {
+          .hero-video-layer { display: none !important; }
+          .hero-overlay { display: none !important; }
+          .hero-section-container { 
+            background: var(--accent-light) !important; 
+            height: auto !important;
+            padding: 64px 0 !important;
+          }
+          .hero-headline { 
+            color: var(--text-primary) !important; 
+            font-size: clamp(32px, 8vw, 40px) !important; 
+          }
+          .hero-suggestion-label { color: var(--text-secondary) !important; }
+          .hero-suggestion-btn { 
+            color: var(--text-primary) !important; 
+            border-color: var(--border) !important; 
+            background: var(--bg-primary) !important;
+          }
+          .hero-suggestion-btn:hover { background: var(--bg-secondary) !important; }
+          .hero-cta-container { flex-direction: column !important; width: 100% !important; margin-top: 16px !important; }
+          .hero-cta-btn { width: 100% !important; justify-content: center !important; }
+        }
+      `}</style>
     </section>
   );
 }
