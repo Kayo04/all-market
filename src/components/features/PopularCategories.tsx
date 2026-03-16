@@ -138,6 +138,8 @@ export default function PopularCategories() {
                 flexDirection: 'column',
                 gap: '12px',
                 transition: 'transform var(--transition-fast)',
+                overflow: 'hidden',
+                position: 'relative',
               }}
               className={`popular-card popular-card-${cat.key}`}
               onMouseEnter={(e) => {
@@ -157,18 +159,24 @@ export default function PopularCategories() {
               >
                 {label}
               </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                {subLabels.map((sub) => (
-                  <span
-                    key={sub}
-                    style={{
-                      fontSize: '12px',
-                      opacity: 0.8,
-                    }}
-                  >
-                    {sub}
-                  </span>
-                ))}
+              <div style={{ flex: 1 }} />
+              <div
+                style={{
+                  margin: '12px -20px -24px -20px',
+                  height: '140px',
+                  position: 'relative',
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={`/categories/${cat.key.replace('_', '-')}.png`}
+                  alt={label}
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                  }}
+                />
               </div>
             </Link>
           );

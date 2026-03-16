@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { ArrowRight, Search } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -20,6 +20,7 @@ const CLIP_DURATION = 5000; // 5 seconds per clip
 
 export default function HeroSection() {
   const t = useTranslations('hero');
+  const locale = useLocale();
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [nextIndex, setNextIndex] = useState(1);
@@ -208,6 +209,61 @@ export default function HeroSection() {
               <Search size={16} />
             </button>
           </form>
+
+          {/* Suggestions */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              flexWrap: 'wrap',
+              marginBottom: '32px',
+            }}
+          >
+            <span
+              style={{
+                fontSize: '14px',
+                fontWeight: 600,
+                color: 'rgba(255,255,255,0.7)',
+              }}
+            >
+              {locale === 'pt' ? 'Sugestões:' : 'Popular:'}
+            </span>
+            {(locale === 'pt'
+              ? ['Criação de Websites', 'Remodelações', 'Gestão de Redes Sociais', 'Fotografia']
+              : ['Website Development', 'Home Remodeling', 'Social Media Management', 'Photography']
+            ).map((sug) => (
+              <button
+                key={sug}
+                onClick={() => {
+                  setSearchQuery(sug);
+                  router.push(`/requests?q=${encodeURIComponent(sug)}`);
+                }}
+                style={{
+                  padding: '6px 14px',
+                  background: 'transparent',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  borderRadius: 'var(--radius-full)',
+                  color: 'white',
+                  fontSize: '13px',
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  whiteSpace: 'nowrap',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.1)';
+                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.6)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.background = 'transparent';
+                  (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.3)';
+                }}
+              >
+                {sug}
+              </button>
+            ))}
+          </div>
 
           {/* CTA Buttons */}
           <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
