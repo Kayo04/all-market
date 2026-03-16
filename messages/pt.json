@@ -152,11 +152,36 @@
     },
     "footer": {
         "tagline": "O marketplace que trabalha por ti.",
-        "links": "Links Rápidos",
-        "legal": "Legal",
-        "privacy": "Política de Privacidade",
-        "terms": "Termos de Serviço",
-        "contact": "Contacto",
+        "colCategories": "Categorias",
+        "colClients": "Para Clientes",
+        "colPros": "Para Profissionais",
+        "colCompany": "Empresa",
+        "colSupport": "Suporte",
+        "clientLinks": {
+            "howItWorks": "Como Funciona o Needer",
+            "success": "Histórias de Sucesso",
+            "quality": "Guia de Qualidade",
+            "trust": "Confiança & Segurança"
+        },
+        "proLinks": {
+            "becomePro": "Torna-te um Profissional Needer",
+            "neederPro": "Needer Pro (Premium)",
+            "community": "Centro da Comunidade",
+            "resources": "Recursos para Vendedores"
+        },
+        "companyLinks": {
+            "about": "Sobre o Needer",
+            "news": "Notícias & Imprensa",
+            "careers": "Carreiras",
+            "partners": "Parcerias",
+            "investors": "Relações com Investidores"
+        },
+        "supportLinks": {
+            "help": "Centro de Ajuda",
+            "contact": "Contactar Suporte",
+            "terms": "Termos de Serviço",
+            "privacy": "Política de Privacidade"
+        },
         "rights": "Todos os direitos reservados."
     },
     "categoryBar": {
@@ -170,5 +195,29 @@
         "empty": "Sem pedidos ainda. Sê o primeiro a publicar!",
         "viewAll": "Ver Todos",
         "budget": "Orçamento"
+    },
+    "proSection": {
+        "title": "A solução freelance premium para empresas.",
+        "apply": "Candidatar Agora",
+        "feat1": {
+            "title": "Especialistas de contratação dedicados",
+            "desc": "Um gestor de conta pessoal para encontrar o talento certo para cada necessidade."
+        },
+        "feat2": {
+            "title": "Garantia de satisfação",
+            "desc": "Profissionais verificados garantindo entregas de alta qualidade ou devolvemos o dinheiro."
+        },
+        "feat3": {
+            "title": "Ferramentas avançadas de gestão",
+            "desc": "Acesso a um Painel Pro exclusivo para gerir fluxos de trabalho complexos e equipas."
+        },
+        "feat4": {
+            "title": "Modelos de pagamento flexíveis",
+            "desc": "Opções de tarifas por projeto ou à hora para colaboração a longo prazo."
+        }
+    },
+    "preFooter": {
+        "title": "Serviços freelance de classe mundial na ponta dos teus dedos.",
+        "cta": "Junta-te ao Needer"
     }
-}
+}

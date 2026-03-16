@@ -152,11 +152,36 @@
   },
   "footer": {
     "tagline": "The marketplace that works for you.",
-    "links": "Quick Links",
-    "legal": "Legal",
-    "privacy": "Privacy Policy",
-    "terms": "Terms of Service",
-    "contact": "Contact",
+    "colCategories": "Categories",
+    "colClients": "For Clients",
+    "colPros": "For Professionals",
+    "colCompany": "Company",
+    "colSupport": "Support",
+    "clientLinks": {
+      "howItWorks": "How Needer Works",
+      "success": "Success Stories",
+      "quality": "Quality Guide",
+      "trust": "Trust & Safety"
+    },
+    "proLinks": {
+      "becomePro": "Become a Needer Professional",
+      "neederPro": "Needer Pro (Premium)",
+      "community": "Community Hub",
+      "resources": "Seller Resources"
+    },
+    "companyLinks": {
+      "about": "About Needer",
+      "news": "News & Press",
+      "careers": "Careers",
+      "partners": "Partnerships",
+      "investors": "Investor Relations"
+    },
+    "supportLinks": {
+      "help": "Help Center",
+      "contact": "Contact Support",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy"
+    },
     "rights": "All rights reserved."
   },
   "categoryBar": {
@@ -170,5 +195,29 @@
     "empty": "No requests yet. Be the first to post!",
     "viewAll": "View All",
     "budget": "Budget"
+  },
+  "proSection": {
+    "title": "The premium freelance solution for businesses.",
+    "apply": "Apply Now",
+    "feat1": {
+      "title": "Dedicated hiring experts",
+      "desc": "A personal account manager to find the right talent for every need."
+    },
+    "feat2": {
+      "title": "Satisfaction guarantee",
+      "desc": "Vetted professionals ensuring high-quality deliveries or your money back."
+    },
+    "feat3": {
+      "title": "Advanced management tools",
+      "desc": "Access to an exclusive Pro Dashboard to manage complex workflows and teams."
+    },
+    "feat4": {
+      "title": "Flexible payment models",
+      "desc": "Options for project-based or hourly rates for long-term collaboration."
+    }
+  },
+  "preFooter": {
+    "title": "World-class freelance services at your fingertips.",
+    "cta": "Join Needer"
   }
-}
+}
