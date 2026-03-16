@@ -8,3 +8,4 @@ const nextConfig: NextConfig = {
 };
 
 export default withNextIntl(nextConfig);
+// Force cache invalidation
