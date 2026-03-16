@@ -137,17 +137,17 @@ export default function HeroSection() {
           width: '100%',
         }}
       >
-        <div style={{ maxWidth: '620px' }}>
+        <div style={{ maxWidth: '850px' }}>
           {/* Headline */}
           <h1
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(36px, 6vw, 56px)',
+              fontSize: 'clamp(48px, 8vw, 84px)',
               fontWeight: 700,
-              lineHeight: 1.1,
-              marginBottom: '16px',
+              lineHeight: 1.05,
+              marginBottom: '20px',
               color: '#ffffff',
-              letterSpacing: '-0.03em',
+              letterSpacing: '-0.04em',
             }}
           >
             {t('title')}
@@ -156,11 +156,11 @@ export default function HeroSection() {
           {/* Subtitle */}
           <p
             style={{
-              fontSize: 'clamp(16px, 2vw, 20px)',
-              color: 'rgba(255,255,255,0.8)',
-              marginBottom: '28px',
+              fontSize: 'clamp(18px, 2.5vw, 24px)',
+              color: 'rgba(255,255,255,0.9)',
+              marginBottom: '40px',
               lineHeight: 1.6,
-              maxWidth: '480px',
+              maxWidth: '600px',
             }}
           >
             {t('subtitle')}
@@ -173,9 +173,9 @@ export default function HeroSection() {
               display: 'flex',
               borderRadius: 'var(--radius-md)',
               overflow: 'hidden',
-              maxWidth: '520px',
-              boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-              marginBottom: '20px',
+              maxWidth: '100%',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+              marginBottom: '32px',
             }}
           >
             <input
@@ -184,8 +184,8 @@ export default function HeroSection() {
               placeholder={t('searchPlaceholder')}
               style={{
                 flex: 1,
-                padding: '14px 18px',
-                fontSize: '14px',
+                padding: '20px 24px',
+                fontSize: '18px',
                 fontFamily: 'var(--font-sans)',
                 background: '#ffffff',
                 border: 'none',
@@ -196,7 +196,7 @@ export default function HeroSection() {
             <button
               type="submit"
               style={{
-                padding: '14px 20px',
+                padding: '20px 36px',
                 background: '#1a1a1a',
                 border: 'none',
                 color: 'white',
@@ -205,7 +205,7 @@ export default function HeroSection() {
                 alignItems: 'center',
               }}
             >
-              <Search size={16} />
+              <Search size={22} />
             </button>
           </form>
 
@@ -214,12 +214,12 @@ export default function HeroSection() {
             <Link
               href="/requests/new"
               style={{
-                padding: '10px 20px',
+                padding: '12px 24px',
                 background: 'var(--accent)',
                 color: 'white',
                 borderRadius: 'var(--radius-md)',
-                fontWeight: 500,
-                fontSize: '14px',
+                fontWeight: 600,
+                fontSize: '15px',
                 textDecoration: 'none',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -233,12 +233,12 @@ export default function HeroSection() {
             <Link
               href="/auth/register"
               style={{
-                padding: '10px 20px',
+                padding: '12px 24px',
                 background: 'rgba(255,255,255,0.15)',
                 color: 'white',
                 borderRadius: 'var(--radius-md)',
-                fontWeight: 500,
-                fontSize: '14px',
+                fontWeight: 600,
+                fontSize: '15px',
                 textDecoration: 'none',
                 border: '1px solid rgba(255,255,255,0.3)',
                 display: 'inline-flex',
