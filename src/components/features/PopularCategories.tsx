@@ -1,241 +1,239 @@
 'use client';
 
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { useRef } from 'react';
+import { useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { categories } from '@/lib/categories';
 
-const categoryColors: Record<string, { bg: string; text: string }> = {
-  'home-repairs': { bg: '#00391b', text: '#ffffff' },
-  'tech-digital': { bg: '#00391b', text: '#ffffff' },
-  tutoring: { bg: '#00391b', text: '#ffffff' },
-  events: { bg: '#00391b', text: '#ffffff' },
-  wellness: { bg: '#00391b', text: '#ffffff' },
-  equipment: { bg: '#00391b', text: '#ffffff' },
-  business: { bg: '#00391b', text: '#ffffff' },
-  design: { bg: '#00391b', text: '#ffffff' },
-  writing: { bg: '#00391b', text: '#ffffff' },
-  cleaning: { bg: '#00391b', text: '#ffffff' },
-  automotive: { bg: '#00391b', text: '#ffffff' },
-  beauty: { bg: '#00391b', text: '#ffffff' },
-};
-
-const categoryColorsDark: Record<string, { bg: string; text: string }> = {
-  'home-repairs': { bg: '#00391b', text: '#ffffff' },
-  'tech-digital': { bg: '#00391b', text: '#ffffff' },
-  tutoring: { bg: '#00391b', text: '#ffffff' },
-  events: { bg: '#00391b', text: '#ffffff' },
-  wellness: { bg: '#00391b', text: '#ffffff' },
-  equipment: { bg: '#00391b', text: '#ffffff' },
-  business: { bg: '#00391b', text: '#ffffff' },
-  design: { bg: '#00391b', text: '#ffffff' },
-  writing: { bg: '#00391b', text: '#ffffff' },
-  cleaning: { bg: '#00391b', text: '#ffffff' },
-  automotive: { bg: '#00391b', text: '#ffffff' },
-  beauty: { bg: '#00391b', text: '#ffffff' },
+// Each category card gets a distinct background color to look vibrant
+const cardColors: Record<string, string> = {
+  'home-repairs':  '#1e3a2f',
+  'tech-digital':  '#1a2e4a',
+  tutoring:        '#2d1b4e',
+  events:          '#3a1a2e',
+  wellness:        '#1a3a2a',
+  equipment:       '#1a2a3a',
+  business:        '#2a1e00',
+  design:          '#1a3a3a',
+  writing:         '#3a2a1a',
+  cleaning:        '#1a3a20',
+  automotive:      '#2a2030',
+  beauty:          '#3a1a32',
 };
 
 export default function PopularCategories() {
-  const t = useTranslations('popular');
   const locale = useLocale();
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
 
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollRef.current) {
-      const amount = 300;
-      scrollRef.current.scrollBy({
-        left: direction === 'left' ? -amount : amount,
-        behavior: 'smooth',
-      });
-    }
+  // How many cards are visible at a time (responsive handled via CSS)
+  const CARDS_PER_PAGE = 5;
+  const [page, setPage] = useState(0);
+  const totalPages = Math.ceil(categories.length / CARDS_PER_PAGE);
+
+  const canPrev = page > 0;
+  const canNext = page < totalPages - 1;
+
+  const scroll = (dir: 'left' | 'right') => {
+    if (dir === 'left' && canPrev) setPage((p) => p - 1);
+    if (dir === 'right' && canNext) setPage((p) => p + 1);
   };
 
+  const offset = page * CARDS_PER_PAGE * (220 + 16); // card width + gap
+
   return (
-    <section style={{ padding: '48px 0 32px', width: '100%', overflow: 'hidden' }}>
-      <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
-        {/* Header */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: '16px',
-          padding: '0',
-          marginBottom: '24px',
-          textAlign: 'left',
-        }}
-      >
-        <h2
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '36px',
-            fontWeight: 700,
-            letterSpacing: '-0.02em',
-          }}
-        >
-          {t('title')}
+    <section className="popular-section">
+      {/* Header row */}
+      <div className="popular-header">
+        <h2 className="popular-title">
+          {locale === 'pt' ? 'Categorias Populares' : 'Popular Categories'}
         </h2>
-        <div style={{ display: 'flex', gap: '8px' }}>
+        <div className="popular-arrows">
           <button
+            className={`popular-arrow ${canPrev ? '' : 'popular-arrow--disabled'}`}
             onClick={() => scroll('left')}
-            style={{
-              width: '36px',
-              height: '36px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-full)',
-              background: 'var(--bg-card)',
-              cursor: 'pointer',
-              color: 'var(--text-secondary)',
-              transition: 'border-color var(--transition-fast)',
-            }}
+            aria-label="Previous"
+            disabled={!canPrev}
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={20} />
           </button>
           <button
+            className={`popular-arrow ${canNext ? '' : 'popular-arrow--disabled'}`}
             onClick={() => scroll('right')}
-            style={{
-              width: '36px',
-              height: '36px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-full)',
-              background: 'var(--bg-card)',
-              cursor: 'pointer',
-              color: 'var(--text-secondary)',
-              transition: 'border-color var(--transition-fast)',
-            }}
+            aria-label="Next"
+            disabled={!canNext}
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={20} />
           </button>
         </div>
       </div>
-      </div>
 
-      {/* Scrollable cards */}
-      <div
-        ref={scrollRef}
-        style={{
-          display: 'flex',
-          gap: '16px',
-          overflowX: 'auto',
-          scrollbarWidth: 'none',
-          scrollSnapType: 'x mandatory',
-        }}
-        className="popular-scroll"
-      >
-        {categories.map((cat) => {
-          const label = locale === 'pt' ? cat.labelPT : cat.labelEN;
-          const lightColors = categoryColors[cat.key] || { bg: '#f3f4f6', text: '#374151' };
-          const darkColors = categoryColorsDark[cat.key] || { bg: '#1f2937', text: '#e5e7eb' };
-          const subLabels = cat.subcategories
-            .slice(0, 3)
-            .map((s) => (locale === 'pt' ? s.labelPT : s.labelEN));
+      {/* Carousel viewport — clips overflow so only current page is visible */}
+      <div className="popular-viewport">
+        <div
+          ref={trackRef}
+          className="popular-track"
+          style={{ transform: `translateX(-${offset}px)` }}
+        >
+          {categories.map((cat) => {
+            const label = locale === 'pt' ? cat.labelPT : cat.labelEN;
+            const bg = cardColors[cat.key] || '#1a2a3a';
 
-          return (
-            <Link
-              key={cat.key}
-              href={`/requests?category=${cat.key}`}
-              style={{
-                minWidth: '220px',
-                maxWidth: '220px',
-                borderRadius: 'var(--radius-lg)',
-                padding: '24px 20px',
-                textDecoration: 'none',
-                scrollSnapAlign: 'start',
-                flexShrink: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '12px',
-                transition: 'transform var(--transition-fast)',
-                overflow: 'hidden',
-                position: 'relative',
-              }}
-              className={`popular-card popular-card-${cat.key}`}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-              }}
-            >
-              <h3
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '16px',
-                  fontWeight: 700,
-                  lineHeight: 1.3,
-                }}
+            return (
+              <Link
+                key={cat.key}
+                href={`/requests?category=${cat.key}`}
+                className="popular-card"
+                style={{ background: bg }}
               >
-                {label}
-              </h3>
-              <div style={{ flex: 1 }} />
-              <div
-                style={{
-                  height: '180px',
-                  position: 'relative',
-                  padding: '16px',
-                  margin: '0 -20px -24px -20px',
-                  background: 'transparent',
-                }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/categories/${cat.key.replace('_', '-')}-3d.png`}
-                  alt={label}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                  }}
-                />
-              </div>
-            </Link>
-          );
-        })}
+                {/* Title at top */}
+                <h3 className="popular-card-title">{label}</h3>
+
+                {/* Image at bottom */}
+                <div className="popular-card-image-wrap">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`/categories/${cat.key}-3d.png`}
+                    alt={label}
+                    className="popular-card-image"
+                  />
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       <style>{`
-        .popular-scroll {
-          padding-left: calc(max(0px, (100% - 1440px) / 2));
-          padding-right: calc(max(0px, (100% - 1440px) / 2));
-          padding-bottom: 8px;
+        .popular-section {
+          padding: 48px 0 40px;
+          width: 100%;
+          overflow: hidden;
         }
-        .popular-scroll::-webkit-scrollbar { display: none; }
 
-        [data-theme="light"] .popular-card-home-repairs { background: ${categoryColors['home-repairs'].bg}; color: ${categoryColors['home-repairs'].text}; }
-        [data-theme="light"] .popular-card-tech-digital { background: ${categoryColors['tech-digital'].bg}; color: ${categoryColors['tech-digital'].text}; }
-        [data-theme="light"] .popular-card-tutoring { background: ${categoryColors.tutoring.bg}; color: ${categoryColors.tutoring.text}; }
-        [data-theme="light"] .popular-card-events { background: ${categoryColors.events.bg}; color: ${categoryColors.events.text}; }
-        [data-theme="light"] .popular-card-wellness { background: ${categoryColors.wellness.bg}; color: ${categoryColors.wellness.text}; }
-        [data-theme="light"] .popular-card-equipment { background: ${categoryColors.equipment.bg}; color: ${categoryColors.equipment.text}; }
-        [data-theme="light"] .popular-card-business { background: ${categoryColors.business.bg}; color: ${categoryColors.business.text}; }
-        [data-theme="light"] .popular-card-design { background: ${categoryColors.design.bg}; color: ${categoryColors.design.text}; }
-        [data-theme="light"] .popular-card-writing { background: ${categoryColors.writing.bg}; color: ${categoryColors.writing.text}; }
-        [data-theme="light"] .popular-card-cleaning { background: ${categoryColors.cleaning.bg}; color: ${categoryColors.cleaning.text}; }
-        [data-theme="light"] .popular-card-automotive { background: ${categoryColors.automotive.bg}; color: ${categoryColors.automotive.text}; }
-        [data-theme="light"] .popular-card-beauty { background: ${categoryColors.beauty.bg}; color: ${categoryColors.beauty.text}; }
+        .popular-header {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 0 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 24px;
+        }
 
-        [data-theme="dark"] .popular-card-home-repairs { background: ${categoryColorsDark['home-repairs'].bg}; color: ${categoryColorsDark['home-repairs'].text}; }
-        [data-theme="dark"] .popular-card-tech-digital { background: ${categoryColorsDark['tech-digital'].bg}; color: ${categoryColorsDark['tech-digital'].text}; }
-        [data-theme="dark"] .popular-card-tutoring { background: ${categoryColorsDark.tutoring.bg}; color: ${categoryColorsDark.tutoring.text}; }
-        [data-theme="dark"] .popular-card-events { background: ${categoryColorsDark.events.bg}; color: ${categoryColorsDark.events.text}; }
-        [data-theme="dark"] .popular-card-wellness { background: ${categoryColorsDark.wellness.bg}; color: ${categoryColorsDark.wellness.text}; }
-        [data-theme="dark"] .popular-card-equipment { background: ${categoryColorsDark.equipment.bg}; color: ${categoryColorsDark.equipment.text}; }
-        [data-theme="dark"] .popular-card-business { background: ${categoryColorsDark.business.bg}; color: ${categoryColorsDark.business.text}; }
-        [data-theme="dark"] .popular-card-design { background: ${categoryColorsDark.design.bg}; color: ${categoryColorsDark.design.text}; }
-        [data-theme="dark"] .popular-card-writing { background: ${categoryColorsDark.writing.bg}; color: ${categoryColorsDark.writing.text}; }
-        [data-theme="dark"] .popular-card-cleaning { background: ${categoryColorsDark.cleaning.bg}; color: ${categoryColorsDark.cleaning.text}; }
-        [data-theme="dark"] .popular-card-automotive { background: ${categoryColorsDark.automotive.bg}; color: ${categoryColorsDark.automotive.text}; }
-        [data-theme="dark"] .popular-card-beauty { background: ${categoryColorsDark.beauty.bg}; color: ${categoryColorsDark.beauty.text}; }
+        .popular-title {
+          font-size: 28px;
+          font-weight: 700;
+          font-family: var(--font-display);
+          letter-spacing: -0.02em;
+          color: var(--text-primary);
+        }
+
+        .popular-arrows {
+          display: flex;
+          gap: 8px;
+        }
+
+        .popular-arrow {
+          width: 38px;
+          height: 38px;
+          border-radius: 50%;
+          border: 1.5px solid var(--border);
+          background: var(--bg-primary);
+          color: var(--text-primary);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: background 0.2s, border-color 0.2s;
+        }
+        .popular-arrow:hover {
+          background: var(--bg-secondary);
+          border-color: var(--text-secondary);
+        }
+        .popular-arrow--disabled {
+          opacity: 0.35;
+          cursor: default;
+          pointer-events: none;
+        }
+
+        /* Clip: only the visible page shows */
+        .popular-viewport {
+          max-width: 1440px;
+          margin: 0 auto;
+          padding: 0 24px;
+          overflow: hidden;
+        }
+
+        /* Sliding track */
+        .popular-track {
+          display: flex;
+          gap: 16px;
+          transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+          will-change: transform;
+        }
+
+        /* Individual card */
+        .popular-card {
+          min-width: 220px;
+          max-width: 220px;
+          height: 260px;
+          border-radius: 16px;
+          padding: 20px 18px 0;
+          text-decoration: none;
+          display: flex;
+          flex-direction: column;
+          flex-shrink: 0;
+          position: relative;
+          overflow: hidden;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .popular-card:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 12px 28px rgba(0,0,0,0.22);
+        }
+
+        .popular-card-title {
+          font-family: var(--font-sans);
+          font-size: 15px;
+          font-weight: 700;
+          color: #ffffff;
+          line-height: 1.3;
+          margin-bottom: auto;
+          flex-shrink: 0;
+        }
+
+        .popular-card-image-wrap {
+          flex: 1;
+          display: flex;
+          align-items: flex-end;
+          justify-content: flex-end;
+          padding-bottom: 0;
+          margin: 8px -18px 0;
+          overflow: hidden;
+        }
+
+        .popular-card-image {
+          width: 100%;
+          height: 180px;
+          object-fit: cover;
+          border-radius: 0 0 16px 16px;
+        }
+
+        @media (max-width: 768px) {
+          .popular-viewport {
+            padding: 0 16px;
+            overflow-x: auto;
+            scrollbar-width: none;
+          }
+          .popular-track {
+            transform: none !important;
+            transition: none;
+          }
+          .popular-arrows {
+            display: none;
+          }
+        }
       `}</style>
     </section>
   );
