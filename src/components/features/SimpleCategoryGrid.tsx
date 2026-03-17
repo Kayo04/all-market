@@ -33,7 +33,7 @@ export default function SimpleCategoryGrid() {
 
   return (
     <section style={{ padding: '40px 0 16px', width: '100%', overflow: 'hidden' }}>
-      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
         <div
           ref={scrollRef}
           style={{
@@ -42,7 +42,7 @@ export default function SimpleCategoryGrid() {
             overflowX: 'auto',
             scrollbarWidth: 'none',
             scrollSnapType: 'x mandatory',
-            padding: '0 24px',
+            paddingBottom: '8px',
           }}
           className="simple-category-scroll"
         >
@@ -100,6 +100,10 @@ export default function SimpleCategoryGrid() {
         </div>
       </div>
       <style>{`
+        .simple-category-scroll {
+          padding-left: calc(max(0px, (100% - 1440px) / 2));
+          padding-right: calc(max(0px, (100% - 1440px) / 2));
+        }
         .simple-category-scroll::-webkit-scrollbar { display: none; }
       `}</style>
     </section>

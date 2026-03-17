@@ -137,9 +137,9 @@ export default function HeroSection() {
         style={{
           position: 'relative',
           zIndex: 3,
-          maxWidth: '1280px',
+          maxWidth: '1440px',
           margin: '0 auto',
-          padding: '0 24px',
+          padding: '0',
           width: '100%',
         }}
       >

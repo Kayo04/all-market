@@ -53,7 +53,7 @@ export default function PopularCategories() {
 
   return (
     <section style={{ padding: '48px 0 32px', width: '100%', overflow: 'hidden' }}>
-      <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
         {/* Header */}
       <div
         style={{
@@ -62,7 +62,7 @@ export default function PopularCategories() {
           justifyContent: 'space-between',
           alignItems: 'center',
           gap: '16px',
-          padding: '0 24px',
+          padding: '0',
           marginBottom: '24px',
           textAlign: 'left',
         }}
@@ -205,8 +205,8 @@ export default function PopularCategories() {
 
       <style>{`
         .popular-scroll {
-          padding-left: calc(max(24px, (100% - 1280px) / 2));
-          padding-right: calc(max(24px, (100% - 1280px) / 2));
+          padding-left: calc(max(0px, (100% - 1440px) / 2));
+          padding-right: calc(max(0px, (100% - 1440px) / 2));
           padding-bottom: 8px;
         }
         .popular-scroll::-webkit-scrollbar { display: none; }
