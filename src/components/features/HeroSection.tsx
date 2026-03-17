@@ -137,13 +137,13 @@ export default function HeroSection() {
         style={{
           position: 'relative',
           zIndex: 3,
-          maxWidth: '1536px',
+          maxWidth: '1280px',
           margin: '0 auto',
           padding: '0 24px',
           width: '100%',
         }}
       >
-        <div style={{ maxWidth: '850px', margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ maxWidth: '800px', margin: '0', textAlign: 'left' }}>
           {/* Headline */}
           <h1
             className="hero-headline"
@@ -179,9 +179,10 @@ export default function HeroSection() {
               display: 'flex',
               borderRadius: 'var(--radius-md)',
               overflow: 'hidden',
+              width: '100%',
               maxWidth: '100%',
               boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-              margin: '0 auto 20px',
+              margin: '0 0 20px 0',
             }}
           >
             <input
@@ -220,7 +221,7 @@ export default function HeroSection() {
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'flex-start',
               gap: '12px',
               flexWrap: 'wrap',
               marginBottom: '32px',
@@ -276,7 +277,7 @@ export default function HeroSection() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="hero-cta-container" style={{ display: 'flex', justifyContent: 'center', gap: '10px', flexWrap: 'wrap' }}>
+          <div className="hero-cta-container" style={{ display: 'flex', justifyContent: 'flex-start', gap: '10px', flexWrap: 'wrap' }}>
             <Link
               href="/requests/new"
               className="hero-cta-btn"

@@ -58,12 +58,13 @@ export default function PopularCategories() {
       <div
         style={{
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
           alignItems: 'center',
           gap: '16px',
           padding: '0 24px',
           marginBottom: '24px',
-          textAlign: 'center',
+          textAlign: 'left',
         }}
       >
         <h2
@@ -177,7 +178,7 @@ export default function PopularCategories() {
               <div style={{ flex: 1 }} />
               <div
                 style={{
-                  height: '140px',
+                  height: '180px',
                   position: 'relative',
                   padding: '16px',
                   margin: '0 -20px -24px -20px',
