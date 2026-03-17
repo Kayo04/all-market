@@ -30,9 +30,9 @@ export default function NeederPro() {
             color: '#404145',
             marginBottom: '40px'
           }}>
-            {t('title').replace('premium', '')}
+            {t('title').split('premium')[0]}
             <span style={{ color: '#1dbf73' }}>premium</span> 
-            {t('title').includes('freelance') ? ' freelance solution for businesses' : ' solução freelance para empresas'}
+            {t('title').split('premium')[1] || t('title').split('pt/premium')[1]} {/* Fallback just in case */}
           </h2>
         </div>
 

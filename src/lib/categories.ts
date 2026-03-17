@@ -70,6 +70,66 @@ export const categories: Category[] = [
             { key: 'laptops', labelEN: 'Laptops', labelPT: 'Portáteis' },
         ],
     },
+    {
+        key: 'business',
+        icon: 'Briefcase',
+        labelEN: 'Business & Consulting',
+        labelPT: 'Negócios e Consultoria',
+        subcategories: [
+            { key: 'accounting', labelEN: 'Accounting', labelPT: 'Contabilidade' },
+            { key: 'legal', labelEN: 'Legal Services', labelPT: 'Serviços Jurídicos' }
+        ],
+    },
+    {
+        key: 'design',
+        icon: 'Palette',
+        labelEN: 'Design & Creative',
+        labelPT: 'Design e Criatividade',
+        subcategories: [
+            { key: 'logo', labelEN: 'Logo Design', labelPT: 'Design de Logótipos' },
+            { key: 'illustration', labelEN: 'Illustration', labelPT: 'Ilustração' }
+        ],
+    },
+    {
+        key: 'writing',
+        icon: 'PenTool',
+        labelEN: 'Writing & Translation',
+        labelPT: 'Escrita e Tradução',
+        subcategories: [
+            { key: 'copywriting', labelEN: 'Copywriting', labelPT: 'Copywriting' },
+            { key: 'translation', labelEN: 'Translation', labelPT: 'Tradução' }
+        ],
+    },
+    {
+        key: 'cleaning',
+        icon: 'Sparkles',
+        labelEN: 'Cleaning Services',
+        labelPT: 'Serviços de Limpeza',
+        subcategories: [
+            { key: 'house-cleaning', labelEN: 'House Cleaning', labelPT: 'Limpeza Doméstica' },
+            { key: 'office-cleaning', labelEN: 'Office Cleaning', labelPT: 'Limpeza de Escritórios' }
+        ],
+    },
+    {
+        key: 'automotive',
+        icon: 'Car',
+        labelEN: 'Automotive Services',
+        labelPT: 'Serviços Automóveis',
+        subcategories: [
+            { key: 'mechanic', labelEN: 'Mechanic', labelPT: 'Mecânico' },
+            { key: 'car-wash', labelEN: 'Car Wash & Detail', labelPT: 'Lavagem Automóvel' }
+        ],
+    },
+    {
+        key: 'beauty',
+        icon: 'Scissors',
+        labelEN: 'Beauty & Personal Care',
+        labelPT: 'Estética e Cuidado Pessoal',
+        subcategories: [
+            { key: 'hairdresser', labelEN: 'Hairdresser', labelPT: 'Cabeleireiro' },
+            { key: 'makeup', labelEN: 'Makeup Artist', labelPT: 'Maquilhador' }
+        ],
+    },
 ];
 
 export function getCategoryByKey(key: string): Category | undefined {

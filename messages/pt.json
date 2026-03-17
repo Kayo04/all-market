@@ -33,7 +33,13 @@
         "tutoring": "Explicações e Línguas",
         "events": "Eventos e Festas",
         "wellness": "Bem-estar e Desporto",
-        "equipment": "Compra de Equipamentos"
+        "equipment": "Compra de Equipamentos",
+        "business": "Negócios e Consultoria",
+        "design": "Design e Criatividade",
+        "writing": "Escrita e Tradução",
+        "cleaning": "Serviços de Limpeza",
+        "automotive": "Serviços Automóveis",
+        "beauty": "Estética e Cuidado Pessoal"
     },
     "stats": {
         "requests": "Pedidos Publicados",

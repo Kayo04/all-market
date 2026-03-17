@@ -33,7 +33,13 @@
     "tutoring": "Tutoring & Languages",
     "events": "Events & Parties",
     "wellness": "Wellness & Sports",
-    "equipment": "Buy Equipment"
+    "equipment": "Buy Equipment",
+    "business": "Business & Consulting",
+    "design": "Design & Creative",
+    "writing": "Writing & Translation",
+    "cleaning": "Cleaning Services",
+    "automotive": "Automotive Services",
+    "beauty": "Beauty & Personal Care"
   },
   "stats": {
     "requests": "Requests Posted",

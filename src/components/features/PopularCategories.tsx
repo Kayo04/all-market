@@ -13,6 +13,12 @@ const categoryColors: Record<string, { bg: string; text: string }> = {
   events: { bg: '#00391b', text: '#ffffff' },
   wellness: { bg: '#00391b', text: '#ffffff' },
   equipment: { bg: '#00391b', text: '#ffffff' },
+  business: { bg: '#00391b', text: '#ffffff' },
+  design: { bg: '#00391b', text: '#ffffff' },
+  writing: { bg: '#00391b', text: '#ffffff' },
+  cleaning: { bg: '#00391b', text: '#ffffff' },
+  automotive: { bg: '#00391b', text: '#ffffff' },
+  beauty: { bg: '#00391b', text: '#ffffff' },
 };
 
 const categoryColorsDark: Record<string, { bg: string; text: string }> = {
@@ -22,6 +28,12 @@ const categoryColorsDark: Record<string, { bg: string; text: string }> = {
   events: { bg: '#00391b', text: '#ffffff' },
   wellness: { bg: '#00391b', text: '#ffffff' },
   equipment: { bg: '#00391b', text: '#ffffff' },
+  business: { bg: '#00391b', text: '#ffffff' },
+  design: { bg: '#00391b', text: '#ffffff' },
+  writing: { bg: '#00391b', text: '#ffffff' },
+  cleaning: { bg: '#00391b', text: '#ffffff' },
+  automotive: { bg: '#00391b', text: '#ffffff' },
+  beauty: { bg: '#00391b', text: '#ffffff' },
 };
 
 export default function PopularCategories() {
@@ -204,6 +216,12 @@ export default function PopularCategories() {
         [data-theme="light"] .popular-card-events { background: ${categoryColors.events.bg}; color: ${categoryColors.events.text}; }
         [data-theme="light"] .popular-card-wellness { background: ${categoryColors.wellness.bg}; color: ${categoryColors.wellness.text}; }
         [data-theme="light"] .popular-card-equipment { background: ${categoryColors.equipment.bg}; color: ${categoryColors.equipment.text}; }
+        [data-theme="light"] .popular-card-business { background: ${categoryColors.business.bg}; color: ${categoryColors.business.text}; }
+        [data-theme="light"] .popular-card-design { background: ${categoryColors.design.bg}; color: ${categoryColors.design.text}; }
+        [data-theme="light"] .popular-card-writing { background: ${categoryColors.writing.bg}; color: ${categoryColors.writing.text}; }
+        [data-theme="light"] .popular-card-cleaning { background: ${categoryColors.cleaning.bg}; color: ${categoryColors.cleaning.text}; }
+        [data-theme="light"] .popular-card-automotive { background: ${categoryColors.automotive.bg}; color: ${categoryColors.automotive.text}; }
+        [data-theme="light"] .popular-card-beauty { background: ${categoryColors.beauty.bg}; color: ${categoryColors.beauty.text}; }
 
         [data-theme="dark"] .popular-card-home-repairs { background: ${categoryColorsDark['home-repairs'].bg}; color: ${categoryColorsDark['home-repairs'].text}; }
         [data-theme="dark"] .popular-card-tech-digital { background: ${categoryColorsDark['tech-digital'].bg}; color: ${categoryColorsDark['tech-digital'].text}; }
@@ -211,6 +229,12 @@ export default function PopularCategories() {
         [data-theme="dark"] .popular-card-events { background: ${categoryColorsDark.events.bg}; color: ${categoryColorsDark.events.text}; }
         [data-theme="dark"] .popular-card-wellness { background: ${categoryColorsDark.wellness.bg}; color: ${categoryColorsDark.wellness.text}; }
         [data-theme="dark"] .popular-card-equipment { background: ${categoryColorsDark.equipment.bg}; color: ${categoryColorsDark.equipment.text}; }
+        [data-theme="dark"] .popular-card-business { background: ${categoryColorsDark.business.bg}; color: ${categoryColorsDark.business.text}; }
+        [data-theme="dark"] .popular-card-design { background: ${categoryColorsDark.design.bg}; color: ${categoryColorsDark.design.text}; }
+        [data-theme="dark"] .popular-card-writing { background: ${categoryColorsDark.writing.bg}; color: ${categoryColorsDark.writing.text}; }
+        [data-theme="dark"] .popular-card-cleaning { background: ${categoryColorsDark.cleaning.bg}; color: ${categoryColorsDark.cleaning.text}; }
+        [data-theme="dark"] .popular-card-automotive { background: ${categoryColorsDark.automotive.bg}; color: ${categoryColorsDark.automotive.text}; }
+        [data-theme="dark"] .popular-card-beauty { background: ${categoryColorsDark.beauty.bg}; color: ${categoryColorsDark.beauty.text}; }
       `}</style>
     </section>
   );
