@@ -222,8 +222,26 @@ export default function PopularCategories() {
         /* ── Mobile ── */
         @media (max-width: 768px) {
           .pc-arrow { display: none; }
+          .pc-section { padding: 32px 0 28px; }
           .pc-track { padding: 4px 16px 12px; }
-          .pc-title { font-size: 22px; }
+          .pc-title { font-size: 20px; }
+          .pc-card {
+            min-width: 160px;
+            max-width: 160px;
+            height: 210px;
+          }
+          .pc-card-img { height: 130px; }
+          .pc-header { margin-bottom: 16px; padding: 0 16px; }
+        }
+        @media (max-width: 480px) {
+          .pc-card {
+            min-width: 145px;
+            max-width: 145px;
+            height: 190px;
+            padding: 14px 12px 0;
+          }
+          .pc-card-img { height: 115px; }
+          .pc-card-title { font-size: 13px; }
         }
       `}</style>
     </section>

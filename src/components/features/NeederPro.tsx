@@ -325,6 +325,18 @@ export default function NeederPro() {
             width: 100%;
           }
         }
+        @media (max-width: 600px) {
+          .np-features {
+            grid-template-columns: 1fr;
+            gap: 20px;
+          }
+          .np-headline { margin-bottom: 28px; }
+          .np-section { padding: 48px 0; }
+          .np-badge { right: 16px; top: -10px; padding: 10px 14px; }
+          .np-right { padding-top: 30px; }
+          .np-card { padding: 24px 20px 20px; }
+          .np-chart-wrap { height: 110px; }
+        }
         @media (max-width: 500px) {
           .np-features { grid-template-columns: 1fr; }
           .np-badge { right: 16px; }

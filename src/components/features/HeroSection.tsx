@@ -216,15 +216,17 @@ export default function HeroSection() {
             </button>
           </form>
 
-          {/* Suggestions */}
+          {/* Suggestions — horizontal scroll on mobile, no wrap */}
           <div
+            className="hero-suggestions-row"
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'flex-start',
-              gap: '12px',
-              flexWrap: 'wrap',
-              marginBottom: '32px',
+              gap: '10px',
+              marginBottom: '28px',
+              overflowX: 'auto',
+              scrollbarWidth: 'none',
+              WebkitOverflowScrolling: 'touch',
             }}
           >
             <span
@@ -337,27 +339,38 @@ export default function HeroSection() {
       </div>
 
       <style>{`
+        .hero-suggestions-row::-webkit-scrollbar { display: none; }
+
         @media (max-width: 768px) {
           .hero-video-layer { display: none !important; }
           .hero-overlay { display: none !important; }
-          .hero-section-container { 
-            background: var(--accent-light) !important; 
-            minHeight: auto !important;
-            padding: 80px 0 !important;
+          .hero-section-container {
+            background: var(--accent-light) !important;
+            min-height: 0 !important;
+            padding: 80px 0 40px !important;
           }
-          .hero-headline { 
-            color: var(--text-primary) !important; 
-            font-size: clamp(32px, 8vw, 40px) !important; 
+          .hero-headline {
+            color: var(--text-primary) !important;
+            font-size: clamp(28px, 7vw, 38px) !important;
+            margin-bottom: 20px !important;
           }
-          .hero-suggestion-label { color: var(--text-secondary) !important; }
-          .hero-suggestion-btn { 
-            color: var(--text-primary) !important; 
-            border-color: var(--border) !important; 
+          .hero-suggestion-label { color: var(--text-secondary) !important; flex-shrink: 0; }
+          .hero-suggestion-btn {
+            color: var(--text-primary) !important;
+            border-color: var(--border) !important;
             background: var(--bg-primary) !important;
+            flex-shrink: 0;
           }
           .hero-suggestion-btn:hover { background: var(--bg-secondary) !important; }
-          .hero-cta-container { flex-direction: column !important; width: 100% !important; margin-top: 16px !important; }
-          .hero-cta-btn { width: 100% !important; justify-content: center !important; }
+          .hero-cta-container {
+            flex-direction: column !important;
+            width: 100% !important;
+            margin-top: 12px !important;
+          }
+          .hero-cta-btn {
+            width: 100% !important;
+            justify-content: center !important;
+          }
         }
       `}</style>
     </section>
