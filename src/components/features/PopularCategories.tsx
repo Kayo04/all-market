@@ -10,21 +10,8 @@ const CARD_WIDTH = 220;
 const CARD_GAP = 16;
 const SCROLL_AMOUNT = CARD_WIDTH + CARD_GAP;
 
-// Light tinted background per category (shows in image area so green header pops)
-const CARD_IMAGE_BG: Record<string, string> = {
-  'home-repairs':        '#f5f0e8',
-  'tech-digital':        '#e8f0f8',
-  'tutoring':            '#e8f5ee',
-  'events':              '#fce8f0',
-  'wellness':            '#ede8f5',
-  'equipment':           '#e8eef5',
-  'business':            '#f0ece8',
-  'design':              '#f5e8f0',
-  'writing':             '#e8f5f0',
-  'cleaning':            '#e8f5fb',
-  'automotive':          '#f5ece8',
-  'beauty':              '#fce8ee',
-};
+// Slightly lighter green for the image inset — dark green frame shows around it
+const IMAGE_SECTION_BG = '#2d5a42';
 
 export default function PopularCategories() {
   const locale = useLocale();
@@ -78,7 +65,6 @@ export default function PopularCategories() {
         <div ref={scrollRef} className="pc-track">
           {categories.map((cat) => {
             const label = locale === 'pt' ? cat.labelPT : cat.labelEN;
-            const imageBg = CARD_IMAGE_BG[cat.key] ?? '#f0f0f0';
             return (
               <Link
                 key={cat.key}
@@ -89,10 +75,10 @@ export default function PopularCategories() {
                 <div className="pc-card-header">
                   <span className="pc-card-title">{label}</span>
                 </div>
-                {/* Light tinted image section with padding */}
+                {/* Image inset — slightly lighter green with dark green frame around it */}
                 <div
                   className="pc-card-img-section"
-                  style={{ background: imageBg }}
+                  style={{ background: IMAGE_SECTION_BG }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -191,22 +177,25 @@ export default function PopularCategories() {
           max-width: 90%;
         }
 
-        /* Light tinted image section */
+        /* Image inset: slightly lighter green, inset from card edges so dark green shows as frame */
         .pc-card-img-section {
+          margin: 0 10px 10px 10px;
+          border-radius: 10px;
+          overflow: hidden;
           flex: 1;
           display: flex;
           align-items: center;
           justify-content: center;
-          padding: 16px;
-          min-height: 160px;
+          min-height: 155px;
+          padding: 10px;
         }
 
         .pc-card-img {
           width: 100%;
-          height: 140px;
+          height: 135px;
           object-fit: contain;
           display: block;
-          border-radius: 8px;
+          border-radius: 6px;
         }
 
         /* ── Floating arrows ── */
