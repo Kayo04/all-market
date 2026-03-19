@@ -155,3 +155,19 @@ body {
     transform: rotate(360deg);
   }
 }
+
+/* ─── Shared Grid Container ──────────────────────────────── */
+/* Every section that needs to align with the Navbar uses this */
+:root {
+  --grid-max: 1280px;
+  --grid-px: 24px;
+}
+
+.grid-container {
+  max-width: var(--grid-max);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--grid-px);
+  padding-right: var(--grid-px);
+  width: 100%;
+}

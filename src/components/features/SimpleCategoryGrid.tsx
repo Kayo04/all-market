@@ -1,6 +1,6 @@
 'use client';
 
-import { useTranslations, useLocale } from 'next-intl';
+import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { 
   Wrench, Monitor, BookOpen, PartyPopper, Heart, Gamepad2, 
@@ -9,102 +9,112 @@ import {
 import { categories } from '@/lib/categories';
 import { useRef } from 'react';
 
+// Tiny icon map — one per category key
 const iconMap: Record<string, React.ReactNode> = {
-  Wrench: <Wrench size={28} strokeWidth={1.5} />,
-  Monitor: <Monitor size={28} strokeWidth={1.5} />,
-  BookOpen: <BookOpen size={28} strokeWidth={1.5} />,
-  PartyPopper: <PartyPopper size={28} strokeWidth={1.5} />,
-  Heart: <Heart size={28} strokeWidth={1.5} />,
-  Gamepad2: <Gamepad2 size={28} strokeWidth={1.5} />,
-  Briefcase: <Briefcase size={28} strokeWidth={1.5} />,
-  Palette: <Palette size={28} strokeWidth={1.5} />,
-  PenTool: <PenTool size={28} strokeWidth={1.5} />,
-  Sparkles: <Sparkles size={28} strokeWidth={1.5} />,
-  Car: <Car size={28} strokeWidth={1.5} />,
-  Scissors: <Scissors size={28} strokeWidth={1.5} />,
+  Wrench:      <Wrench      size={26} strokeWidth={1.4} />,
+  Monitor:     <Monitor     size={26} strokeWidth={1.4} />,
+  BookOpen:    <BookOpen    size={26} strokeWidth={1.4} />,
+  PartyPopper: <PartyPopper size={26} strokeWidth={1.4} />,
+  Heart:       <Heart       size={26} strokeWidth={1.4} />,
+  Gamepad2:    <Gamepad2    size={26} strokeWidth={1.4} />,
+  Briefcase:   <Briefcase   size={26} strokeWidth={1.4} />,
+  Palette:     <Palette     size={26} strokeWidth={1.4} />,
+  PenTool:     <PenTool     size={26} strokeWidth={1.4} />,
+  Sparkles:    <Sparkles    size={26} strokeWidth={1.4} />,
+  Car:         <Car         size={26} strokeWidth={1.4} />,
+  Scissors:    <Scissors    size={26} strokeWidth={1.4} />,
 };
 
 export default function SimpleCategoryGrid() {
   const locale = useLocale();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // We only show the first 9 or all 12. Let's show all 12 in a scrollable list to match Fiverr's horizontal square cards.
-  const displayCategories = categories;
-
   return (
-    <section style={{ padding: '40px 0 16px', width: '100%', overflow: 'hidden' }}>
-      <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
-        <div
-          ref={scrollRef}
-          style={{
-            display: 'flex',
-            gap: '16px',
-            overflowX: 'auto',
-            scrollbarWidth: 'none',
-            scrollSnapType: 'x mandatory',
-            paddingBottom: '8px',
-          }}
-          className="simple-category-scroll"
-        >
-          {displayCategories.map((cat) => {
+    <section className="scg-section">
+      {/* The scroll track is INSIDE a wrapper that clips it,
+          but the track itself has the 1280px-grid-aligned padding
+          so the first card aligns perfectly with the Navbar logo. */}
+      <div className="scg-track-wrap">
+        <div ref={scrollRef} className="scg-track">
+          {categories.map((cat) => {
             const label = locale === 'pt' ? cat.labelPT : cat.labelEN;
-            
             return (
               <Link
                 key={cat.key}
                 href={`/requests?category=${cat.key}`}
-                style={{
-                  minWidth: '120px',
-                  maxWidth: '120px',
-                  height: '110px',
-                  borderRadius: '16px',
-                  border: '1px solid var(--border)',
-                  background: 'var(--bg-primary)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  justifyContent: 'center',
-                  padding: '16px',
-                  textDecoration: 'none',
-                  color: 'var(--text-primary)',
-                  scrollSnapAlign: 'start',
-                  flexShrink: 0,
-                  transition: 'box-shadow var(--transition-fast), transform var(--transition-fast)',
-                }}
-                className="simple-category-card"
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 16px rgba(0,0,0,0.08)';
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-                }}
+                className="scg-card"
               >
-                <div style={{ marginBottom: '12px', color: 'var(--text-secondary)' }}>
-                  {iconMap[cat.icon]}
-                </div>
-                <h3
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    lineHeight: 1.2,
-                  }}
-                >
-                  {label}
-                </h3>
+                <span className="scg-icon">{iconMap[cat.icon]}</span>
+                <span className="scg-label">{label}</span>
               </Link>
             );
           })}
         </div>
       </div>
+
       <style>{`
-        .simple-category-scroll {
-          padding-left: calc(max(0px, (100% - 1440px) / 2));
-          padding-right: calc(max(0px, (100% - 1440px) / 2));
+        .scg-section {
+          width: 100%;
+          overflow: hidden;
+          padding: 24px 0 8px;
+          border-bottom: 1px solid var(--border);
         }
-        .simple-category-scroll::-webkit-scrollbar { display: none; }
+
+        /* Clip overflow but align the first card with the Navbar */
+        .scg-track-wrap {
+          overflow: hidden;
+        }
+
+        /* Scrollable flex row — padding mirrors the Navbar grid */
+        .scg-track {
+          display: flex;
+          gap: 4px;
+          overflow-x: auto;
+          scrollbar-width: none;
+          /* Left padding = same as Navbar: (screen - 1280px) / 2 + 24px */
+          padding-left: calc(max(var(--grid-px), (100% - var(--grid-max)) / 2 + var(--grid-px)));
+          padding-right: calc(max(var(--grid-px), (100% - var(--grid-max)) / 2 + var(--grid-px)));
+          padding-bottom: 8px;
+        }
+        .scg-track::-webkit-scrollbar { display: none; }
+
+        /* Each mini card */
+        .scg-card {
+          flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          padding: 16px 20px;
+          border-radius: var(--radius-lg);
+          text-decoration: none;
+          color: var(--text-secondary);
+          white-space: nowrap;
+          font-family: var(--font-sans);
+          font-size: 12.5px;
+          font-weight: 500;
+          text-align: center;
+          transition: background var(--transition-fast), color var(--transition-fast);
+          min-width: 90px;
+        }
+        .scg-card:hover {
+          background: var(--bg-secondary);
+          color: var(--text-primary);
+        }
+
+        .scg-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        .scg-label {
+          line-height: 1.3;
+          max-width: 80px;
+        }
+
+        @media (max-width: 640px) {
+          .scg-card { padding: 12px 14px; min-width: 72px; }
+        }
       `}</style>
     </section>
   );

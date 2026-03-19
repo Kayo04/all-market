@@ -106,9 +106,9 @@ export default function PopularCategories() {
         }
 
         .pc-header {
-          max-width: 1440px;
+          max-width: var(--grid-max);
           margin: 0 auto;
-          padding: 0 24px;
+          padding: 0 var(--grid-px);
           margin-bottom: 24px;
         }
 
@@ -123,9 +123,8 @@ export default function PopularCategories() {
         /* ── Outer wrapper — provides the clipping and arrow anchoring ── */
         .pc-outer {
           position: relative;
-          max-width: 1440px;
+          max-width: var(--grid-max);
           margin: 0 auto;
-          /* let track bleed slightly under arrows */
         }
 
         /* ── Scrollable track ── */
@@ -135,8 +134,8 @@ export default function PopularCategories() {
           overflow-x: auto;
           scroll-behavior: smooth;
           scrollbar-width: none;
-          padding: 4px 24px 12px;
-          /* cards clip at edges — no full bleed */
+          /* Left padding ensures first card aligns with Navbar logo */
+          padding: 4px var(--grid-px) 12px;
         }
         .pc-track::-webkit-scrollbar { display: none; }
 
