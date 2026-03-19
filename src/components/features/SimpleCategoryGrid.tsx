@@ -9,18 +9,18 @@ import {
 import { categories } from '@/lib/categories';
 
 const iconMap: Record<string, React.ReactNode> = {
-  Wrench:      <Wrench      size={24} strokeWidth={1.4} />,
-  Monitor:     <Monitor     size={24} strokeWidth={1.4} />,
-  BookOpen:    <BookOpen    size={24} strokeWidth={1.4} />,
-  PartyPopper: <PartyPopper size={24} strokeWidth={1.4} />,
-  Heart:       <Heart       size={24} strokeWidth={1.4} />,
-  Gamepad2:    <Gamepad2    size={24} strokeWidth={1.4} />,
-  Briefcase:   <Briefcase   size={24} strokeWidth={1.4} />,
-  Palette:     <Palette     size={24} strokeWidth={1.4} />,
-  PenTool:     <PenTool     size={24} strokeWidth={1.4} />,
-  Sparkles:    <Sparkles    size={24} strokeWidth={1.4} />,
-  Car:         <Car         size={24} strokeWidth={1.4} />,
-  Scissors:    <Scissors    size={24} strokeWidth={1.4} />,
+  Wrench:      <Wrench      size={22} strokeWidth={1.4} />,
+  Monitor:     <Monitor     size={22} strokeWidth={1.4} />,
+  BookOpen:    <BookOpen    size={22} strokeWidth={1.4} />,
+  PartyPopper: <PartyPopper size={22} strokeWidth={1.4} />,
+  Heart:       <Heart       size={22} strokeWidth={1.4} />,
+  Gamepad2:    <Gamepad2    size={22} strokeWidth={1.4} />,
+  Briefcase:   <Briefcase   size={22} strokeWidth={1.4} />,
+  Palette:     <Palette     size={22} strokeWidth={1.4} />,
+  PenTool:     <PenTool     size={22} strokeWidth={1.4} />,
+  Sparkles:    <Sparkles    size={22} strokeWidth={1.4} />,
+  Car:         <Car         size={22} strokeWidth={1.4} />,
+  Scissors:    <Scissors    size={22} strokeWidth={1.4} />,
 };
 
 export default function SimpleCategoryGrid() {
@@ -50,19 +50,18 @@ export default function SimpleCategoryGrid() {
         .scg-section {
           width: 100%;
           overflow: hidden;
-          padding: 28px 0 24px;
+          padding: 20px 0 16px;
           border-bottom: 1px solid var(--border);
         }
 
-        /* Clip but allow horizontal scroll on mobile */
         .scg-track-wrap {
           overflow: hidden;
         }
 
-        /* Perfectly aligned to the grid – first card left-edge = Navbar logo left-edge */
+        /* Grid-aligned scroll track */
         .scg-track {
           display: flex;
-          gap: 12px;
+          gap: 8px;
           overflow-x: auto;
           scrollbar-width: none;
           padding-left: calc(max(var(--grid-px), (100% - var(--grid-max)) / 2 + var(--grid-px)));
@@ -71,31 +70,32 @@ export default function SimpleCategoryGrid() {
         }
         .scg-track::-webkit-scrollbar { display: none; }
 
-        /* Fiverr-style — white bordered square card */
+        /* Compact Fiverr-style bordered card */
         .scg-card {
           flex-shrink: 0;
           display: flex;
           flex-direction: column;
-          align-items: flex-start;
-          gap: 12px;
-          padding: 16px 16px 20px;
-          border-radius: 12px;
+          align-items: center;
+          gap: 10px;
+          padding: 14px 14px 16px;
+          border-radius: 10px;
           border: 1px solid var(--border);
           background: var(--bg-primary);
           text-decoration: none;
           color: var(--text-secondary);
-          min-width: 130px;
-          max-width: 140px;
+          min-width: 105px;
+          max-width: 115px;
           font-family: var(--font-sans);
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 500;
           line-height: 1.3;
+          text-align: center;
           transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
           cursor: pointer;
         }
         .scg-card:hover {
           border-color: var(--border-hover);
-          box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+          box-shadow: 0 3px 10px rgba(0,0,0,0.06);
           color: var(--text-primary);
         }
 
@@ -105,6 +105,9 @@ export default function SimpleCategoryGrid() {
           justify-content: center;
           color: var(--text-secondary);
         }
+        .scg-card:hover .scg-icon {
+          color: var(--text-primary);
+        }
 
         .scg-label {
           white-space: pre-wrap;
@@ -112,8 +115,11 @@ export default function SimpleCategoryGrid() {
         }
 
         @media (max-width: 768px) {
-          .scg-card { min-width: 110px; padding: 14px 14px 18px; }
-          .scg-label { font-size: 12px; }
+          .scg-card {
+            min-width: 88px;
+            padding: 12px 10px 14px;
+            font-size: 11.5px;
+          }
         }
       `}</style>
     </section>
