@@ -62,14 +62,13 @@ export default function Navbar() {
     >
       <nav
         style={{
-          maxWidth: '1280px',
+          maxWidth: 'var(--grid-max)',
           margin: '0 auto',
-          padding: '0 24px',
+          padding: '0 var(--grid-px)',
           height: '56px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          gap: '32px',
+          gap: '24px',
         }}
       >
         {/* Logo */}
@@ -85,6 +84,7 @@ export default function Navbar() {
             color: '#404145',
             letterSpacing: '-0.02em',
             flexShrink: 0,
+            marginRight: 'auto',
           }}
         >
           <span>needer</span>
