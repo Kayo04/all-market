@@ -10,8 +10,8 @@ const CARD_WIDTH = 220;
 const CARD_GAP = 16;
 const SCROLL_AMOUNT = CARD_WIDTH + CARD_GAP;
 
-// Slightly lighter green for the image inset — dark green frame shows around it
-const IMAGE_SECTION_BG = '#2d5a42';
+// Light mint green for the image inset — floats image with visible light space around it
+const IMAGE_SECTION_BG = '#c8ead4';
 
 export default function PopularCategories() {
   const locale = useLocale();
@@ -177,25 +177,24 @@ export default function PopularCategories() {
           max-width: 90%;
         }
 
-        /* Image inset: slightly lighter green, inset from card edges so dark green shows as frame */
+        /* Image inset: light mint green, image floats centered with visible padding */
         .pc-card-img-section {
           margin: 0 10px 10px 10px;
-          border-radius: 10px;
+          border-radius: 12px;
           overflow: hidden;
           flex: 1;
           display: flex;
           align-items: center;
           justify-content: center;
-          min-height: 155px;
-          padding: 10px;
+          min-height: 165px;
+          padding: 20px;
         }
 
         .pc-card-img {
           width: 100%;
-          height: 135px;
+          height: 130px;
           object-fit: contain;
           display: block;
-          border-radius: 6px;
         }
 
         /* ── Floating arrows ── */
