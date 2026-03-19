@@ -10,8 +10,21 @@ const CARD_WIDTH = 220;
 const CARD_GAP = 16;
 const SCROLL_AMOUNT = CARD_WIDTH + CARD_GAP;
 
-// Dark green background — same for all cards, matching the Fiverr reference
-const CARD_BG = '#1e3d2f';
+// Light tinted background per category (shows in image area so green header pops)
+const CARD_IMAGE_BG: Record<string, string> = {
+  'home-repairs':        '#f5f0e8',
+  'tech-digital':        '#e8f0f8',
+  'tutoring':            '#e8f5ee',
+  'events':              '#fce8f0',
+  'wellness':            '#ede8f5',
+  'equipment':           '#e8eef5',
+  'business':            '#f0ece8',
+  'design':              '#f5e8f0',
+  'writing':             '#e8f5f0',
+  'cleaning':            '#e8f5fb',
+  'automotive':          '#f5ece8',
+  'beauty':              '#fce8ee',
+};
 
 export default function PopularCategories() {
   const locale = useLocale();
@@ -62,20 +75,25 @@ export default function PopularCategories() {
         </button>
 
         {/* Scrollable track */}
-        <div
-          ref={scrollRef}
-          className="pc-track"
-        >
+        <div ref={scrollRef} className="pc-track">
           {categories.map((cat) => {
             const label = locale === 'pt' ? cat.labelPT : cat.labelEN;
+            const imageBg = CARD_IMAGE_BG[cat.key] ?? '#f0f0f0';
             return (
               <Link
                 key={cat.key}
                 href={`/requests?category=${cat.key}`}
                 className="pc-card"
               >
-                <span className="pc-card-title">{label}</span>
-                <div className="pc-card-img-wrap">
+                {/* Dark green header with category name */}
+                <div className="pc-card-header">
+                  <span className="pc-card-title">{label}</span>
+                </div>
+                {/* Light tinted image section with padding */}
+                <div
+                  className="pc-card-img-section"
+                  style={{ background: imageBg }}
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={`/categories/${cat.key}-3d.png`}
@@ -120,7 +138,7 @@ export default function PopularCategories() {
           color: var(--text-primary);
         }
 
-        /* ── Outer wrapper — provides the clipping and arrow anchoring ── */
+        /* ── Outer wrapper ── */
         .pc-outer {
           position: relative;
           max-width: var(--grid-max);
@@ -134,7 +152,6 @@ export default function PopularCategories() {
           overflow-x: auto;
           scroll-behavior: smooth;
           scrollbar-width: none;
-          /* Left padding ensures first card aligns with Navbar logo */
           padding: 4px var(--grid-px) 12px;
         }
         .pc-track::-webkit-scrollbar { display: none; }
@@ -144,48 +161,52 @@ export default function PopularCategories() {
           flex-shrink: 0;
           min-width: ${CARD_WIDTH}px;
           max-width: ${CARD_WIDTH}px;
-          height: 260px;
           border-radius: 14px;
-          background: ${CARD_BG};
+          background: #1e3d2f;
           text-decoration: none;
           display: flex;
           flex-direction: column;
-          padding: 18px 16px 0;
           overflow: hidden;
           transition: transform 0.2s ease, box-shadow 0.2s ease;
-          position: relative;
         }
         .pc-card:hover {
           transform: translateY(-4px);
           box-shadow: 0 14px 30px rgba(0,0,0,0.22);
         }
 
-        /* Category name — top left, white, bold */
+        /* Dark green header section */
+        .pc-card-header {
+          padding: 18px 16px 14px;
+          flex-shrink: 0;
+        }
+
+        /* Category name — top, white, bold */
         .pc-card-title {
           font-family: var(--font-sans);
           font-size: 14.5px;
           font-weight: 700;
           color: #ffffff;
           line-height: 1.35;
-          margin-bottom: auto;
-          flex-shrink: 0;
+          display: block;
           max-width: 90%;
         }
 
-        /* Image fills the bottom of the card */
-        .pc-card-img-wrap {
+        /* Light tinted image section */
+        .pc-card-img-section {
           flex: 1;
           display: flex;
-          align-items: flex-end;
-          overflow: hidden;
-          margin: 8px -16px 0;
+          align-items: center;
+          justify-content: center;
+          padding: 16px;
+          min-height: 160px;
         }
+
         .pc-card-img {
           width: 100%;
-          height: 175px;
-          object-fit: cover;
-          border-radius: 0 0 14px 14px;
+          height: 140px;
+          object-fit: contain;
           display: block;
+          border-radius: 8px;
         }
 
         /* ── Floating arrows ── */
@@ -213,7 +234,6 @@ export default function PopularCategories() {
         }
         .pc-arrow--left  { left: -10px; }
         .pc-arrow--right { right: -10px; }
-
         .pc-arrow--hidden {
           opacity: 0;
           pointer-events: none;
@@ -228,20 +248,20 @@ export default function PopularCategories() {
           .pc-card {
             min-width: 160px;
             max-width: 160px;
-            height: 210px;
           }
-          .pc-card-img { height: 130px; }
+          .pc-card-img { height: 100px; }
+          .pc-card-img-section { min-height: 120px; padding: 12px; }
           .pc-header { margin-bottom: 16px; padding: 0 16px; }
         }
         @media (max-width: 480px) {
           .pc-card {
             min-width: 145px;
             max-width: 145px;
-            height: 190px;
-            padding: 14px 12px 0;
           }
-          .pc-card-img { height: 115px; }
           .pc-card-title { font-size: 13px; }
+          .pc-card-header { padding: 14px 12px 10px; }
+          .pc-card-img-section { padding: 10px; min-height: 108px; }
+          .pc-card-img { height: 88px; }
         }
       `}</style>
     </section>

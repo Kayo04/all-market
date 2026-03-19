@@ -30,7 +30,8 @@ export default function SimpleCategoryGrid() {
     <section className="scg-section">
       <div className="scg-overflow">
         <div className="scg-track">
-          {categories.map((cat) => {
+          {/* Show 9 categories — fits perfectly in the 1280px grid */}
+          {categories.slice(0, 9).map((cat) => {
             const label = locale === 'pt' ? cat.labelPT : cat.labelEN;
             return (
               <Link
@@ -49,8 +50,7 @@ export default function SimpleCategoryGrid() {
       <style>{`
         .scg-section {
           width: 100%;
-          padding: 28px 0 24px;
-          border-bottom: 1px solid var(--border);
+          padding: 20px 0 16px;
         }
 
         /* Overflow clip but keep grid alignment */
