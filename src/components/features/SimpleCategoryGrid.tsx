@@ -9,18 +9,18 @@ import {
 import { categories } from '@/lib/categories';
 
 const iconMap: Record<string, React.ReactNode> = {
-  Wrench:      <Wrench      size={22} strokeWidth={1.4} />,
-  Monitor:     <Monitor     size={22} strokeWidth={1.4} />,
-  BookOpen:    <BookOpen    size={22} strokeWidth={1.4} />,
-  PartyPopper: <PartyPopper size={22} strokeWidth={1.4} />,
-  Heart:       <Heart       size={22} strokeWidth={1.4} />,
-  Gamepad2:    <Gamepad2    size={22} strokeWidth={1.4} />,
-  Briefcase:   <Briefcase   size={22} strokeWidth={1.4} />,
-  Palette:     <Palette     size={22} strokeWidth={1.4} />,
-  PenTool:     <PenTool     size={22} strokeWidth={1.4} />,
-  Sparkles:    <Sparkles    size={22} strokeWidth={1.4} />,
-  Car:         <Car         size={22} strokeWidth={1.4} />,
-  Scissors:    <Scissors    size={22} strokeWidth={1.4} />,
+  Wrench:      <Wrench      size={28} strokeWidth={1.2} />,
+  Monitor:     <Monitor     size={28} strokeWidth={1.2} />,
+  BookOpen:    <BookOpen    size={28} strokeWidth={1.2} />,
+  PartyPopper: <PartyPopper size={28} strokeWidth={1.2} />,
+  Heart:       <Heart       size={28} strokeWidth={1.2} />,
+  Gamepad2:    <Gamepad2    size={28} strokeWidth={1.2} />,
+  Briefcase:   <Briefcase   size={28} strokeWidth={1.2} />,
+  Palette:     <Palette     size={28} strokeWidth={1.2} />,
+  PenTool:     <PenTool     size={28} strokeWidth={1.2} />,
+  Sparkles:    <Sparkles    size={28} strokeWidth={1.2} />,
+  Car:         <Car         size={28} strokeWidth={1.2} />,
+  Scissors:    <Scissors    size={28} strokeWidth={1.2} />,
 };
 
 export default function SimpleCategoryGrid() {
@@ -28,7 +28,7 @@ export default function SimpleCategoryGrid() {
 
   return (
     <section className="scg-section">
-      <div className="scg-track-wrap">
+      <div className="scg-overflow">
         <div className="scg-track">
           {categories.map((cat) => {
             const label = locale === 'pt' ? cat.labelPT : cat.labelEN;
@@ -49,77 +49,78 @@ export default function SimpleCategoryGrid() {
       <style>{`
         .scg-section {
           width: 100%;
-          overflow: hidden;
-          padding: 20px 0 16px;
+          padding: 28px 0 24px;
           border-bottom: 1px solid var(--border);
         }
 
-        .scg-track-wrap {
-          overflow: hidden;
+        /* Overflow clip but keep grid alignment */
+        .scg-overflow {
+          overflow-x: auto;
+          overflow-y: visible;
+          scrollbar-width: none;
         }
+        .scg-overflow::-webkit-scrollbar { display: none; }
 
-        /* Grid-aligned scroll track */
+        /* Track starts/ends at the 1280px grid boundary — same as Navbar */
         .scg-track {
           display: flex;
-          gap: 8px;
-          overflow-x: auto;
-          scrollbar-width: none;
-          padding-left: calc(max(var(--grid-px), (100% - var(--grid-max)) / 2 + var(--grid-px)));
-          padding-right: calc(max(var(--grid-px), (100% - var(--grid-max)) / 2 + var(--grid-px)));
-          padding-bottom: 4px;
+          gap: 12px;
+          min-width: max-content;
+          /* Align left edge to the grid */
+          padding-left: calc(max(var(--grid-px), (100vw - var(--grid-max)) / 2 + var(--grid-px)));
+          padding-right: calc(max(var(--grid-px), (100vw - var(--grid-max)) / 2 + var(--grid-px)));
+          padding-bottom: 2px;
         }
-        .scg-track::-webkit-scrollbar { display: none; }
 
-        /* Compact Fiverr-style bordered card */
+        /* Square card — same proportions as Fiverr */
         .scg-card {
           flex-shrink: 0;
           display: flex;
           flex-direction: column;
-          align-items: center;
-          gap: 10px;
-          padding: 14px 14px 16px;
+          align-items: flex-start;
+          justify-content: space-between;
+          padding: 18px 16px 16px;
+          width: 128px;
+          height: 108px;
           border-radius: 10px;
           border: 1px solid var(--border);
           background: var(--bg-primary);
           text-decoration: none;
           color: var(--text-secondary);
-          min-width: 105px;
-          max-width: 115px;
-          font-family: var(--font-sans);
-          font-size: 12px;
-          font-weight: 500;
-          line-height: 1.3;
-          text-align: center;
-          transition: border-color 0.15s ease, box-shadow 0.15s ease, color 0.15s ease;
           cursor: pointer;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
         .scg-card:hover {
-          border-color: var(--border-hover);
-          box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+          border-color: var(--text-tertiary);
+          box-shadow: 0 4px 14px rgba(0,0,0,0.07);
           color: var(--text-primary);
         }
 
         .scg-icon {
           display: flex;
           align-items: center;
-          justify-content: center;
-          color: var(--text-secondary);
-        }
-        .scg-card:hover .scg-icon {
-          color: var(--text-primary);
+          color: inherit;
+          flex-shrink: 0;
         }
 
         .scg-label {
-          white-space: pre-wrap;
+          font-family: var(--font-sans);
+          font-size: 12.5px;
+          font-weight: 500;
+          line-height: 1.35;
+          color: inherit;
           word-break: break-word;
+          white-space: normal;
         }
 
-        @media (max-width: 768px) {
+        /* Mobile: slightly smaller */
+        @media (max-width: 640px) {
           .scg-card {
-            min-width: 88px;
-            padding: 12px 10px 14px;
-            font-size: 11.5px;
+            width: 110px;
+            height: 96px;
+            padding: 14px 12px 12px;
           }
+          .scg-label { font-size: 12px; }
         }
       `}</style>
     </section>
