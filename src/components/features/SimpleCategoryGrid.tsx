@@ -75,7 +75,6 @@ export default function UseCaseShowcase() {
                 key={i}
                 href={c.href}
                 className="uc-card"
-                style={{ background: c.color }}
               >
                 {/* Icon pill */}
                 <span className="uc-card-icon" style={{ background: c.iconBg }}>
@@ -148,15 +147,17 @@ export default function UseCaseShowcase() {
           gap: 12px;
         }
 
-        /* Each use-case card */
+        /* Each use-case card — square shaped, uniform light green */
         .uc-card {
           display: flex;
           flex-direction: column;
           gap: 10px;
-          padding: 20px;
+          padding: 24px;
           border-radius: 14px;
           text-decoration: none;
           border: 1px solid transparent;
+          background: #e8f5ee;
+          aspect-ratio: 1 / 1;
           transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
           cursor: pointer;
         }
