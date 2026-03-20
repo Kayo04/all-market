@@ -2,186 +2,226 @@
 
 import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { Wrench, Monitor, BookOpen, Heart, Briefcase, Palette } from 'lucide-react';
+import { Wrench, Briefcase, Gamepad2, Car } from 'lucide-react';
 
-const HIGHLIGHTS = [
+const CASES = [
   {
-    icon: <Wrench size={28} strokeWidth={1.3} />,
-    en: 'Home Repairs',
-    pt: 'Reparações',
-    descEN: 'Plumbers, electricians, painters & more',
-    descPT: 'Canalizadores, eletricistas, pintores',
-    key: 'home-repairs',
-    color: '#fff9f0',
-    iconColor: '#c97d30',
+    icon: <Wrench size={20} strokeWidth={1.5} />,
+    labelEN: 'Local Service',
+    labelPT: 'Serviço Local',
+    queryEN: 'I need an electrician\nin Porto, ASAP.',
+    queryPT: 'Preciso de um eletricista\nem Porto, urgente.',
+    color: '#fff7ed',
+    iconBg: '#f97316',
+    href: '/requests/new?category=home-repairs',
   },
   {
-    icon: <Monitor size={28} strokeWidth={1.3} />,
-    en: 'Tech & Digital',
-    pt: 'Tecnologia',
-    descEN: 'Websites, apps, social media & IT',
-    descPT: 'Websites, apps, redes sociais e TI',
-    key: 'tech-digital',
-    color: '#f0f5ff',
-    iconColor: '#3b6fd4',
+    icon: <Briefcase size={20} strokeWidth={1.5} />,
+    labelEN: 'Professional Hire',
+    labelPT: 'Contratação',
+    queryEN: 'I need a Marketing\nDirector for 3 months.',
+    queryPT: 'Preciso de um Diretor\nde Marketing por 3 meses.',
+    color: '#eff6ff',
+    iconBg: '#3b82f6',
+    href: '/requests/new?category=business',
   },
   {
-    icon: <Heart size={28} strokeWidth={1.3} />,
-    en: 'Wellness',
-    pt: 'Bem-estar',
-    descEN: 'Personal trainers, massage & health',
-    descPT: 'Personal trainers, massagens e saúde',
-    key: 'wellness',
-    color: '#fff0f5',
-    iconColor: '#c9336a',
+    icon: <Gamepad2 size={20} strokeWidth={1.5} />,
+    labelEN: 'Buy a Product',
+    labelPT: 'Comprar Produto',
+    queryEN: 'Looking for a PS4\nunder €400.',
+    queryPT: 'Quero uma PS4\naté 400€.',
+    color: '#f0fdf4',
+    iconBg: '#22c55e',
+    href: '/requests/new?category=equipment',
   },
   {
-    icon: <BookOpen size={28} strokeWidth={1.3} />,
-    en: 'Tutoring',
-    pt: 'Explicações',
-    descEN: 'Languages, maths, music & prep',
-    descPT: 'Línguas, matemática, música',
-    key: 'tutoring',
-    color: '#f0fbf5',
-    iconColor: '#2e8c56',
-  },
-  {
-    icon: <Briefcase size={28} strokeWidth={1.3} />,
-    en: 'Business',
-    pt: 'Negócios',
-    descEN: 'Legal, accounting & consulting',
-    descPT: 'Jurídico, contabilidade e consultoria',
-    key: 'business',
-    color: '#f5f0ff',
-    iconColor: '#7c3dd4',
-  },
-  {
-    icon: <Palette size={28} strokeWidth={1.3} />,
-    en: 'Design',
-    pt: 'Design',
-    descEN: 'Logos, branding & creative work',
-    descPT: 'Logótipos, branding e criatividade',
-    key: 'design',
-    color: '#fff0fb',
-    iconColor: '#c9338c',
+    icon: <Car size={20} strokeWidth={1.5} />,
+    labelEN: 'Big Purchase',
+    labelPT: 'Grande Compra',
+    queryEN: 'Looking for a BMW\nSeries 1, under €15k.',
+    queryPT: 'Quero um BMW\nSérie 1, até 15.000€.',
+    color: '#fdf4ff',
+    iconBg: '#a855f7',
+    href: '/requests/new?category=automotive',
   },
 ];
 
-export default function SimpleCategoryGrid() {
+export default function UseCaseShowcase() {
   const locale = useLocale();
   const isEN = locale !== 'pt';
 
   return (
-    <section className="scg-section">
-      <div className="scg-inner">
-        <p className="scg-label">
-          {isEN ? 'Explore services' : 'Explorar serviços'}
-        </p>
-        <div className="scg-grid">
-          {HIGHLIGHTS.map((h) => (
-            <Link key={h.key} href={`/requests?category=${h.key}`} className="scg-tile">
-              <span className="scg-tile-icon" style={{ background: h.color, color: h.iconColor }}>
-                {h.icon}
-              </span>
-              <span className="scg-tile-text">
-                <span className="scg-tile-name">{isEN ? h.en : h.pt}</span>
-                <span className="scg-tile-desc">{isEN ? h.descEN : h.descPT}</span>
-              </span>
-            </Link>
-          ))}
+    <section className="uc-section">
+      <div className="uc-inner">
+        {/* Outer container */}
+        <div className="uc-box">
+          {/* Header */}
+          <div className="uc-box-header">
+            <p className="uc-box-label">
+              {isEN ? 'What can you post?' : 'O que podes publicar?'}
+            </p>
+            <p className="uc-box-sub">
+              {isEN
+                ? 'Services, professionals or products — any need, any budget.'
+                : 'Serviços, profissionais ou produtos — qualquer necessidade, qualquer orçamento.'}
+            </p>
+          </div>
+
+          {/* 2×2 grid of use-case cards */}
+          <div className="uc-grid">
+            {CASES.map((c, i) => (
+              <Link
+                key={i}
+                href={c.href}
+                className="uc-card"
+                style={{ background: c.color }}
+              >
+                {/* Icon pill */}
+                <span className="uc-card-icon" style={{ background: c.iconBg }}>
+                  {c.icon}
+                </span>
+                {/* Type label */}
+                <span className="uc-card-type">
+                  {isEN ? c.labelEN : c.labelPT}
+                </span>
+                {/* Example query — the "post" */}
+                <span className="uc-card-query">
+                  {isEN ? c.queryEN : c.queryPT}
+                </span>
+                {/* Subtle CTA */}
+                <span className="uc-card-cta">
+                  {isEN ? 'Post this →' : 'Publicar →'}
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 
       <style>{`
-        .scg-section {
+        .uc-section {
           width: 100%;
-          padding: 28px 0 24px;
+          padding: 28px 0 32px;
         }
 
-        .scg-inner {
+        .uc-inner {
           max-width: var(--grid-max);
           margin: 0 auto;
           padding: 0 var(--grid-px);
         }
 
-        .scg-label {
-          font-family: var(--font-sans);
-          font-size: 12px;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-          color: var(--text-tertiary);
-          margin-bottom: 14px;
-        }
-
-        .scg-grid {
-          display: grid;
-          grid-template-columns: repeat(6, 1fr);
-          gap: 10px;
-        }
-
-        .scg-tile {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          gap: 10px;
-          padding: 16px 14px;
-          border-radius: 12px;
+        /* Outer container — single rounded card */
+        .uc-box {
           border: 1px solid var(--border);
+          border-radius: 18px;
+          padding: 28px;
           background: var(--bg-primary);
-          text-decoration: none;
-          transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
-          cursor: pointer;
-        }
-        .scg-tile:hover {
-          border-color: var(--border-hover);
-          box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-          transform: translateY(-2px);
         }
 
-        .scg-tile-icon {
-          width: 46px;
-          height: 46px;
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex-shrink: 0;
+        .uc-box-header {
+          margin-bottom: 20px;
         }
 
-        .scg-tile-text {
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
-        }
-
-        .scg-tile-name {
-          font-family: var(--font-sans);
-          font-size: 13.5px;
-          font-weight: 600;
-          color: var(--text-primary);
-          line-height: 1.2;
-        }
-
-        .scg-tile-desc {
+        .uc-box-label {
           font-family: var(--font-sans);
           font-size: 11.5px;
-          font-weight: 400;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.09em;
           color: var(--text-tertiary);
+          margin-bottom: 4px;
+        }
+
+        .uc-box-sub {
+          font-family: var(--font-sans);
+          font-size: 15px;
+          font-weight: 500;
+          color: var(--text-primary);
           line-height: 1.4;
         }
 
-        /* Tablet: 3 cols */
-        @media (max-width: 900px) {
-          .scg-grid { grid-template-columns: repeat(3, 1fr); }
+        /* 2×2 grid */
+        .uc-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
         }
-        /* Mobile: 2 cols */
-        @media (max-width: 540px) {
-          .scg-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-          .scg-tile { padding: 12px 10px; }
-          .scg-tile-icon { width: 38px; height: 38px; border-radius: 8px; }
-          .scg-tile-name { font-size: 12.5px; }
-          .scg-tile-desc { display: none; }
+
+        /* Each use-case card */
+        .uc-card {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          padding: 20px;
+          border-radius: 14px;
+          text-decoration: none;
+          border: 1px solid transparent;
+          transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+          cursor: pointer;
+        }
+        .uc-card:hover {
+          border-color: rgba(0,0,0,0.10);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+          transform: translateY(-2px);
+        }
+
+        /* Coloured icon pill */
+        .uc-card-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 9px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #fff;
+          flex-shrink: 0;
+        }
+
+        /* Small "type" label */
+        .uc-card-type {
+          font-family: var(--font-sans);
+          font-size: 11px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.07em;
+          color: var(--text-tertiary);
+        }
+
+        /* The example "post" text — looks like a real request */
+        .uc-card-query {
+          font-family: var(--font-sans);
+          font-size: 15px;
+          font-weight: 600;
+          color: var(--text-primary);
+          line-height: 1.35;
+          white-space: pre-line;
+        }
+
+        /* Subtle "Post this →" link */
+        .uc-card-cta {
+          font-family: var(--font-sans);
+          font-size: 12.5px;
+          font-weight: 500;
+          color: var(--text-tertiary);
+          margin-top: auto;
+          transition: color 0.15s ease;
+        }
+        .uc-card:hover .uc-card-cta {
+          color: var(--text-primary);
+        }
+
+        /* Tablet: keep 2 cols but reduce padding */
+        @media (max-width: 768px) {
+          .uc-box { padding: 20px; }
+          .uc-card { padding: 16px; gap: 8px; }
+          .uc-card-query { font-size: 13.5px; }
+        }
+
+        /* Mobile: stack to 1 col */
+        @media (max-width: 480px) {
+          .uc-grid { grid-template-columns: 1fr; }
+          .uc-box { padding: 16px; border-radius: 14px; }
         }
       `}</style>
     </section>
