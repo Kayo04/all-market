@@ -240,8 +240,8 @@ export default function HeroSection() {
               {locale === 'pt' ? 'Popular:' : 'Popular:'}
             </span>
             {(locale === 'pt'
-              ? ['Criação de Websites', 'Remodelações', 'Gestão de Redes Sociais', 'Fotografia']
-              : ['Website Development', 'Home Remodeling', 'Social Media Management', 'Photography']
+              ? ['Criação de Websites', 'Remodelações', 'Gestão de Redes Sociais']
+              : ['Website Development', 'Home Remodeling', 'Social Media Management']
             ).map((sug) => (
               <button
                 key={sug}
