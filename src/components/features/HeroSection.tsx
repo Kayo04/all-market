@@ -159,13 +159,13 @@ export default function HeroSection() {
           >
             {locale === 'pt' ? (
               <>
-                Encontra os profissionais perfeitos <br />
-                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>para o teu negócio</span>
+                Diz-nos o que precisas.{' '}<br />
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>As propostas chegam até ti.</span>
               </>
             ) : (
               <>
-                Find the perfect professionals <br />
-                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>for your business</span>
+                Tell us what you need.{' '}<br />
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>The proposals come to you.</span>
               </>
             )}
           </h1>

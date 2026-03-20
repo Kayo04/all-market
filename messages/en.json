@@ -10,20 +10,20 @@
     "profile": "Profile"
   },
   "hero": {
-    "title": "What do you need?",
-    "subtitle": "Post what you're looking for. Receive proposals from trusted professionals.",
-    "cta": "Post Your Request",
-    "ctaPro": "Join as a Professional",
-    "searchPlaceholder": "E.g.: Electrician in Lisbon, PS4 up to 400€..."
+    "title": "Tell us what you need.",
+    "subtitle": "Services, professionals or products — post your need and receive proposals. No searching, no hunting.",
+    "cta": "Post Your Need",
+    "ctaPro": "Join as a Seller",
+    "searchPlaceholder": "E.g.: Electrician in Lisbon, PS4 up to €400, BMW Series 1 up to €15k..."
   },
   "howItWorks": {
     "title": "How It Works",
     "step1Title": "Post Your Need",
-    "step1Desc": "Describe what you need, set your budget, and choose a category.",
+    "step1Desc": "Describe what you need — a service, a professional, or a product. Set your budget and location.",
     "step2Title": "Receive Proposals",
-    "step2Desc": "Verified professionals send you quotes and messages.",
-    "step3Title": "Choose the Best",
-    "step3Desc": "Compare proposals, check ratings, and pick the right fit."
+    "step2Desc": "Sellers, pros and individuals send you their best offers directly.",
+    "step3Title": "You Choose",
+    "step3Desc": "Compare offers, check ratings, pick the best one. Zero hunting required."
   },
   "categories": {
     "title": "Explore Categories",

@@ -10,20 +10,20 @@
         "profile": "Perfil"
     },
     "hero": {
-        "title": "O que precisas?",
-        "subtitle": "Publica o que procuras. Recebe propostas de profissionais verificados.",
+        "title": "Diz-nos o que precisas.",
+        "subtitle": "Serviços, profissionais ou produtos — publica a tua necessidade e recebe propostas. Sem pesquisar, sem perder tempo.",
         "cta": "Publicar Pedido",
-        "ctaPro": "Registar como Profissional",
-        "searchPlaceholder": "Ex: Eletricista em Lisboa, PS4 até 400€..."
+        "ctaPro": "Registar como Vendedor",
+        "searchPlaceholder": "Ex: Eletricista em Lisboa, PS4 até 400€, BMW Série 1 até 15k€..."
     },
     "howItWorks": {
         "title": "Como Funciona",
-        "step1Title": "Publica o teu Pedido",
-        "step1Desc": "Descreve o que precisas, define o orçamento e escolhe a categoria.",
+        "step1Title": "Publica a tua Necessidade",
+        "step1Desc": "Descreve o que precisas — um serviço, um profissional ou um produto. Define o orçamento e a localização.",
         "step2Title": "Recebe Propostas",
-        "step2Desc": "Profissionais verificados enviam-te orçamentos e mensagens.",
-        "step3Title": "Escolhe o Melhor",
-        "step3Desc": "Compara propostas, vê avaliações e escolhe o mais adequado."
+        "step2Desc": "Vendedores, profissionais e particulares enviam-te as melhores ofertas diretamente.",
+        "step3Title": "Tu Escolhes",
+        "step3Desc": "Compara propostas, vê avaliações e escolhe a melhor. Zero pesquisa necessária."
     },
     "categories": {
         "title": "Explorar Categorias",
