@@ -140,24 +140,25 @@ export default function UseCaseShowcase() {
           line-height: 1.4;
         }
 
-        /* 2×2 grid */
+        /* 4 cols on desktop, 2 on tablet, 1 on mobile */
         .uc-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 12px;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 10px;
         }
 
-        /* Each use-case card — square shaped, uniform light green */
+        /* Each use-case card — compact, light green */
         .uc-card {
           display: flex;
           flex-direction: column;
-          gap: 10px;
-          padding: 24px;
-          border-radius: 14px;
+          justify-content: space-between;
+          gap: 8px;
+          padding: 18px;
+          border-radius: 12px;
           text-decoration: none;
           border: 1px solid transparent;
           background: #e8f5ee;
-          aspect-ratio: 1 / 1;
+          height: 160px;
           transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
           cursor: pointer;
         }
@@ -212,17 +213,21 @@ export default function UseCaseShowcase() {
           color: var(--text-primary);
         }
 
-        /* Tablet: keep 2 cols but reduce padding */
+        /* Tablet: 2 cols */
         @media (max-width: 768px) {
-          .uc-box { padding: 20px; }
-          .uc-card { padding: 16px; gap: 8px; }
-          .uc-card-query { font-size: 13.5px; }
+          .uc-grid { grid-template-columns: repeat(2, 1fr); }
+          .uc-box { padding: 16px; }
+          .uc-card { padding: 14px; height: 150px; }
+          .uc-card-query { font-size: 13px; }
         }
 
-        /* Mobile: stack to 1 col */
+        /* Mobile: 2 cols still, smaller */
         @media (max-width: 480px) {
-          .uc-grid { grid-template-columns: 1fr; }
-          .uc-box { padding: 16px; border-radius: 14px; }
+          .uc-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+          .uc-box { padding: 14px; border-radius: 14px; }
+          .uc-card { padding: 12px; height: 130px; }
+          .uc-card-query { font-size: 12px; }
+          .uc-card-icon { width: 30px; height: 30px; border-radius: 7px; }
         }
       `}</style>
     </section>
