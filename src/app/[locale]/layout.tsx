@@ -3,6 +3,7 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { CurrencyProvider } from '@/context/CurrencyContext';
 import AuthProvider from '@/context/AuthProvider';
 import Navbar from '@/components/layout/Navbar';
 import CategoryBar from '@/components/layout/CategoryBar';
@@ -34,14 +35,16 @@ export default async function LocaleLayout({ children, params }: Props) {
         <NextIntlClientProvider messages={messages}>
           <AuthProvider>
             <ThemeProvider>
-              <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-                <Navbar />
-                <CategoryBar />
-                <main style={{ flex: 1 }}>
-                  {children}
-                </main>
-                <Footer />
-              </div>
+              <CurrencyProvider>
+                <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+                  <Navbar />
+                  <CategoryBar />
+                  <main style={{ flex: 1 }}>
+                    {children}
+                  </main>
+                  <Footer />
+                </div>
+              </CurrencyProvider>
             </ThemeProvider>
           </AuthProvider>
         </NextIntlClientProvider>

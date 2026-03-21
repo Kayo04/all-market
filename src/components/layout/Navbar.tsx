@@ -7,6 +7,8 @@ import { useTheme } from '@/context/ThemeContext';
 import { useSession, signOut } from 'next-auth/react';
 import { Sun, Moon, Menu, X, Globe, MessageSquare, Search } from 'lucide-react';
 import NotificationBell from '@/components/layout/NotificationBell';
+import PreferencesModal from '@/components/layout/PreferencesModal';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function Navbar() {
   const t = useTranslations('nav');
@@ -19,6 +21,8 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [scrollY, setScrollY] = useState(0);
+  const [showPrefs, setShowPrefs] = useState(false);
+  const { currency } = useCurrency();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -90,67 +94,47 @@ export default function Navbar() {
           <span>needer</span>
         </Link>
 
-        {/* Search Bar (desktop) */}
+        {/* Search Bar (desktop) — big white input + black flush button */}
         <form
           onSubmit={handleSearch}
           style={{
             width: '100%',
-            maxWidth: '480px',
+            maxWidth: '500px',
             display: 'flex',
-            alignItems: 'center',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--border)',
+            alignItems: 'stretch',
+            borderRadius: '8px',
+            border: '1px solid #d0d0d0',
             overflow: 'hidden',
-            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            transition: 'opacity 0.3s ease, transform 0.3s ease',
             opacity: showSearch ? 1 : 0,
             pointerEvents: showSearch ? 'auto' : 'none',
             transform: showSearch ? 'translateY(0)' : 'translateY(10px)',
           }}
           className="desktop-search"
-          onFocus={(e) => {
-            (e.currentTarget as HTMLElement).style.borderColor = 'var(--border-hover)';
-          }}
-          onBlur={(e) => {
-            (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
-          }}
         >
-          <div style={{ position: 'relative', flex: 1 }}>
-            <Search
-              size={15}
-              style={{
-                position: 'absolute',
-                left: '12px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: 'var(--text-tertiary)',
-                pointerEvents: 'none',
-              }}
-            />
-            <input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={th('searchPlaceholder')}
-              style={{
-                width: '100%',
-                padding: '8px 12px 8px 36px',
-                fontSize: '13px',
-                fontFamily: 'var(--font-sans)',
-                background: 'var(--bg-input)',
-                border: 'none',
-                color: 'var(--text-primary)',
-                outline: 'none',
-              }}
-            />
-          </div>
+          <input
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={locale === 'pt' ? 'O que procuras?' : 'What do you need?'}
+            style={{
+              flex: 1,
+              padding: '8px 14px',
+              fontSize: '13px',
+              fontFamily: 'var(--font-sans)',
+              background: '#ffffff',
+              border: 'none',
+              color: 'var(--text-primary)',
+              outline: 'none',
+              minWidth: 0,
+            }}
+          />
           <button
             type="submit"
             style={{
-              margin: '4px',
-              padding: '6px 14px',
+              padding: '0 18px',
               background: '#111111',
               color: '#ffffff',
               border: 'none',
-              borderRadius: 'var(--radius-md)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
@@ -158,7 +142,7 @@ export default function Navbar() {
               flexShrink: 0,
             }}
           >
-            <Search size={14} />
+            <Search size={16} />
           </button>
         </form>
 
@@ -171,9 +155,9 @@ export default function Navbar() {
           }}
           className="desktop-nav"
         >
-          {/* Language Toggle */}
+          {/* Language/Currency Toggle */}
           <button
-            onClick={switchLocale}
+            onClick={() => setShowPrefs(true)}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -188,10 +172,10 @@ export default function Navbar() {
               cursor: 'pointer',
               transition: 'color var(--transition-fast)',
             }}
-            title={locale === 'pt' ? 'Switch to English' : 'Mudar para Português'}
+            title="Language & Currency"
           >
             <Globe size={13} />
-            {locale.toUpperCase()}
+            {locale.toUpperCase()} · {currency}
           </button>
 
           {/* Theme Toggle */}
@@ -280,10 +264,9 @@ export default function Navbar() {
                   padding: '6px 10px',
                   fontSize: '13px',
                   fontWeight: 500,
-                  color: 'var(--text-primary)',
+                  color: 'var(--text-secondary)',
                   textDecoration: 'none',
                   whiteSpace: 'nowrap',
-                  transition: 'color var(--transition-fast)',
                 }}
               >
                 {locale === 'pt' ? 'Tornar-me Profissional' : 'Become a Professional'}
@@ -470,6 +453,7 @@ export default function Navbar() {
       `}</style>
     </header>
       <div style={{ height: '56px', flexShrink: 0 }} />
+      {showPrefs && <PreferencesModal onClose={() => setShowPrefs(false)} />}
     </>
   );
 }
