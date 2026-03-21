@@ -11,8 +11,6 @@ const CASES = [
     labelPT: 'Serviço Local',
     queryEN: 'I need an electrician\nin Porto, ASAP.',
     queryPT: 'Preciso de um eletricista\nem Porto, urgente.',
-    color: '#fff7ed',
-    iconBg: '#f97316',
     href: '/requests/new?category=home-repairs',
   },
   {
@@ -21,8 +19,6 @@ const CASES = [
     labelPT: 'Contratação',
     queryEN: 'I need a Marketing\nDirector for 3 months.',
     queryPT: 'Preciso de um Diretor\nde Marketing por 3 meses.',
-    color: '#eff6ff',
-    iconBg: '#3b82f6',
     href: '/requests/new?category=business',
   },
   {
@@ -31,8 +27,6 @@ const CASES = [
     labelPT: 'Comprar Produto',
     queryEN: 'Looking for a PS4\nunder €400.',
     queryPT: 'Quero uma PS4\naté 400€.',
-    color: '#f0fdf4',
-    iconBg: '#22c55e',
     href: '/requests/new?category=equipment',
   },
   {
@@ -41,11 +35,11 @@ const CASES = [
     labelPT: 'Grande Compra',
     queryEN: 'Looking for a BMW\nSeries 1, under €15k.',
     queryPT: 'Quero um BMW\nSérie 1, até 15.000€.',
-    color: '#fdf4ff',
-    iconBg: '#a855f7',
     href: '/requests/new?category=automotive',
   },
 ];
+
+const ICON_BG = '#1e3d2f';
 
 export default function UseCaseShowcase() {
   const locale = useLocale();
@@ -77,7 +71,7 @@ export default function UseCaseShowcase() {
                 className="uc-card"
               >
                 {/* Icon pill */}
-                <span className="uc-card-icon" style={{ background: c.iconBg }}>
+                <span className="uc-card-icon" style={{ background: ICON_BG }}>
                   {c.icon}
                 </span>
                 {/* Type label */}
@@ -101,7 +95,7 @@ export default function UseCaseShowcase() {
       <style>{`
         .uc-section {
           width: 100%;
-          padding: 28px 0 32px;
+          padding: 48px 0 32px;
         }
 
         .uc-inner {
@@ -110,16 +104,15 @@ export default function UseCaseShowcase() {
           padding: 0 var(--grid-px);
         }
 
-        /* Outer container — single rounded card */
+        /* Outer container — no border, just spacing */
         .uc-box {
-          border: 1px solid var(--border);
-          border-radius: 18px;
-          padding: 28px;
-          background: var(--bg-primary);
+          padding: 0;
+          background: transparent;
         }
 
         .uc-box-header {
           margin-bottom: 20px;
+          text-align: center;
         }
 
         .uc-box-label {
@@ -158,7 +151,7 @@ export default function UseCaseShowcase() {
           text-decoration: none;
           border: 1px solid transparent;
           background: #e8f5ee;
-          height: 160px;
+          height: 180px;
           transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
           cursor: pointer;
         }
@@ -168,11 +161,11 @@ export default function UseCaseShowcase() {
           transform: translateY(-2px);
         }
 
-        /* Coloured icon pill */
+        /* Icon pill — uniform dark green, fully circular */
         .uc-card-icon {
-          width: 36px;
-          height: 36px;
-          border-radius: 9px;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
