@@ -147,7 +147,7 @@ export default function Navbar() {
             style={{
               margin: '4px',
               padding: '6px 14px',
-              background: 'var(--primary)',
+              background: '#111111',
               color: '#ffffff',
               border: 'none',
               borderRadius: 'var(--radius-md)',
@@ -156,10 +156,7 @@ export default function Navbar() {
               alignItems: 'center',
               justifyContent: 'center',
               flexShrink: 0,
-              transition: 'background 0.15s ease',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--primary-dark, #163a24)')}
-            onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--primary)')}
           >
             <Search size={14} />
           </button>
@@ -282,7 +279,7 @@ export default function Navbar() {
                 style={{
                   padding: '6px 10px',
                   fontSize: '13px',
-                  fontWeight: 700,
+                  fontWeight: 500,
                   color: 'var(--text-primary)',
                   textDecoration: 'none',
                   whiteSpace: 'nowrap',

@@ -332,7 +332,7 @@ export default function HeroSection() {
                 (e.currentTarget as HTMLElement).style.color = '#000000';
               }}
             >
-              {t('ctaPro')}
+              {locale === 'pt' ? 'Aderir Agora' : 'Join Now'}
             </Link>
           </div>
         </div>

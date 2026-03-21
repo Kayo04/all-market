@@ -177,7 +177,7 @@ export default function PopularCategories() {
           max-width: 90%;
         }
 
-        /* Image inset: light mint green, image floats centered with visible padding */
+        /* Image inset: light mint green, image fills completely */
         .pc-card-img-section {
           margin: 0 10px 10px 10px;
           border-radius: 12px;
@@ -187,13 +187,13 @@ export default function PopularCategories() {
           align-items: center;
           justify-content: center;
           min-height: 165px;
-          padding: 20px;
+          padding: 0;
         }
 
         .pc-card-img {
           width: 100%;
-          height: 130px;
-          object-fit: contain;
+          height: 100%;
+          object-fit: cover;
           display: block;
         }
 
