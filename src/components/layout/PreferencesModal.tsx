@@ -90,8 +90,8 @@ export default function PreferencesModal({ onClose }: Props) {
                   marginRight: '24px',
                   background: 'none', border: 'none', cursor: 'pointer',
                   fontSize: '15px', fontWeight: 500,
-                  color: tab === t ? '#1dbf73' : '#777',
-                  borderBottom: tab === t ? '2px solid #1dbf73' : '2px solid transparent',
+                  color: tab === t ? '#003912' : '#777',
+                  borderBottom: tab === t ? '2px solid #003912' : '2px solid transparent',
                   marginBottom: '-1px',
                   textTransform: 'capitalize',
                   transition: 'color 0.15s ease',
@@ -123,7 +123,7 @@ export default function PreferencesModal({ onClose }: Props) {
                       onMouseEnter={(e) => { (e.currentTarget).style.background = '#f5f5f5'; }}
                       onMouseLeave={(e) => { (e.currentTarget).style.background = 'none'; }}
                     >
-                      <span style={{ width: '16px', color: '#1dbf73', flexShrink: 0 }}>
+                      <span style={{ width: '16px', color: '#003912', flexShrink: 0 }}>
                         {active && <Check size={15} strokeWidth={2.5} />}
                       </span>
                       {lang.label}
@@ -152,7 +152,7 @@ export default function PreferencesModal({ onClose }: Props) {
                       onMouseEnter={(e) => { (e.currentTarget).style.background = '#f5f5f5'; }}
                       onMouseLeave={(e) => { (e.currentTarget).style.background = 'none'; }}
                     >
-                      <span style={{ width: '16px', color: '#1dbf73', flexShrink: 0 }}>
+                      <span style={{ width: '16px', color: '#003912', flexShrink: 0 }}>
                         {active && <Check size={15} strokeWidth={2.5} />}
                       </span>
                       <span style={{ fontWeight: 600, minWidth: '32px', color: '#555' }}>{cur.symbol}</span>

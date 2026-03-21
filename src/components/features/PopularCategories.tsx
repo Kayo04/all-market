@@ -148,7 +148,7 @@ export default function PopularCategories() {
           min-width: ${CARD_WIDTH}px;
           max-width: ${CARD_WIDTH}px;
           border-radius: 14px;
-          background: #1e3d2f;
+          background: #003912;
           text-decoration: none;
           display: flex;
           flex-direction: column;
@@ -164,12 +164,15 @@ export default function PopularCategories() {
         .pc-card-header {
           padding: 18px 16px 14px;
           flex-shrink: 0;
+          height: 72px;
+          display: flex;
+          align-items: flex-start;
         }
 
         /* Category name — top, white, bold */
         .pc-card-title {
           font-family: var(--font-sans);
-          font-size: 14.5px;
+          font-size: 17px;
           font-weight: 700;
           color: #ffffff;
           line-height: 1.35;

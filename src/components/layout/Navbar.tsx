@@ -269,7 +269,7 @@ export default function Navbar() {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {locale === 'pt' ? 'Tornar-me Profissional' : 'Become a Professional'}
+                {locale === 'pt' ? 'Torne-se um Profissional' : 'Become a Professional'}
               </Link>
 
               <Link
@@ -431,7 +431,7 @@ export default function Navbar() {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <Link href="/auth/register?role=pro" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', background: 'var(--primary)', color: '#ffffff', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontSize: '14px', fontWeight: 700, textAlign: 'center' }}>
-                {locale === 'pt' ? 'Tornar-me Profissional' : 'Become a Professional'}
+                {locale === 'pt' ? 'Torne-se um Profissional' : 'Become a Professional'}
               </Link>
               <Link href="/auth/login" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', textDecoration: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: 'var(--radius-md)', fontSize: '14px', fontWeight: 500, textAlign: 'center' }}>
                 {t('login')}

@@ -70,7 +70,7 @@ export default function NeederPro() {
                 <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                   fill="none" stroke="#eee" strokeWidth="3.5" />
                 <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none" stroke="#1dbf73" strokeWidth="3.5" strokeDasharray="92, 100" />
+                  fill="none" stroke="#003912" strokeWidth="3.5" strokeDasharray="92, 100" />
               </svg>
               <span className="np-ring-pct">92%</span>
             </div>
@@ -87,12 +87,12 @@ export default function NeederPro() {
               <svg viewBox="0 0 200 80" preserveAspectRatio="none" className="np-chart-svg">
                 <defs>
                   <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#1dbf73" stopOpacity="0.25" />
-                    <stop offset="100%" stopColor="#1dbf73" stopOpacity="0.02" />
+                    <stop offset="0%" stopColor="#003912" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="#003912" stopOpacity="0.02" />
                   </linearGradient>
                 </defs>
                 <path d="M0,80 L0,50 C30,55 60,35 90,28 C120,21 150,15 200,10 L200,80 Z" fill="url(#chartGrad)" />
-                <path d="M0,50 C30,55 60,35 90,28 C120,21 150,15 200,10" fill="none" stroke="#1dbf73" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M0,50 C30,55 60,35 90,28 C120,21 150,15 200,10" fill="none" stroke="#003912" strokeWidth="2.5" strokeLinecap="round" />
               </svg>
             </div>
 
@@ -169,7 +169,7 @@ export default function NeederPro() {
           color: #404145;
           margin-bottom: 40px;
         }
-        .np-accent { color: #1dbf73; }
+        .np-accent { color: #003912; }
 
         /* 2-col feature grid */
         .np-features {
@@ -179,7 +179,7 @@ export default function NeederPro() {
           margin-bottom: 36px;
         }
         .np-feat { display: flex; flex-direction: column; gap: 8px; }
-        .np-feat-icon { color: #1dbf73; }
+        .np-feat-icon { color: #003912; }
         .np-feat-title {
           font-family: var(--font-sans);
           font-size: 15px;
