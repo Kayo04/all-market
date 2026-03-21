@@ -145,14 +145,21 @@ export default function Navbar() {
           <button
             type="submit"
             style={{
-              padding: '8px 14px',
-              background: 'var(--text-primary)',
-              color: 'var(--bg-primary)',
+              margin: '4px',
+              padding: '6px 14px',
+              background: 'var(--primary)',
+              color: '#ffffff',
               border: 'none',
+              borderRadius: 'var(--radius-md)',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+              transition: 'background 0.15s ease',
             }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--primary-dark, #163a24)')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--primary)')}
           >
             <Search size={14} />
           </button>
@@ -269,6 +276,22 @@ export default function Navbar() {
             </>
           ) : (
             <>
+              {/* Become a Professional */}
+              <Link
+                href="/auth/register?role=pro"
+                style={{
+                  padding: '6px 10px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  textDecoration: 'none',
+                  whiteSpace: 'nowrap',
+                  transition: 'color var(--transition-fast)',
+                }}
+              >
+                {locale === 'pt' ? 'Tornar-me Profissional' : 'Become a Professional'}
+              </Link>
+
               <Link
                 href="/auth/login"
                 style={{
@@ -372,10 +395,12 @@ export default function Navbar() {
             <button
               type="submit"
               style={{
-                padding: '10px 14px',
-                background: 'var(--text-primary)',
+                margin: '4px',
+                padding: '8px 14px',
+                background: 'var(--primary)',
                 border: 'none',
-                color: 'var(--bg-primary)',
+                color: '#ffffff',
+                borderRadius: 'var(--radius-md)',
                 cursor: 'pointer',
               }}
             >
@@ -425,6 +450,9 @@ export default function Navbar() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <Link href="/auth/register?role=pro" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', background: 'var(--primary)', color: '#ffffff', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontSize: '14px', fontWeight: 700, textAlign: 'center' }}>
+                {locale === 'pt' ? 'Tornar-me Profissional' : 'Become a Professional'}
+              </Link>
               <Link href="/auth/login" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', textDecoration: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: 'var(--radius-md)', fontSize: '14px', fontWeight: 500, textAlign: 'center' }}>
                 {t('login')}
               </Link>
