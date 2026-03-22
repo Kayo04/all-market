@@ -42,11 +42,13 @@ export interface Category {
     labelEN: string;
     labelPT: string;
     subcategories: SubCategory[];
+    type: 'service' | 'product';
 }
 
 // ─── Request ────────────────────────────────────────────
 export type RequestStatus = 'open' | 'in_progress' | 'closed';
 export type ItemCondition = 'new' | 'used' | 'any';
+export type RequestType = 'service' | 'product';
 
 export interface IRequest {
     _id: string;
@@ -58,6 +60,7 @@ export interface IRequest {
     location: GeoLocation;
     locationLabel?: string; // human-readable, e.g. "Lisbon, Portugal"
     status: RequestStatus;
+    type: RequestType;
     userId: string;
     isFeatured: boolean;
     // Equipment-specific fields

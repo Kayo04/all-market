@@ -7,6 +7,11 @@ const RequestSchema = new Schema(
         category: { type: String, required: true },
         subcategory: { type: String, required: true },
         budget: { type: Number, required: true, min: 0 },
+        type: {
+            type: String,
+            enum: ['service', 'product'],
+            default: 'service',
+        },
         location: {
             type: { type: String, enum: ['Point'], default: 'Point' },
             coordinates: { type: [Number], required: true },

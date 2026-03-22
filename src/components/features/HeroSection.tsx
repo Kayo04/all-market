@@ -29,6 +29,7 @@ export default function HeroSection() {
   const videoARef = useRef<HTMLVideoElement>(null);
   const videoBRef = useRef<HTMLVideoElement>(null);
   const [activeSlot, setActiveSlot] = useState<'A' | 'B'>('A');
+  const [activeType, setActiveType] = useState<'service' | 'product'>('service');
 
   const cycleVideo = useCallback(() => {
     const incoming = (currentIndex + 1) % VIDEOS.length;
@@ -67,7 +68,7 @@ export default function HeroSection() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/requests?q=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/requests?q=${encodeURIComponent(searchQuery.trim())}&type=${activeType}`);
     }
   };
 
@@ -172,6 +173,42 @@ export default function HeroSection() {
 
 
 
+          {/* Services / Products toggle */}
+          <div style={{
+            display: 'flex',
+            gap: '4px',
+            marginBottom: '16px',
+            background: 'rgba(255,255,255,0.15)',
+            borderRadius: '10px',
+            padding: '4px',
+            alignSelf: 'flex-start',
+            backdropFilter: 'blur(8px)',
+          }}>
+            {(['service', 'product'] as const).map((tp) => (
+              <button
+                key={tp}
+                onClick={() => setActiveType(tp)}
+                style={{
+                  padding: '7px 20px',
+                  borderRadius: '7px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: 600,
+                  fontFamily: 'var(--font-sans)',
+                  transition: 'all 0.18s ease',
+                  background: activeType === tp ? '#ffffff' : 'transparent',
+                  color: activeType === tp ? '#003912' : 'rgba(255,255,255,0.85)',
+                  boxShadow: activeType === tp ? '0 1px 4px rgba(0,0,0,0.15)' : 'none',
+                }}
+              >
+                {tp === 'service'
+                  ? (locale === 'pt' ? 'Serviços' : 'Services')
+                  : (locale === 'pt' ? 'Produtos' : 'Products')}
+              </button>
+            ))}
+          </div>
+
           {/* Search Bar */}
           <form
             onSubmit={handleSearch}
@@ -188,7 +225,11 @@ export default function HeroSection() {
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t('searchPlaceholder')}
+              placeholder={
+                activeType === 'service'
+                  ? (locale === 'pt' ? 'Ex: Eletricista em Lisboa, Explicações de Matemática...' : 'E.g. Electrician in Lisbon, Math tutoring...')
+                  : (locale === 'pt' ? 'Ex: PS4 até €400, iPhone 14, Portátil gaming...' : 'E.g. PS4 up to €400, iPhone 14, Gaming laptop...')
+              }
               style={{
                 flex: 1,
                 padding: '16px 20px',
@@ -231,24 +272,24 @@ export default function HeroSection() {
           >
             <span
               className="hero-suggestion-label"
-              style={{
-                fontSize: '14px',
-                fontWeight: 600,
-                color: 'rgba(255,255,255,0.9)',
-              }}
+              style={{ fontSize: '14px', fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}
             >
               {locale === 'pt' ? 'Popular:' : 'Popular:'}
             </span>
-            {(locale === 'pt'
-              ? ['Criação de Websites', 'Remodelações', 'Gestão de Redes Sociais']
-              : ['Website Development', 'Home Remodeling', 'Social Media Management']
+            {(activeType === 'service'
+              ? (locale === 'pt'
+                ? ['Criação de Websites', 'Remodelações', 'Gestão de Redes Sociais']
+                : ['Website Development', 'Home Remodeling', 'Social Media Management'])
+              : (locale === 'pt'
+                ? ['PlayStation 5', 'iPhone 15', 'MacBook Air']
+                : ['PlayStation 5', 'iPhone 15', 'MacBook Air'])
             ).map((sug) => (
               <button
                 key={sug}
                 className="hero-suggestion-btn"
                 onClick={() => {
                   setSearchQuery(sug);
-                  router.push(`/requests?q=${encodeURIComponent(sug)}`);
+                  router.push(`/requests?q=${encodeURIComponent(sug)}&type=${activeType}`);
                 }}
                 style={{
                   padding: '8px 16px',
@@ -265,12 +306,8 @@ export default function HeroSection() {
                   alignItems: 'center',
                   gap: '6px',
                 }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.2)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = 'transparent';
-                }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.2)'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
               >
                 {sug}
                 <ArrowRight size={14} />
