@@ -29,7 +29,6 @@ export default function HeroSection() {
   const videoARef = useRef<HTMLVideoElement>(null);
   const videoBRef = useRef<HTMLVideoElement>(null);
   const [activeSlot, setActiveSlot] = useState<'A' | 'B'>('A');
-  const [activeType, setActiveType] = useState<'service' | 'product'>('service');
 
   const cycleVideo = useCallback(() => {
     const incoming = (currentIndex + 1) % VIDEOS.length;
@@ -68,7 +67,7 @@ export default function HeroSection() {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/requests?q=${encodeURIComponent(searchQuery.trim())}&type=${activeType}`);
+      router.push(`/requests?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
@@ -160,54 +159,18 @@ export default function HeroSection() {
           >
             {locale === 'pt' ? (
               <>
-                Diz-nos o que precisas.{' '}<br />
-                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>As propostas chegam até ti.</span>
+                Precisas de um canalizador <span style={{ color: '#f97316' }}>AGORA</span>?{' '}<br />
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>Define o preço. O primeiro profissional a aceitar fica com o trabalho.</span>
               </>
             ) : (
               <>
-                Tell us what you need.{' '}<br />
-                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>The proposals come to you.</span>
+                Need a plumber <span style={{ color: '#f97316' }}>RIGHT NOW</span>?{' '}<br />
+                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>Set your price. First pro to accept gets the job.</span>
               </>
             )}
           </h1>
 
 
-
-          {/* Services / Products toggle */}
-          <div style={{
-            display: 'flex',
-            gap: '4px',
-            marginBottom: '16px',
-            background: 'rgba(255,255,255,0.15)',
-            borderRadius: '10px',
-            padding: '4px',
-            alignSelf: 'flex-start',
-            backdropFilter: 'blur(8px)',
-          }}>
-            {(['service', 'product'] as const).map((tp) => (
-              <button
-                key={tp}
-                onClick={() => setActiveType(tp)}
-                style={{
-                  padding: '7px 20px',
-                  borderRadius: '7px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: 600,
-                  fontFamily: 'var(--font-sans)',
-                  transition: 'all 0.18s ease',
-                  background: activeType === tp ? '#ffffff' : 'transparent',
-                  color: activeType === tp ? '#003912' : 'rgba(255,255,255,0.85)',
-                  boxShadow: activeType === tp ? '0 1px 4px rgba(0,0,0,0.15)' : 'none',
-                }}
-              >
-                {tp === 'service'
-                  ? (locale === 'pt' ? 'Serviços' : 'Services')
-                  : (locale === 'pt' ? 'Produtos' : 'Products')}
-              </button>
-            ))}
-          </div>
 
           {/* Search Bar */}
           <form
@@ -225,11 +188,7 @@ export default function HeroSection() {
             <input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={
-                activeType === 'service'
-                  ? (locale === 'pt' ? 'Ex: Eletricista em Lisboa, Explicações de Matemática...' : 'E.g. Electrician in Lisbon, Math tutoring...')
-                  : (locale === 'pt' ? 'Ex: PS4 até €400, iPhone 14, Portátil gaming...' : 'E.g. PS4 up to €400, iPhone 14, Gaming laptop...')
-              }
+              placeholder={t('searchPlaceholder')}
               style={{
                 flex: 1,
                 padding: '16px 20px',
@@ -257,6 +216,7 @@ export default function HeroSection() {
             </button>
           </form>
 
+
           {/* Suggestions — horizontal scroll on mobile, no wrap */}
           <div
             className="hero-suggestions-row"
@@ -276,20 +236,16 @@ export default function HeroSection() {
             >
               {locale === 'pt' ? 'Popular:' : 'Popular:'}
             </span>
-            {(activeType === 'service'
-              ? (locale === 'pt'
-                ? ['Criação de Websites', 'Remodelações', 'Gestão de Redes Sociais']
-                : ['Website Development', 'Home Remodeling', 'Social Media Management'])
-              : (locale === 'pt'
-                ? ['PlayStation 5', 'iPhone 15', 'MacBook Air']
-                : ['PlayStation 5', 'iPhone 15', 'MacBook Air'])
+            {(locale === 'pt'
+              ? ['Canalizador Porto 🔥', 'Eletricista Urgente', 'Pintor Porto', 'Serralheiro']
+              : ['Porto Plumber 🔥', 'Emergency Electrician', 'Painter Porto', 'Locksmith']
             ).map((sug) => (
               <button
                 key={sug}
                 className="hero-suggestion-btn"
                 onClick={() => {
                   setSearchQuery(sug);
-                  router.push(`/requests?q=${encodeURIComponent(sug)}&type=${activeType}`);
+                  router.push(`/requests?q=${encodeURIComponent(sug)}`);
                 }}
                 style={{
                   padding: '8px 16px',

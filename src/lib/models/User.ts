@@ -14,6 +14,8 @@ const UserSchema = new Schema(
         locationLabel: { type: String, default: '' },
         avatar: { type: String, default: '' },
         bio: { type: String, default: '' },
+        phone: { type: String, default: '' },
+        proCategory: { type: String, default: '' },
         skills: [{ type: String }],
         ratings: [
             {

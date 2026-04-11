@@ -1,8 +1,8 @@
 {
   "nav": {
     "home": "Home",
-    "requests": "Browse Requests",
-    "postRequest": "Post a Request",
+    "requests": "Browse Jobs",
+    "postRequest": "Post a Job",
     "dashboard": "Dashboard",
     "login": "Sign In",
     "register": "Sign Up",
@@ -10,30 +10,29 @@
     "profile": "Profile"
   },
   "hero": {
-    "title": "Tell us what you need.",
-    "subtitle": "Services, professionals or products — post your need and receive proposals. No searching, no hunting.",
-    "cta": "Post Your Need",
-    "ctaPro": "Join as a Seller",
-    "searchPlaceholder": "E.g.: Electrician in Lisbon, PS4 up to €400, BMW Series 1 up to €15k..."
+    "title": "Need a plumber RIGHT NOW?",
+    "subtitle": "Set your fixed price. The first verified professional to accept gets the job — in minutes, not days.",
+    "cta": "Post a Job",
+    "ctaPro": "Join as a Pro",
+    "searchPlaceholder": "E.g.: Emergency plumber Porto, Electrician urgently, Painter..."
   },
   "howItWorks": {
     "title": "How It Works",
-    "step1Title": "Post Your Need",
-    "step1Desc": "Describe what you need — a service, a professional, or a product. Set your budget and location.",
-    "step2Title": "Receive Proposals",
-    "step2Desc": "Sellers, pros and individuals send you their best offers directly.",
-    "step3Title": "You Choose",
-    "step3Desc": "Compare offers, check ratings, pick the best one. Zero hunting required."
+    "step1Title": "Post Your Job & Set a Fixed Price",
+    "step1Desc": "Describe what you need and set the exact amount you will pay. No guessing, no back-and-forth negotiation.",
+    "step2Title": "First Verified Pro Accepts",
+    "step2Desc": "Verified professionals see your job in real-time. The very first one to click Accept gets it — speed wins.",
+    "step3Title": "Job Done in Minutes",
+    "step3Desc": "The pro contacts you immediately. No waiting 24 hours for quotes. No comparing 10 proposals."
   },
   "categories": {
-    "title": "Explore Categories",
+    "title": "Service Categories",
     "subtitle": "Find exactly what you need across our service categories.",
     "home-repairs": "Home Repairs",
     "tech-digital": "Tech & Digital",
     "tutoring": "Tutoring & Languages",
     "events": "Events & Parties",
     "wellness": "Wellness & Sports",
-    "equipment": "Buy Equipment",
     "business": "Business & Consulting",
     "design": "Design & Creative",
     "writing": "Writing & Translation",
@@ -42,16 +41,16 @@
     "beauty": "Beauty & Personal Care"
   },
   "stats": {
-    "requests": "Requests Posted",
+    "requests": "Jobs Posted",
     "professionals": "Verified Professionals",
     "categories": "Service Categories",
     "satisfaction": "Satisfaction Rate"
   },
   "cta": {
     "title": "Ready to get started?",
-    "subtitle": "Join thousands who already found what they need.",
-    "clientBtn": "Post Your First Request",
-    "proBtn": "Register as a Professional"
+    "subtitle": "Post a job in under a minute. A pro accepts in seconds.",
+    "clientBtn": "Post Your First Job",
+    "proBtn": "Join as a Professional"
   },
   "auth": {
     "loginTitle": "Welcome Back",
@@ -72,27 +71,34 @@
     "orContinue": "Or continue with"
   },
   "request": {
-    "newTitle": "Create a Request",
+    "newTitle": "Post a Job",
     "title": "Title",
-    "titlePlaceholder": "E.g.: Need an electrician for my apartment",
+    "titlePlaceholder": "E.g.: Need a plumber urgently, pipe burst",
     "description": "Description",
-    "descriptionPlaceholder": "Describe in detail what you need...",
+    "descriptionPlaceholder": "Describe the problem in detail so pros can decide quickly...",
     "category": "Category",
     "subcategory": "Subcategory",
-    "budget": "Maximum Budget (€)",
-    "budgetPlaceholder": "E.g.: 500",
+    "budget": "Fixed Price (€)",
+    "budgetPlaceholder": "E.g.: 80",
     "location": "Location",
-    "locationPlaceholder": "E.g.: Lisbon, Portugal",
+    "locationPlaceholder": "Porto, Portugal",
     "itemCondition": "Item Condition",
     "conditionNew": "New",
     "conditionUsed": "Used",
     "conditionAny": "Any",
     "acceptsTrades": "Accepts trades?",
-    "submit": "Publish Request",
+    "submit": "Publish Job",
     "statusOpen": "Open",
     "statusInProgress": "In Progress",
+    "statusAccepted": "Accepted",
     "statusClosed": "Closed",
-    "featured": "Featured"
+    "featured": "Featured",
+    "urgentNow": "RIGHT NOW",
+    "urgentStandard": "FLEXIBLE",
+    "acceptJob": "Accept this job for €{price}",
+    "jobTaken": "Too late — another pro accepted first.",
+    "waitingForPro": "Waiting for a professional...",
+    "intentConfirmLabel": "I confirm that I have the budget available and will pay the first verified professional who accepts."
   },
   "proposal": {
     "title": "Proposals",
@@ -110,27 +116,27 @@
   },
   "dashboard": {
     "client": {
-      "title": "My Requests",
-      "subtitle": "Track your requests and received proposals",
-      "noRequests": "You haven't made any requests yet.",
+      "title": "My Jobs",
+      "subtitle": "Track your posted jobs",
+      "noRequests": "You haven't posted any jobs yet.",
       "proposalsReceived": "proposals received",
-      "viewProposals": "View Proposals",
-      "closeRequest": "Close Request"
+      "viewProposals": "View",
+      "closeRequest": "Close Job"
     },
     "pro": {
-      "title": "Opportunities Feed",
-      "subtitle": "Find and respond to requests near you",
-      "noOpportunities": "No matching opportunities right now.",
-      "respond": "Respond",
-      "proposalsSent": "Proposals Sent",
-      "acceptanceRate": "Acceptance Rate",
-      "activeLeads": "Active Leads",
-      "drafts": "My Draft Templates",
-      "manageDrafts": "Manage Drafts"
+      "title": "Available Jobs",
+      "subtitle": "Real-time jobs near you — be the first to accept",
+      "noOpportunities": "No matching jobs right now.",
+      "respond": "Accept",
+      "proposalsSent": "Jobs Accepted",
+      "acceptanceRate": "Win Rate",
+      "activeLeads": "Active Jobs",
+      "drafts": "My Templates",
+      "manageDrafts": "Manage Templates"
     }
   },
   "drafts": {
-    "title": "Proposal Templates",
+    "title": "Response Templates",
     "subtitle": "Save time with reusable response templates",
     "newDraft": "New Template",
     "draftTitle": "Template Title",
@@ -157,23 +163,23 @@
     "verified": "Verified"
   },
   "footer": {
-    "tagline": "The marketplace that works for you.",
+    "tagline": "The fastest way to hire a professional.",
     "colCategories": "Categories",
     "colClients": "For Clients",
     "colPros": "For Professionals",
     "colCompany": "Company",
     "colSupport": "Support",
     "clientLinks": {
-      "howItWorks": "How Needer Works",
+      "howItWorks": "How It Works",
       "success": "Success Stories",
       "quality": "Quality Guide",
       "trust": "Trust & Safety"
     },
     "proLinks": {
-      "becomePro": "Become a Needer Professional",
+      "becomePro": "Become a Professional",
       "neederPro": "Needer Pro (Premium)",
       "community": "Community Hub",
-      "resources": "Seller Resources"
+      "resources": "Pro Resources"
     },
     "companyLinks": {
       "about": "About Needer",
@@ -197,13 +203,13 @@
     "title": "Popular Categories"
   },
   "recent": {
-    "title": "Recent Requests",
-    "empty": "No requests yet. Be the first to post!",
+    "title": "Latest Jobs",
+    "empty": "No jobs yet. Be the first to post!",
     "viewAll": "View All",
-    "budget": "Budget"
+    "budget": "Fixed Price"
   },
   "proSection": {
-    "title": "The premium freelance solution for businesses.",
+    "title": "The premium professional services solution for businesses.",
     "apply": "Apply Now",
     "feat1": {
       "title": "Dedicated hiring experts",
@@ -223,7 +229,7 @@
     }
   },
   "preFooter": {
-    "title": "World-class freelance services at your fingertips.",
+    "title": "World-class professional services at your fingertips.",
     "cta": "Join Needer"
   }
-}
+}

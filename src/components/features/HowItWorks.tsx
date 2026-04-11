@@ -1,12 +1,12 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { FileText, MessageSquare, CheckCircle } from 'lucide-react';
+import { Euro, Zap, ShieldCheck } from 'lucide-react';
 
 const steps = [
-  { icon: FileText, key: 'step1', num: '01' },
-  { icon: MessageSquare, key: 'step2', num: '02' },
-  { icon: CheckCircle, key: 'step3', num: '03' },
+  { icon: Euro, key: 'step1', num: '01', color: 'var(--accent)' },
+  { icon: Zap, key: 'step2', num: '02', color: '#f97316' },
+  { icon: ShieldCheck, key: 'step3', num: '03', color: '#22c55e' },
 ];
 
 export default function HowItWorks() {
@@ -78,7 +78,7 @@ export default function HowItWorks() {
 
               <Icon
                 size={20}
-                color="var(--accent)"
+                color={step.color}
                 style={{ marginBottom: '12px' }}
               />
 

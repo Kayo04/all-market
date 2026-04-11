@@ -148,6 +148,38 @@ export default function ClientDashboard() {
           ))}
         </div>
       )}
+
+      {/* Become a Professional nudge */}
+      <Card
+        variant="glass"
+        hover={false}
+        style={{
+          marginTop: '40px',
+          padding: '28px 32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '20px',
+          flexWrap: 'wrap',
+          borderLeft: '4px solid #003912',
+        }}
+      >
+        <div>
+          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 700, marginBottom: '6px' }}>
+            {locale === 'pt' ? 'Oferece os teus serviços?' : 'Do you offer services?'}
+          </h3>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+            {locale === 'pt'
+              ? 'Torna-te um Profissional e começa a receber pedidos de clientes.'
+              : 'Become a Professional and start receiving requests from clients.'}
+          </p>
+        </div>
+        <Link href="/pro" style={{ textDecoration: 'none', flexShrink: 0 }}>
+          <Button style={{ background: '#003912', color: '#fff', border: 'none' }}>
+            {locale === 'pt' ? 'Tornar-me Profissional' : 'Become a Professional'}
+          </Button>
+        </Link>
+      </Card>
     </div>
   );
 }

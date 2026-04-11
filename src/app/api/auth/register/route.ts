@@ -6,21 +6,16 @@ import User from '@/lib/models/User';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { name, email, password, role, location, locationLabel } = body;
+        const { name, email, password, phone, role, locationLabel } = body;
 
-        if (!name || !email || !password || !role) {
+        if (!name || !email || !password) {
             return NextResponse.json(
-                { error: 'Name, email, password, and role are required' },
+                { error: 'Name, email and password are required' },
                 { status: 400 }
             );
         }
 
-        if (!['client', 'pro'].includes(role)) {
-            return NextResponse.json(
-                { error: 'Role must be "client" or "pro"' },
-                { status: 400 }
-            );
-        }
+        const assignedRole = role === 'pro' ? 'pro' : 'client';
 
         await dbConnect();
 
@@ -41,9 +36,10 @@ export async function POST(request: Request) {
             name,
             email: email.toLowerCase(),
             password: hashedPassword,
-            role,
-            location: location || { type: 'Point', coordinates: [0, 0] },
+            role: assignedRole,
+            phone: phone || '',
             locationLabel: locationLabel || '',
+            location: { type: 'Point', coordinates: [0, 0] },
         });
 
         return NextResponse.json(

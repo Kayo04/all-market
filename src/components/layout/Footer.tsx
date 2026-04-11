@@ -38,7 +38,7 @@ export default function Footer() {
             <Link href="/requests?category=tutoring" style={{ fontSize: '14px', color: '#62646a', textDecoration: 'none' }}>{tc('tutoring')}</Link>
             <Link href="/requests?category=events" style={{ fontSize: '14px', color: '#62646a', textDecoration: 'none' }}>{tc('events')}</Link>
             <Link href="/requests?category=wellness" style={{ fontSize: '14px', color: '#62646a', textDecoration: 'none' }}>{tc('wellness')}</Link>
-            <Link href="/requests?category=equipment" style={{ fontSize: '14px', color: '#62646a', textDecoration: 'none' }}>{tc('equipment')}</Link>
+            <Link href="/requests?category=cleaning" style={{ fontSize: '14px', color: '#62646a', textDecoration: 'none' }}>{tc('cleaning')}</Link>
           </div>
         </div>
 

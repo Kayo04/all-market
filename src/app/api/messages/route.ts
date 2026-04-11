@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
+import mongoose from 'mongoose';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import Message from '@/lib/models/Message';
@@ -24,16 +25,16 @@ export async function GET(request: Request) {
 
         if (conversations === '1') {
             // Get unique conversations: group by requestId, return last message
-            const pipeline = [
+            const pipeline: mongoose.PipelineStage[] = [
                 {
                     $match: {
                         $or: [
-                            { senderId: new (await import('mongoose')).default.Types.ObjectId(userId) },
-                            { receiverId: new (await import('mongoose')).default.Types.ObjectId(userId) },
+                            { senderId: new mongoose.Types.ObjectId(userId) },
+                            { receiverId: new mongoose.Types.ObjectId(userId) },
                         ],
                     },
                 },
-                { $sort: { createdAt: -1 as const } },
+                { $sort: { createdAt: -1 } },
                 {
                     $group: {
                         _id: '$requestId',
@@ -43,7 +44,7 @@ export async function GET(request: Request) {
                                 $cond: [
                                     {
                                         $and: [
-                                            { $eq: ['$receiverId', new (await import('mongoose')).default.Types.ObjectId(userId)] },
+                                            { $eq: ['$receiverId', new mongoose.Types.ObjectId(userId)] },
                                             { $eq: ['$readAt', null] },
                                         ],
                                     },
@@ -54,7 +55,7 @@ export async function GET(request: Request) {
                         },
                     },
                 },
-                { $sort: { 'lastMessage.createdAt': -1 as const } },
+                { $sort: { 'lastMessage.createdAt': -1 } },
             ];
 
             const convos = await Message.aggregate(pipeline);

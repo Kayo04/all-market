@@ -1,8 +1,8 @@
 {
     "nav": {
         "home": "Início",
-        "requests": "Ver Pedidos",
-        "postRequest": "Publicar Pedido",
+        "requests": "Ver Trabalhos",
+        "postRequest": "Publicar Trabalho",
         "dashboard": "Painel",
         "login": "Entrar",
         "register": "Registar",
@@ -10,30 +10,29 @@
         "profile": "Perfil"
     },
     "hero": {
-        "title": "Diz-nos o que precisas.",
-        "subtitle": "Serviços, profissionais ou produtos — publica a tua necessidade e recebe propostas. Sem pesquisar, sem perder tempo.",
-        "cta": "Publicar Pedido",
-        "ctaPro": "Registar como Vendedor",
-        "searchPlaceholder": "Ex: Eletricista em Lisboa, PS4 até 400€, BMW Série 1 até 15k€..."
+        "title": "Precisas de um canalizador AGORA?",
+        "subtitle": "Define o preço fixo. O primeiro profissional verificado a aceitar fica com o trabalho — em minutos, não em dias.",
+        "cta": "Publicar Trabalho",
+        "ctaPro": "Registar como Profissional",
+        "searchPlaceholder": "Ex: Canalizador urgente Porto, Eletricista, Pintor..."
     },
     "howItWorks": {
         "title": "Como Funciona",
-        "step1Title": "Publica a tua Necessidade",
-        "step1Desc": "Descreve o que precisas — um serviço, um profissional ou um produto. Define o orçamento e a localização.",
-        "step2Title": "Recebe Propostas",
-        "step2Desc": "Vendedores, profissionais e particulares enviam-te as melhores ofertas diretamente.",
-        "step3Title": "Tu Escolhes",
-        "step3Desc": "Compara propostas, vê avaliações e escolhe a melhor. Zero pesquisa necessária."
+        "step1Title": "Publica o Trabalho & Define o Preço Fixo",
+        "step1Desc": "Descreve o que precisas e define o valor exato que pagas. Sem adivinhações, sem negociação interminável.",
+        "step2Title": "O Primeiro Profissional Aceita",
+        "step2Desc": "Profissionais verificados vêem o teu trabalho em tempo real. O primeiro a clicar Aceitar fica com ele — a velocidade é tudo.",
+        "step3Title": "Trabalho Concluído em Minutos",
+        "step3Desc": "O profissional contacta-te imediatamente. Sem esperar 24h por orçamentos. Sem comparar 10 propostas."
     },
     "categories": {
-        "title": "Explorar Categorias",
-        "subtitle": "Encontra exatamente o que precisas nas nossas categorias.",
+        "title": "Categorias de Serviço",
+        "subtitle": "Encontra exatamente o que precisas nas nossas categorias de serviço.",
         "home-repairs": "Reparações Domésticas",
         "tech-digital": "Tecnologia e Digital",
         "tutoring": "Explicações e Línguas",
         "events": "Eventos e Festas",
         "wellness": "Bem-estar e Desporto",
-        "equipment": "Compra de Equipamentos",
         "business": "Negócios e Consultoria",
         "design": "Design e Criatividade",
         "writing": "Escrita e Tradução",
@@ -42,15 +41,15 @@
         "beauty": "Estética e Cuidado Pessoal"
     },
     "stats": {
-        "requests": "Pedidos Publicados",
+        "requests": "Trabalhos Publicados",
         "professionals": "Profissionais Verificados",
         "categories": "Categorias de Serviço",
         "satisfaction": "Taxa de Satisfação"
     },
     "cta": {
         "title": "Pronto para começar?",
-        "subtitle": "Junta-te a milhares que já encontraram o que precisavam.",
-        "clientBtn": "Publicar o Primeiro Pedido",
+        "subtitle": "Publica um trabalho em menos de um minuto. Um profissional aceita em segundos.",
+        "clientBtn": "Publicar o Primeiro Trabalho",
         "proBtn": "Registar como Profissional"
     },
     "auth": {
@@ -72,27 +71,34 @@
         "orContinue": "Ou continuar com"
     },
     "request": {
-        "newTitle": "Criar Pedido",
+        "newTitle": "Publicar Trabalho",
         "title": "Título",
-        "titlePlaceholder": "Ex: Preciso de eletricista para o meu apartamento",
+        "titlePlaceholder": "Ex: Preciso de canalizador urgente, cano rebentou",
         "description": "Descrição",
-        "descriptionPlaceholder": "Descreve em detalhe o que precisas...",
+        "descriptionPlaceholder": "Descreve o problema em detalhe para que o profissional possa decidir rapidamente...",
         "category": "Categoria",
         "subcategory": "Subcategoria",
-        "budget": "Orçamento Máximo (€)",
-        "budgetPlaceholder": "Ex: 500",
+        "budget": "Preço Fixo (€)",
+        "budgetPlaceholder": "Ex: 80",
         "location": "Localização",
-        "locationPlaceholder": "Ex: Lisboa, Portugal",
+        "locationPlaceholder": "Porto, Portugal",
         "itemCondition": "Estado do Item",
         "conditionNew": "Novo",
         "conditionUsed": "Usado",
         "conditionAny": "Qualquer",
         "acceptsTrades": "Aceita trocas?",
-        "submit": "Publicar Pedido",
+        "submit": "Publicar Trabalho",
         "statusOpen": "Aberto",
         "statusInProgress": "Em Progresso",
+        "statusAccepted": "Aceite",
         "statusClosed": "Fechado",
-        "featured": "Destaque"
+        "featured": "Destaque",
+        "urgentNow": "AGORA",
+        "urgentStandard": "FLEXÍVEL",
+        "acceptJob": "Aceitar este trabalho por €{price}",
+        "jobTaken": "Tarde demais — outro profissional aceitou primeiro.",
+        "waitingForPro": "À espera de um profissional...",
+        "intentConfirmLabel": "Confirmo que tenho o orçamento disponível e pagarei ao primeiro profissional verificado que aceitar."
     },
     "proposal": {
         "title": "Propostas",
@@ -110,27 +116,27 @@
     },
     "dashboard": {
         "client": {
-            "title": "Os Meus Pedidos",
-            "subtitle": "Acompanha os teus pedidos e propostas recebidas",
-            "noRequests": "Ainda não fizeste nenhum pedido.",
-            "proposalsReceived": "propostas recebidas",
-            "viewProposals": "Ver Propostas",
-            "closeRequest": "Fechar Pedido"
+            "title": "Os Meus Trabalhos",
+            "subtitle": "Acompanha os teus trabalhos publicados",
+            "noRequests": "Ainda não publicaste nenhum trabalho.",
+            "proposalsReceived": "respostas recebidas",
+            "viewProposals": "Ver",
+            "closeRequest": "Fechar Trabalho"
         },
         "pro": {
-            "title": "Feed de Oportunidades",
-            "subtitle": "Encontra e responde a pedidos perto de ti",
-            "noOpportunities": "Sem oportunidades correspondentes de momento.",
-            "respond": "Responder",
-            "proposalsSent": "Propostas Enviadas",
-            "acceptanceRate": "Taxa de Aceitação",
-            "activeLeads": "Leads Ativos",
+            "title": "Trabalhos Disponíveis",
+            "subtitle": "Trabalhos em tempo real perto de ti — sê o primeiro a aceitar",
+            "noOpportunities": "Sem trabalhos disponíveis de momento.",
+            "respond": "Aceitar",
+            "proposalsSent": "Trabalhos Aceites",
+            "acceptanceRate": "Taxa de Sucesso",
+            "activeLeads": "Trabalhos Ativos",
             "drafts": "Os Meus Modelos",
             "manageDrafts": "Gerir Modelos"
         }
     },
     "drafts": {
-        "title": "Modelos de Proposta",
+        "title": "Modelos de Resposta",
         "subtitle": "Poupa tempo com modelos de resposta reutilizáveis",
         "newDraft": "Novo Modelo",
         "draftTitle": "Título do Modelo",
@@ -157,23 +163,23 @@
         "verified": "Verificado"
     },
     "footer": {
-        "tagline": "O marketplace que trabalha por ti.",
+        "tagline": "A forma mais rápida de contratar um profissional.",
         "colCategories": "Categorias",
         "colClients": "Para Clientes",
         "colPros": "Para Profissionais",
         "colCompany": "Empresa",
         "colSupport": "Suporte",
         "clientLinks": {
-            "howItWorks": "Como Funciona o Needer",
+            "howItWorks": "Como Funciona",
             "success": "Histórias de Sucesso",
             "quality": "Guia de Qualidade",
             "trust": "Confiança & Segurança"
         },
         "proLinks": {
-            "becomePro": "Torna-te um Profissional Needer",
+            "becomePro": "Torna-te um Profissional",
             "neederPro": "Needer Pro (Premium)",
             "community": "Centro da Comunidade",
-            "resources": "Recursos para Vendedores"
+            "resources": "Recursos para Profissionais"
         },
         "companyLinks": {
             "about": "Sobre o Needer",
@@ -197,13 +203,13 @@
         "title": "Categorias Populares"
     },
     "recent": {
-        "title": "Pedidos Recentes",
-        "empty": "Sem pedidos ainda. Sê o primeiro a publicar!",
+        "title": "Trabalhos Recentes",
+        "empty": "Sem trabalhos ainda. Sê o primeiro a publicar!",
         "viewAll": "Ver Todos",
-        "budget": "Orçamento"
+        "budget": "Preço Fixo"
     },
     "proSection": {
-        "title": "A solução freelance premium para empresas.",
+        "title": "A solução profissional premium para empresas.",
         "apply": "Candidatar Agora",
         "feat1": {
             "title": "Especialistas de contratação dedicados",
@@ -223,7 +229,7 @@
         }
     },
     "preFooter": {
-        "title": "Serviços freelance de classe mundial na ponta dos teus dedos.",
+        "title": "Serviços profissionais de classe mundial na ponta dos teus dedos.",
         "cta": "Junta-te ao Needer"
     }
-}
+}

@@ -101,8 +101,8 @@ export const categories: Category[] = [
     {
         key: 'writing',
         icon: 'PenTool',
-        labelEN: 'Writing & Translation',
-        labelPT: 'Escrita e Tradução',
+        labelEN: 'Writing',
+        labelPT: 'Escrita',
         type: 'service',
         subcategories: [
             { key: 'copywriting', labelEN: 'Copywriting', labelPT: 'Copywriting' },

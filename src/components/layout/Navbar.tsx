@@ -259,7 +259,7 @@ export default function Navbar() {
             <>
               {/* Become a Professional */}
               <Link
-                href="/auth/register?role=pro"
+                href="/pro"
                 style={{
                   padding: '6px 10px',
                   fontSize: '13px',
