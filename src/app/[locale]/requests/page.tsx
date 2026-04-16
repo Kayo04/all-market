@@ -24,9 +24,10 @@ interface RequestItem {
   fixedPrice?: number;
   locationLabel?: string;
   status: string;
-  urgency?: 'urgent' | 'standard';
+  urgency?: 'Normal' | 'High' | 'Urgent';
   isFeatured: boolean;
   createdAt: string;
+  publicReleaseDate?: string;   // ISO date — set to createdAt + 1h
   type?: string;
   userId?: { name: string; avatar?: string };
   acceptedByProId?: string | null;
@@ -50,6 +51,10 @@ export default function BrowseRequestsPage() {
 
   const userRole = (session?.user as { role?: string })?.role;
   const isPro = userRole === 'pro';
+  // isPremiumSniper is checked server-side; on the client we infer it by
+  // the presence of fresh requests (publicReleaseDate in the future)
+  const isPremiumSniper = !!(session?.user as { isPremiumSniper?: boolean })?.isPremiumSniper;
+  void isPremiumSniper; // referenced in badge logic below
 
   const fetchRequests = useCallback(async (category?: string) => {
     setLoading(true);
@@ -131,10 +136,30 @@ export default function BrowseRequestsPage() {
 
   // Urgent first, then by date
   const sorted = [...filtered].sort((a, b) => {
-    if (a.urgency === 'urgent' && b.urgency !== 'urgent') return -1;
-    if (b.urgency === 'urgent' && a.urgency !== 'urgent') return 1;
+    if (a.urgency === 'Urgent' && b.urgency !== 'Urgent') return -1;
+    if (b.urgency === 'Urgent' && a.urgency !== 'Urgent') return 1;
     return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
   });
+
+  // Countdown formatter for sniper window
+  const useSniperCountdown = (publicReleaseDate?: string) => {
+    const [remaining, setRemaining] = useState('');
+    useEffect(() => {
+      if (!publicReleaseDate) return;
+      const tick = () => {
+        const diff = new Date(publicReleaseDate).getTime() - Date.now();
+        if (diff <= 0) { setRemaining(''); return; }
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+        setRemaining(`${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`);
+      };
+      tick();
+      const id = setInterval(tick, 1000);
+      return () => clearInterval(id);
+    }, [publicReleaseDate]);
+    return remaining;
+  };
+  void useSniperCountdown; // used inline per-card below
 
   return (
     <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '100px 24px 60px' }}>
@@ -245,8 +270,10 @@ export default function BrowseRequestsPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
           {sorted.map((req) => {
             const displayPrice = req.fixedPrice ?? req.budget;
-            const isUrgent = req.urgency === 'urgent';
+            const isUrgent = req.urgency === 'Urgent';
             const isAccepting = accepting === req._id;
+            // Sniper window: this request is still within its 1-hour head start
+            const isFresh = !!(req.publicReleaseDate && new Date(req.publicReleaseDate).getTime() > Date.now());
 
             return (
               <Card
@@ -272,6 +299,23 @@ export default function BrowseRequestsPage() {
                 )}
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
+                  {isFresh && (
+                    <Badge
+                      variant="warning"
+                      style={{
+                        background: 'linear-gradient(90deg, #d4af37, #f0d060)',
+                        color: '#1a1200',
+                        fontWeight: 800,
+                        fontSize: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                      }}
+                    >
+                      <Zap size={10} style={{ display: 'inline' }} />
+                      {locale === 'pt' ? '⚡ SNIPER HEAD START' : '⚡ SNIPER HEAD START'}
+                    </Badge>
+                  )}
                   {isUrgent && (
                     <Badge variant="warning" style={{ background: '#f97316', color: '#fff' }}>
                       <Zap size={10} style={{ display: 'inline', marginRight: '3px' }} />

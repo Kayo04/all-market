@@ -25,6 +25,12 @@ const UserSchema = new Schema(
                 createdAt: { type: Date, default: Date.now },
             },
         ],
+        // Aggregate rating score — updated on each review for fast AI match queries
+        rating: { type: Number, default: 0, min: 0, max: 5 },
+        // Monetization: Product sellers who pay for 1-hour early access (Sniper Bidding)
+        isPremiumSniper: { type: Boolean, default: false },
+        // Monetization: Service pros who pay to appear as #1 Sponsored AI Match
+        hasSponsoredSpot: { type: Boolean, default: false },
         verificationStatus: {
             type: String,
             enum: ['none', 'pending', 'approved', 'rejected'],
@@ -41,6 +47,10 @@ const UserSchema = new Schema(
 );
 
 UserSchema.index({ location: '2dsphere' });
+UserSchema.index({ rating: -1 });
+UserSchema.index({ hasSponsoredSpot: 1, rating: -1 }); // AI quality gate query
+UserSchema.index({ isPremiumSniper: 1 });               // Sniper bidding check
 
 const User = models.User || mongoose.model('User', UserSchema);
 export default User;
+

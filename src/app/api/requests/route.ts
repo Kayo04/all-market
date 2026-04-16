@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import RequestModel from '@/lib/models/Request';
+import UserModel from '@/lib/models/User';
 
 // GET: List/filter requests (with geospatial queries)
 export async function GET(request: Request) {
@@ -45,9 +46,34 @@ export async function GET(request: Request) {
                         type: 'Point',
                         coordinates: [parseFloat(lng), parseFloat(lat)],
                     },
-                    $maxDistance: parseFloat(radius) * 1000, // convert km to meters
+                    $maxDistance: parseFloat(radius) * 1000,
                 },
             };
+        }
+
+        // ── Sniper Bidding filter ─────────────────────────────────────────
+        // Non-premium users only see requests after their 1-hour sniper window.
+        // Premium snipers (isPremiumSniper=true) can see ALL fresh requests.
+        // Only applies when browsing (not when fetching own requests with mine=1).
+        if (mine !== '1') {
+            const session = await getServerSession(authOptions);
+            let isPremiumSniper = false;
+
+            if (session?.user) {
+                const userId = (session.user as { id: string }).id;
+                const user = await UserModel.findById(userId).select('isPremiumSniper').lean() as { isPremiumSniper?: boolean } | null;
+                isPremiumSniper = user?.isPremiumSniper ?? false;
+            }
+
+            if (!isPremiumSniper) {
+                // Show only requests past their sniper window, OR legacy requests without a publicReleaseDate
+                query.$or = [
+                    { publicReleaseDate: { $lte: new Date() } },
+                    { publicReleaseDate: null },
+                    { publicReleaseDate: { $exists: false } },
+                ];
+            }
+            // isPremiumSniper=true → no filter, they see everything
         }
 
         // Featured requests first, then by date
@@ -120,7 +146,7 @@ export async function POST(request: Request) {
             subcategory,
             budget,
             fixedPrice: fixedPrice ?? budget,
-            urgency: urgency || 'standard',
+            urgency: urgency || 'Normal',
             intentConfirmed: intentConfirmed === true,
             location,
             locationLabel: locationLabel || '',
