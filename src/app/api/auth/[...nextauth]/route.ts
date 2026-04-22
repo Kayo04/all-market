@@ -72,6 +72,8 @@ export const authOptions: AuthOptions = {
         error: '/auth/login',
     },
     secret: process.env.NEXTAUTH_SECRET,
+    // Required for Next.js 16 — prevents CLIENT_FETCH_ERROR / JSON parse failures
+    trustHost: true,
 };
 
 const handler = NextAuth(authOptions);

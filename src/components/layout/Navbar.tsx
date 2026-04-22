@@ -3,9 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter, usePathname } from '@/i18n/navigation';
-import { useTheme } from '@/context/ThemeContext';
+
 import { useSession, signOut } from 'next-auth/react';
-import { Sun, Moon, Menu, X, Globe, MessageSquare, Search } from 'lucide-react';
+import { Menu, X, Globe, MessageSquare, Search, Settings } from 'lucide-react';
 import NotificationBell from '@/components/layout/NotificationBell';
 import PreferencesModal from '@/components/layout/PreferencesModal';
 import { useCurrency } from '@/context/CurrencyContext';
@@ -16,13 +16,14 @@ export default function Navbar() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
   const { data: session } = useSession();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [scrollY, setScrollY] = useState(0);
   const [showPrefs, setShowPrefs] = useState(false);
   const { currency } = useCurrency();
+
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -178,26 +179,43 @@ export default function Navbar() {
             {locale.toUpperCase()} · {currency}
           </button>
 
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
+
+
+          {/* ✦ Find a Pro CTA → /concierge */}
+          <Link
+            id="find-pro-btn"
+            href="/concierge"
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              width: '32px',
-              height: '32px',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: 'var(--radius-md)',
+              gap: '6px',
+              padding: '7px 16px',
+              background: 'linear-gradient(135deg, #003912, #005a1a)',
+              border: '1px solid rgba(0,100,30,0.45)',
+              borderRadius: '99px',
+              color: '#ffffff',
+              fontSize: '13px',
+              fontWeight: 600,
               cursor: 'pointer',
-              color: 'var(--text-tertiary)',
-              transition: 'color var(--transition-fast)',
+              fontFamily: 'var(--font-sans)',
+              letterSpacing: '0.01em',
+              textDecoration: 'none',
+              boxShadow: '0 0 12px rgba(0,80,20,0.30)',
+              transition: 'all 0.2s ease',
+              flexShrink: 0,
             }}
-            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLElement).style.boxShadow = '0 0 22px rgba(0,100,30,0.55)';
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLElement).style.boxShadow = '0 0 12px rgba(0,80,20,0.30)';
+              (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
+            }}
           >
-            {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
-          </button>
+            <span>✦</span>
+            <span>{locale === 'pt' ? 'Contratar Profissional' : 'Find a Pro'}</span>
+          </Link>
 
           {/* Auth Area */}
           {isLoggedIn ? (
@@ -237,6 +255,19 @@ export default function Navbar() {
                 }}
               >
                 {t('dashboard')}
+              </Link>
+              <Link
+                href="/settings"
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  width: '32px', height: '32px',
+                  background: 'transparent', border: 'none',
+                  borderRadius: 'var(--radius-md)', textDecoration: 'none',
+                  color: 'var(--text-tertiary)', transition: 'color var(--transition-fast)',
+                }}
+                title={locale === 'pt' ? 'Definições' : 'Settings'}
+              >
+                <Settings size={15} />
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}
@@ -411,12 +442,14 @@ export default function Navbar() {
               <Globe size={13} style={{ marginRight: '4px' }} />
               {locale.toUpperCase()}
             </button>
-            <button
-              onClick={toggleTheme}
-              style={{ padding: '6px 12px', fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', cursor: 'pointer' }}
+            <Link
+              href="/settings"
+              onClick={() => setIsMenuOpen(false)}
+              style={{ padding: '6px 12px', fontSize: '13px', fontWeight: 500, color: 'var(--text-secondary)', background: 'transparent', border: '1px solid var(--border)', borderRadius: 'var(--radius-md)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}
             >
-              {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
-            </button>
+              <Settings size={13} />
+              {locale === 'pt' ? 'Definições' : 'Settings'}
+            </Link>
           </div>
 
           {isLoggedIn ? (

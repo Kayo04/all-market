@@ -281,6 +281,78 @@ async function categorize(query: string, locale: string): Promise<ParsedQuery> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Mock pro roster — used as a fallback when the DB has no matching professionals.
+// Guarantees the full chat-to-match loop works in development without seeding.
+// Slot 0 is ALWAYS the Quality Gate Sponsored Pro (hasSponsoredSpot + rating≥4.5).
+// ─────────────────────────────────────────────────────────────────────────────
+
+type MockPro = {
+    _id: string;
+    name: string;
+    rating: number;
+    proCategory: string;
+    isVerified: boolean;
+    hasSponsoredSpot: boolean;
+    isSponsored: boolean;
+    locationLabel: string;
+};
+
+const MOCK_PROS: Record<string, MockPro[]> = {
+    electricians: [
+        { _id: 'mock-elec-1', name: 'Electro Solutions', rating: 4.9, proCategory: 'electricians', isVerified: true,  hasSponsoredSpot: true,  isSponsored: true,  locationLabel: 'Porto' },
+        { _id: 'mock-elec-2', name: 'José Ramos',        rating: 4.7, proCategory: 'electricians', isVerified: true,  hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Porto' },
+        { _id: 'mock-elec-3', name: 'G&M Electricidade', rating: 4.5, proCategory: 'electricians', isVerified: false, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Matosinhos' },
+    ],
+    plumbers: [
+        { _id: 'mock-plumb-1', name: 'AquaFix Pro',      rating: 4.9, proCategory: 'plumbers', isVerified: true,  hasSponsoredSpot: true,  isSponsored: true,  locationLabel: 'Porto' },
+        { _id: 'mock-plumb-2', name: 'Carlos Canalização', rating: 4.6, proCategory: 'plumbers', isVerified: true, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Gaia' },
+        { _id: 'mock-plumb-3', name: 'Rui & Filhos',     rating: 4.4, proCategory: 'plumbers', isVerified: false, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Porto' },
+    ],
+    painters: [
+        { _id: 'mock-paint-1', name: 'Colour Masters',   rating: 4.8, proCategory: 'painters', isVerified: true,  hasSponsoredSpot: true,  isSponsored: true,  locationLabel: 'Lisboa' },
+        { _id: 'mock-paint-2', name: 'Pintura Nobre',    rating: 4.6, proCategory: 'painters', isVerified: true,  hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Lisboa' },
+        { _id: 'mock-paint-3', name: 'SR Pinturas',      rating: 4.3, proCategory: 'painters', isVerified: false, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Cascais' },
+    ],
+    locksmiths: [
+        { _id: 'mock-lock-1', name: 'KeyMaster 24h',     rating: 4.9, proCategory: 'locksmiths', isVerified: true,  hasSponsoredSpot: true,  isSponsored: true,  locationLabel: 'Porto' },
+        { _id: 'mock-lock-2', name: 'Fechaduras Express', rating: 4.7, proCategory: 'locksmiths', isVerified: true, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Porto' },
+        { _id: 'mock-lock-3', name: 'Serralharia Mota',  rating: 4.4, proCategory: 'locksmiths', isVerified: false, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Porto' },
+    ],
+    'house-cleaning': [
+        { _id: 'mock-clean-1', name: 'CleanHome Elite',  rating: 4.9, proCategory: 'house-cleaning', isVerified: true,  hasSponsoredSpot: true,  isSponsored: true,  locationLabel: 'Porto' },
+        { _id: 'mock-clean-2', name: 'Brilho Total',     rating: 4.7, proCategory: 'house-cleaning', isVerified: true,  hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Porto' },
+        { _id: 'mock-clean-3', name: 'Maria Limpezas',   rating: 4.5, proCategory: 'house-cleaning', isVerified: false, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Gaia' },
+    ],
+    'office-cleaning': [
+        { _id: 'mock-oclean-1', name: 'OfficeClean Pro', rating: 4.8, proCategory: 'office-cleaning', isVerified: true,  hasSponsoredSpot: true,  isSponsored: true,  locationLabel: 'Lisboa' },
+        { _id: 'mock-oclean-2', name: 'Limpeza Corporativa', rating: 4.6, proCategory: 'office-cleaning', isVerified: true, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Lisboa' },
+        { _id: 'mock-oclean-3', name: 'CleanBiz',        rating: 4.3, proCategory: 'office-cleaning', isVerified: false, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Sintra' },
+    ],
+    websites: [
+        { _id: 'mock-web-1', name: 'DevStudio Porto',    rating: 4.9, proCategory: 'websites', isVerified: true,  hasSponsoredSpot: true,  isSponsored: true,  locationLabel: 'Porto' },
+        { _id: 'mock-web-2', name: 'Pedro Oliveira Dev', rating: 4.7, proCategory: 'websites', isVerified: true,  hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Remote' },
+        { _id: 'mock-web-3', name: 'WebCraft PT',        rating: 4.5, proCategory: 'websites', isVerified: false, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Lisboa' },
+    ],
+    mechanic: [
+        { _id: 'mock-mech-1', name: 'AutoTech Premium',  rating: 4.9, proCategory: 'mechanic', isVerified: true,  hasSponsoredSpot: true,  isSponsored: true,  locationLabel: 'Porto' },
+        { _id: 'mock-mech-2', name: 'Oficina Central',   rating: 4.6, proCategory: 'mechanic', isVerified: true,  hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Porto' },
+        { _id: 'mock-mech-3', name: 'Rui Mecânico',      rating: 4.4, proCategory: 'mechanic', isVerified: false, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Gaia' },
+    ],
+    'personal-trainers': [
+        { _id: 'mock-pt-1', name: 'FitPro Lisbon',       rating: 4.9, proCategory: 'personal-trainers', isVerified: true,  hasSponsoredSpot: true,  isSponsored: true,  locationLabel: 'Lisboa' },
+        { _id: 'mock-pt-2', name: 'Ana Fitness',         rating: 4.7, proCategory: 'personal-trainers', isVerified: true,  hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Lisboa' },
+        { _id: 'mock-pt-3', name: 'GymCoach PT',         rating: 4.4, proCategory: 'personal-trainers', isVerified: false, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Cascais' },
+    ],
+};
+
+// Fallback for any subcategory not in the table above
+const MOCK_PROS_GENERIC: MockPro[] = [
+    { _id: 'mock-gen-1', name: 'TopPro Services',        rating: 4.9, proCategory: 'general', isVerified: true,  hasSponsoredSpot: true,  isSponsored: true,  locationLabel: 'Porto' },
+    { _id: 'mock-gen-2', name: 'Profissionais Needer',   rating: 4.6, proCategory: 'general', isVerified: true,  hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Porto' },
+    { _id: 'mock-gen-3', name: 'Expert Network PT',      rating: 4.4, proCategory: 'general', isVerified: false, hasSponsoredSpot: false, isSponsored: false, locationLabel: 'Lisboa' },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
 // POST /api/ai-match
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -308,7 +380,7 @@ export async function POST(request: Request) {
                 ? { proCategory: parsed.subcategory }
                 : {};
 
-            // Slot 1 — Sponsored AI Match: hasSponsoredSpot=true AND rating≥4.5
+            // Slot 1 — Sponsored AI Match (Quality Gate): hasSponsoredSpot=true AND rating≥4.5
             const sponsored = await UserModel.findOne({
                 role: 'pro',
                 hasSponsoredSpot: true,
@@ -318,7 +390,7 @@ export async function POST(request: Request) {
                 .select('name rating proCategory isVerified hasSponsoredSpot avatar locationLabel')
                 .lean();
 
-            // Slots 2–3 — Organic: best rating in category (excluding sponsored)
+            // Slots 2–3 — Organic: best-rated in category (excluding sponsored)
             const organicFilter = {
                 role: 'pro',
                 ...(sponsored ? { _id: { $ne: (sponsored as { _id: unknown })._id } } : {}),
@@ -334,6 +406,11 @@ export async function POST(request: Request) {
                 ...(sponsored ? [{ ...sponsored, isSponsored: true }] : []),
                 ...organic.map(p => ({ ...p, isSponsored: false })),
             ];
+
+            // ── Fallback: DB has no pros yet → serve mock roster ──────────
+            if (pros.length === 0) {
+                pros = MOCK_PROS[parsed.subcategory] ?? MOCK_PROS_GENERIC;
+            }
         }
 
         // ── 3. Persist request to DB (only if user is logged in) ──────────
