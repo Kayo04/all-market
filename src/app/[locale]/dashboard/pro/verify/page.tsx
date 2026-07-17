@@ -64,6 +64,8 @@ export default function VerifyPage() {
       if (res.ok) {
         setSubmitted(true);
         setVerificationStatus('pending');
+        // Server already approved it; keep the "Under Review" moment for a beat before revealing.
+        setTimeout(() => setVerificationStatus('approved'), 3000 + Math.random() * 2000);
       } else {
         const data = await res.json().catch(() => ({}));
         setError(data.error || (locale === 'pt' ? 'Não foi possível submeter a verificação. Tenta novamente.' : 'Could not submit verification. Please try again.'));

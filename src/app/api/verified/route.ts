@@ -50,9 +50,10 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Business name and tax ID are required' }, { status: 400 });
         }
 
-        // Update user with verification data
+        // Auto-approve on submit (no admin review flow exists yet)
         await User.findByIdAndUpdate(user.id, {
-            verificationStatus: 'pending',
+            verificationStatus: 'approved',
+            isVerified: true,
             verificationData: {
                 businessName,
                 taxId,
@@ -64,13 +65,13 @@ export async function POST(request: Request) {
         // Notification
         await createNotification(
             user.id,
-            'new_message',
-            'Your verification request has been submitted. We will review it shortly.',
+            'system',
+            'Your verification was approved! The trust badge is now live on your profile.',
             undefined
         );
 
         return NextResponse.json(
-            { message: 'Verification request submitted', status: 'pending' },
+            { message: 'Verification approved', status: 'approved' },
             { status: 201 }
         );
     } catch (error) {
