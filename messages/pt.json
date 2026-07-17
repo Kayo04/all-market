@@ -10,20 +10,20 @@
         "profile": "Perfil"
     },
     "hero": {
-        "title": "Precisas de um canalizador AGORA?",
-        "subtitle": "Define o preço fixo. O primeiro profissional verificado a aceitar fica com o trabalho — em minutos, não em dias.",
-        "cta": "Publicar Trabalho",
+        "title": "O que precisas hoje?",
+        "subtitle": "Descreve uma vez — profissionais e vendedores que podem ajudar enviam-te a melhor oferta.",
+        "cta": "Publicar Pedido",
         "ctaPro": "Registar como Profissional",
         "searchPlaceholder": "Ex: Canalizador urgente Porto, Eletricista, Pintor..."
     },
     "howItWorks": {
         "title": "Como Funciona",
-        "step1Title": "Publica o Trabalho & Define o Preço Fixo",
-        "step1Desc": "Descreve o que precisas e define o valor exato que pagas. Sem adivinhações, sem negociação interminável.",
-        "step2Title": "O Primeiro Profissional Aceita",
-        "step2Desc": "Profissionais verificados vêem o teu trabalho em tempo real. O primeiro a clicar Aceitar fica com ele — a velocidade é tudo.",
-        "step3Title": "Trabalho Concluído em Minutos",
-        "step3Desc": "O profissional contacta-te imediatamente. Sem esperar 24h por orçamentos. Sem comparar 10 propostas."
+        "step1Title": "Descreve o Que Precisas",
+        "step1Desc": "Publica um pedido de serviço ou produto em linguagem simples — sem formulários, sem categorias para percorrer.",
+        "step2Title": "Recebe Matches Instantaneamente",
+        "step2Desc": "A nossa IA percebe o teu pedido e notifica profissionais ou vendedores verificados que podem ajudar.",
+        "step3Title": "Compara e Escolhe",
+        "step3Desc": "Revê propostas, preços e avaliações — depois escolhe a que for melhor para ti."
     },
     "categories": {
         "title": "Categorias de Serviço",

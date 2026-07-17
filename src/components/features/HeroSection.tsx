@@ -6,30 +6,30 @@ import { useRouter } from '@/i18n/navigation';
 import { Search } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Product-only suggestion chips
+// Suggestion chips — mixed services + products, since Needer handles both
 // ─────────────────────────────────────────────────────────────────────────────
 
 const SUGGESTIONS = {
     pt: [
+        'Eletricista urgente',
+        'Explicador de Matemática',
         'BMW Série 1 abaixo de €10k 🚗',
         'PS5 usado Porto',
         'iPhone 15 Pro Max',
-        'MacBook Pro M3',
-        'Sofá 3 lugares',
     ],
     en: [
+        'Emergency electrician',
+        'Math tutor',
         'BMW Series 1 under €10k 🚗',
         'Used PS5 Porto',
         'iPhone 15 Pro Max',
-        'MacBook Pro M3',
-        'Rolex Submariner',
     ],
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HeroSection — Products / Reverse Marketplace entry point
-// Submitting routes to /concierge?q=… for AI matching (services live there)
-// but for products we could also handle them — same route, AI will detect type.
+// HeroSection — reverse marketplace entry point (services AND products)
+// Submitting routes to /concierge?q=… for AI matching — the AI detects
+// whether the query is a service need or a product want.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function HeroSection() {
@@ -153,7 +153,7 @@ export default function HeroSection() {
                                 textTransform: 'uppercase',
                             }}
                         >
-                            {locale === 'pt' ? 'Marketplace Reverso · Produtos' : 'Reverse Marketplace · Products'}
+                            {locale === 'pt' ? 'Marketplace Reverso' : 'Reverse Marketplace'}
                         </span>
                     </div>
 
@@ -170,8 +170,8 @@ export default function HeroSection() {
                         }}
                     >
                         {locale === 'pt'
-                            ? <>O que queres <span style={{ color: '#4ade80' }}>comprar</span> hoje?</>
-                            : <>What do you want to <span style={{ color: '#4ade80' }}>buy</span> today?</>}
+                            ? <>O que <span style={{ color: '#4ade80' }}>precisas</span> hoje?</>
+                            : <>What do you <span style={{ color: '#4ade80' }}>need</span> today?</>}
                     </h1>
 
                     {/* Subtitle */}
@@ -185,8 +185,8 @@ export default function HeroSection() {
                         }}
                     >
                         {locale === 'pt'
-                            ? 'Pára de procurar. Pede o que queres e quem tem o produto manda-te mensagem.'
-                            : 'Stop searching. Tell us what you want and sellers with the product message you.'}
+                            ? 'Descreve o que precisas — um serviço ou um produto. Profissionais e vendedores que podem ajudar enviam-te a melhor oferta.'
+                            : 'Describe what you need — a service or a product. Pros and sellers who can help send you their best offer.'}
                     </p>
 
                     {/* Input box */}
@@ -213,8 +213,8 @@ export default function HeroSection() {
                             onKeyDown={handleKeyDown}
                             placeholder={
                                 locale === 'pt'
-                                    ? "Ex: 'BMW Série 1 abaixo de €10k', 'PS5 usado no Porto', 'iPhone 15 Pro Max'..."
-                                    : "E.g. 'BMW Series 1 under €10k', 'Used PS5 in Porto', 'iPhone 15 Pro Max'..."
+                                    ? "Ex: 'Eletricista urgente', 'BMW Série 1 abaixo de €10k', 'Explicador de Matemática'..."
+                                    : "E.g. 'Emergency electrician', 'BMW Series 1 under €10k', 'Math tutor'..."
                             }
                             rows={2}
                             style={{

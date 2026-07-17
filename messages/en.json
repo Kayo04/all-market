@@ -10,20 +10,20 @@
     "profile": "Profile"
   },
   "hero": {
-    "title": "Need a plumber RIGHT NOW?",
-    "subtitle": "Set your fixed price. The first verified professional to accept gets the job — in minutes, not days.",
-    "cta": "Post a Job",
+    "title": "What do you need today?",
+    "subtitle": "Describe it once — verified pros and sellers who can help send you their best offer.",
+    "cta": "Post a Need",
     "ctaPro": "Join as a Pro",
     "searchPlaceholder": "E.g.: Emergency plumber Porto, Electrician urgently, Painter..."
   },
   "howItWorks": {
     "title": "How It Works",
-    "step1Title": "Post Your Job & Set a Fixed Price",
-    "step1Desc": "Describe what you need and set the exact amount you will pay. No guessing, no back-and-forth negotiation.",
-    "step2Title": "First Verified Pro Accepts",
-    "step2Desc": "Verified professionals see your job in real-time. The very first one to click Accept gets it — speed wins.",
-    "step3Title": "Job Done in Minutes",
-    "step3Desc": "The pro contacts you immediately. No waiting 24 hours for quotes. No comparing 10 proposals."
+    "step1Title": "Describe What You Need",
+    "step1Desc": "Post a service or product need in plain language — no forms, no categories to browse.",
+    "step2Title": "Get Matched Instantly",
+    "step2Desc": "Our AI understands your request and notifies verified pros or sellers who can help.",
+    "step3Title": "Compare & Choose",
+    "step3Desc": "Review proposals, prices, and ratings — then pick the one that's right for you."
   },
   "categories": {
     "title": "Service Categories",

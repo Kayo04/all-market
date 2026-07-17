@@ -392,6 +392,30 @@ export default function Navbar() {
             </button>
           </form>
 
+          {/* ✦ Find a Pro CTA — mirrors the desktop pill, was missing on mobile */}
+          <Link
+            href="/concierge"
+            onClick={() => setIsMenuOpen(false)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              padding: '10px 16px',
+              background: 'linear-gradient(135deg, #003912, #005a1a)',
+              border: '1px solid rgba(0,100,30,0.45)',
+              borderRadius: '99px',
+              color: '#ffffff',
+              fontSize: '14px',
+              fontWeight: 600,
+              textDecoration: 'none',
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            <span>✦</span>
+            <span>{locale === 'pt' ? 'Contratar Profissional' : 'Find a Pro'}</span>
+          </Link>
+
           <Link
             href="/"
             onClick={() => setIsMenuOpen(false)}
