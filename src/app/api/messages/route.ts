@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import Message from '@/lib/models/Message';
+import RequestModel from '@/lib/models/Request';
+import Proposal from '@/lib/models/Proposal';
 import { createNotification } from '@/lib/notifications';
 
 // GET: Fetch messages
@@ -113,6 +115,23 @@ export async function POST(request: Request) {
 
         if (!receiverId || !requestId || !content) {
             return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        }
+
+        // Only the request owner and pros who proposed on this request may message each other here.
+        const reqDoc = await RequestModel.findById(requestId).select('userId').lean();
+        if (!reqDoc) {
+            return NextResponse.json({ error: 'Request not found' }, { status: 404 });
+        }
+        const ownerId = (reqDoc as { userId: { toString(): string } }).userId.toString();
+
+        let authorized = false;
+        if (user.id === ownerId) {
+            authorized = !!(await Proposal.exists({ requestId, proId: receiverId }));
+        } else if (receiverId === ownerId) {
+            authorized = !!(await Proposal.exists({ requestId, proId: user.id }));
+        }
+        if (!authorized) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
         const message = await Message.create({
