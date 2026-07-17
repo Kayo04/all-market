@@ -19,7 +19,7 @@ There is no test suite configured in this repo.
 
 ## Environment
 
-`.env` requires `MONGODB_URI`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, and optionally `OPENAI_API_KEY`. MongoDB is Atlas-hosted — the local machine's IP must be whitelisted or connections fail with `ENOTFOUND`.
+`.env` requires `MONGODB_URI`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, and optionally `GEMINI_API_KEY`. MongoDB is Atlas-hosted — the local machine's IP must be whitelisted or connections fail with `ENOTFOUND`.
 
 ## Architecture
 
@@ -27,7 +27,7 @@ There is no test suite configured in this repo.
 - `src/proxy.ts` is the routing middleware (Next.js 16 renamed the `middleware.ts` convention to `proxy.ts`) — it wraps `next-intl`'s middleware and matches all paths except API/static routes.
 - MongoDB via Mongoose. Models are in `src/lib/models/` (`User`, `Request`, `Proposal`, `Notification`, `Message`, `ProposalDraft`). Connection is a cached singleton in `src/lib/db.ts`.
 - Auth is NextAuth Credentials + JWT (30-day sessions). Session carries `id`, `name`, `email`, `role`, `isVerified`. Changing a user's `role` in the DB requires them to log out/in since it's baked into the JWT.
-- The core product logic is the AI match engine at `src/app/api/ai-match/route.ts`: categorizes the query, finds/ranks pros (sponsored slot first, then organic by rating), falls back to a hardcoded mock pro roster per category if no real pros exist, and persists the request. Without `OPENAI_API_KEY` it uses a keyword-based mock categorizer (`mockCategorize()`) instead of calling GPT-4o-mini — this is the normal/expected dev mode.
+- The core product logic is the AI match engine at `src/app/api/ai-match/route.ts`: categorizes the query, finds/ranks pros (sponsored slot first, then organic by rating), falls back to a hardcoded mock pro roster per category if no real pros exist, and persists the request. Without `GEMINI_API_KEY` it uses a keyword-based mock categorizer (`mockCategorize()`) instead of calling Gemini — this is the normal/expected dev mode. Gemini (not OpenAI) was chosen because its free tier needs no billing/payment method.
 - Mock proposal injection: when mock pros are used, the system upserts them as real `User` documents (emails like `*@mock.needer.com`) 3–10s after a match, so `Proposal` documents can reference valid ObjectIds. Don't assume mock pro IDs (e.g. `'mock-plumb-1'`) are valid ObjectIds anywhere else — they only become real after upsert.
 - Categories (12, each with 2–4 subcategories, EN/PT labels) are defined centrally in `src/lib/categories.ts` — this is the single place category taxonomy changes.
 - Next.js 16: `params` in route handlers is a Promise — must `await params` before destructuring.

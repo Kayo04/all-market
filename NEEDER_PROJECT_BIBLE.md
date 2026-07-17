@@ -39,7 +39,7 @@ Needer is an **AI-powered Concierge Marketplace** (Reverse Marketplace). It is N
 MONGODB_URI=mongodb+srv://...@cluster0.5b2kgy4.mongodb.net/allmarket
 NEXTAUTH_SECRET=<secret>
 NEXTAUTH_URL=http://localhost:3000
-OPENAI_API_KEY=<optional — enables real AI categorization>
+GEMINI_API_KEY=<optional — enables real AI categorization, free tier, no billing required>
 ```
 
 ---
@@ -194,11 +194,11 @@ content, readStatus, relatedId
 
 This is the **core of the product**. It has two modes:
 
-### Mode 1: Mock (default — no OPENAI_API_KEY)
+### Mode 1: Mock (default — no GEMINI_API_KEY)
 A keyword-based router (`mockCategorize()`) that pattern-matches the user query to categories. Works for demo/dev without any API key.
 
-### Mode 2: Live AI (when OPENAI_API_KEY is set)
-Calls GPT-4o-mini with a structured system prompt. Falls back to mock on any error.
+### Mode 2: Live AI (when GEMINI_API_KEY is set)
+Calls Gemini (`gemini-2.0-flash`) with a structured system prompt. Falls back to mock on any error. Gemini was chosen over OpenAI because its free tier requires no billing/payment method.
 
 ### The matching flow:
 1. **Categorize** the query → `{ category, subcategory, urgency, budget, city, tags }`
@@ -321,8 +321,8 @@ Made professionals real participants instead of mock data.
 ### Phase 3: The Pro Side ✅ COMPLETE
 
 ### Phase 4: Real AI (NEXT)
-- Add `OPENAI_API_KEY` to `.env`
-- The code already has the full OpenAI integration (`openAICategorize()` function)
+- Add `GEMINI_API_KEY` to `.env`
+- The code already has the full Gemini integration (`geminiCategorize()` function, using the free-tier `gemini-2.0-flash` model — no billing required)
 - Just needs the key — everything else is wired
 
 ### Phase 5: Payment & Billing
@@ -356,7 +356,7 @@ Made professionals real participants instead of mock data.
 2. **Next.js 16 params** — `params` in route handlers is a Promise and must be `await`ed: `const { id } = await params`
 3. **Mock ObjectIds** — mock pro IDs like `'mock-plumb-1'` are strings, not valid ObjectIds. The injection system now upserts them as real users first
 4. **Session role** — the `role` field is in the JWT token. If you change a user's role in the DB, they need to log out and back in
-5. **No OpenAI key** — without `OPENAI_API_KEY` in `.env`, the AI match uses the keyword-based mock categorizer. This is fine for development
+5. **No Gemini key** — without `GEMINI_API_KEY` in `.env`, the AI match uses the keyword-based mock categorizer. This is fine for development
 
 ---
 
@@ -384,7 +384,7 @@ http://localhost:3000
 - **Client side** (Phase 1+2): search → match → proposals → accept → complete → review ✅
 - **Pro side** (Phase 3): register as pro → onboarding wizard → dashboard with real stats → submit proposals on open requests ✅
 
-The next steps are Phase 4 (real OpenAI integration), Phase 5 (Stripe payments), and Phase 6 (production polish).
+The next steps are Phase 4 (real Gemini integration), Phase 5 (Stripe payments), and Phase 6 (production polish).
 
 ### Test Accounts
 - **Client:** `testflow@needer.com` / `Test1234!`

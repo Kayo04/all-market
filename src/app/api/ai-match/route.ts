@@ -23,8 +23,8 @@ interface ParsedQuery {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// OpenAI system prompt
-// When OPENAI_API_KEY is present, this drives real GPT-4o-mini calls.
+// AI system prompt
+// When GEMINI_API_KEY is present, this drives real Gemini calls.
 // The entire switch is in categorize() — no other code change needed.
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -52,7 +52,7 @@ Rules:
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Keyword-based mock categorizer
-// Used when OPENAI_API_KEY is not set. Covers the 95% case for a PT marketplace.
+// Used when GEMINI_API_KEY is not set. Covers the 95% case for a PT marketplace.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const PROF_LABELS: Record<string, { en: string; pt: string }> = {
@@ -228,42 +228,48 @@ function mockCategorize(query: string, locale: string): ParsedQuery {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// OpenAI categorizer
-// Auto-activates when OPENAI_API_KEY is present in .env — zero code changes needed.
+// Gemini categorizer
+// Auto-activates when GEMINI_API_KEY is present in .env — zero code changes needed.
+// Uses Gemini's free tier (no billing/payment method required), unlike OpenAI.
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function openAICategorize(query: string, locale: string): Promise<ParsedQuery | null> {
+const GEMINI_MODEL = 'gemini-flash-latest';
+
+async function geminiCategorize(query: string, locale: string): Promise<ParsedQuery | null> {
     try {
-        const res = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                model: 'gpt-4o-mini',
-                response_format: { type: 'json_object' },
-                messages: [
-                    { role: 'system', content: SYSTEM_PROMPT },
-                    { role: 'user', content: `User query (locale: ${locale}): "${query}"` },
-                ],
-                temperature: 0.2,
-                max_tokens: 450,
-            }),
-        });
+        const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-goog-api-key': process.env.GEMINI_API_KEY!,
+                },
+                body: JSON.stringify({
+                    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+                    contents: [{ parts: [{ text: `User query (locale: ${locale}): "${query}"` }] }],
+                    generationConfig: {
+                        responseMimeType: 'application/json',
+                        temperature: 0.2,
+                        maxOutputTokens: 800,
+                        thinkingConfig: { thinkingBudget: 0 },
+                    },
+                }),
+            }
+        );
 
         if (!res.ok) {
-            console.warn('[ai-match] OpenAI returned', res.status, '— falling back to mock');
+            console.warn('[ai-match] Gemini returned', res.status, '— falling back to mock');
             return null;
         }
 
         const data = await res.json();
-        const raw = data.choices?.[0]?.message?.content;
+        const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!raw) return null;
 
         return JSON.parse(raw) as ParsedQuery;
     } catch (err) {
-        console.warn('[ai-match] OpenAI error — falling back to mock:', err);
+        console.warn('[ai-match] Gemini error — falling back to mock:', err);
         return null;
     }
 }
@@ -273,9 +279,9 @@ async function openAICategorize(query: string, locale: string): Promise<ParsedQu
 // ─────────────────────────────────────────────────────────────────────────────
 
 async function categorize(query: string, locale: string): Promise<ParsedQuery> {
-    // If OPENAI_API_KEY is set, try the live model first; gracefully fall back to mock on any error
-    if (process.env.OPENAI_API_KEY) {
-        const result = await openAICategorize(query, locale);
+    // If GEMINI_API_KEY is set, try the live model first; gracefully fall back to mock on any error
+    if (process.env.GEMINI_API_KEY) {
+        const result = await geminiCategorize(query, locale);
         if (result) return result;
     }
     // No key → always mock
@@ -545,7 +551,7 @@ export async function POST(request: Request) {
             pros,
             requestId,
             isProduct: parsed.type === 'product',
-            usingLiveAI: !!process.env.OPENAI_API_KEY, // debug flag — can remove in production
+            usingLiveAI: !!process.env.GEMINI_API_KEY, // debug flag — can remove in production
         });
     } catch (error) {
         console.error('[ai-match] Unhandled error:', error);
