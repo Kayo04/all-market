@@ -41,6 +41,13 @@ interface ProposalData {
   createdAt: string;
 }
 
+interface DraftItem {
+  _id: string;
+  title: string;
+  message: string;
+  defaultPrice?: number;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Mock proposal enrichment for demo (mock proId fields)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -255,6 +262,8 @@ export default function RequestDetailPage() {
   const [completeError, setCompleteError] = useState('');
   const [reviewError, setReviewError] = useState('');
   const [proposalSubmitError, setProposalSubmitError] = useState('');
+  const [drafts, setDrafts] = useState<DraftItem[]>([]);
+  const [selectedDraftId, setSelectedDraftId] = useState('');
 
   const genericError = locale === 'pt' ? 'Ocorreu um erro. Tenta novamente.' : 'Something went wrong. Please try again.';
 
@@ -310,6 +319,17 @@ export default function RequestDetailPage() {
     const interval = setInterval(loadProposals, 15000);
     return () => clearInterval(interval);
   }, [isOpen, loadProposals]);
+
+  // Load the pro's saved draft templates for the proposal form (optional — failure just hides the dropdown)
+  useEffect(() => {
+    if (!isPro || isOwner || !request) return;
+    let cancelled = false;
+    fetch('/api/drafts')
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => { if (data && !cancelled) setDrafts(data.drafts || []); })
+      .catch(err => console.error('Error loading drafts:', err));
+    return () => { cancelled = true; };
+  }, [isPro, isOwner, request]);
 
   // Handle proposal accept/reject
   const handleProposalAction = async (proposalId: string, action: 'accept' | 'reject') => {
@@ -820,6 +840,38 @@ export default function RequestDetailPage() {
               {locale === 'pt' ? 'Enviar proposta' : 'Submit proposal'}
             </h3>
           </div>
+
+          {drafts.length > 0 && (
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '4px', color: 'var(--text-secondary)' }}>
+                {locale === 'pt' ? 'Usar um modelo guardado' : 'Use a saved template'}
+              </label>
+              <select
+                value={selectedDraftId}
+                onChange={e => {
+                  const draftId = e.target.value;
+                  setSelectedDraftId(draftId);
+                  const draft = drafts.find(d => d._id === draftId);
+                  if (draft) {
+                    setProposalMessage(draft.message);
+                    if (draft.defaultPrice) setProposalPrice(String(draft.defaultPrice));
+                  }
+                }}
+                style={{
+                  width: '100%', padding: '10px 12px',
+                  background: 'var(--bg-primary)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '8px', fontSize: '13px',
+                  color: 'var(--text-primary)',
+                  fontFamily: 'var(--font-sans)',
+                  boxSizing: 'border-box',
+                }}
+              >
+                <option value="">{locale === 'pt' ? '— Escrever do zero —' : '— Write from scratch —'}</option>
+                {drafts.map(d => <option key={d._id} value={d._id}>{d.title}</option>)}
+              </select>
+            </div>
+          )}
 
           <textarea
             value={proposalMessage}
