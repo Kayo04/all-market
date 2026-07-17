@@ -14,7 +14,7 @@ export async function GET(
         const { id } = await params;
 
         const user = await User.findById(id)
-            .select('name role isVerified bio skills location avatar ratings createdAt')
+            .select('name role isVerified bio skills location locationLabel avatar ratings rating proCategory hasSponsoredSpot phone createdAt')
             .lean();
 
         if (!user) {

@@ -1,23 +1,19 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useTranslations, useLocale } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useLocale } from 'next-intl';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams } from 'next/navigation';
+import { Link } from '@/i18n/navigation';
 import {
-  MapPin,
-  Euro,
-  Clock,
-  User,
-  CheckCircle,
-  Zap,
-  XCircle,
-  ShieldCheck,
+  MapPin, Euro, Clock, User, CheckCircle, Zap,
+  XCircle, Star, MessageSquare, ArrowLeft, Sparkles,
+  ThumbsUp, Send as SendIcon, FileText,
 } from 'lucide-react';
-import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
-import Button from '@/components/ui/Button';
-import { categories } from '@/lib/categories';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface RequestDetail {
   _id: string;
@@ -29,324 +25,950 @@ interface RequestDetail {
   fixedPrice?: number;
   locationLabel?: string;
   status: string;
-  urgency?: 'urgent' | 'standard';
+  urgency?: string;
   isFeatured: boolean;
-  intentConfirmed?: boolean;
   createdAt: string;
-  userId?: { name: string; avatar?: string };
-  acceptedByProId?: { name: string; avatar?: string; isVerified?: boolean } | null;
+  userId?: { _id?: string; name: string };
+  acceptedByProId?: { name: string } | null;
 }
+
+interface ProposalData {
+  _id: string;
+  proId: { _id: string; name: string; avatar?: string; isVerified?: boolean; rating?: number; ratings?: { score: number }[] };
+  message: string;
+  price: number;
+  status: string;
+  createdAt: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Mock proposal enrichment for demo (mock proId fields)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MOCK_PRO_DATA: Record<string, { name: string; isVerified: boolean; rating: number }> = {
+  'mock-plumb-1': { name: 'AquaFix Pro', isVerified: true, rating: 4.9 },
+  'mock-plumb-2': { name: 'Carlos Canalização', isVerified: true, rating: 4.6 },
+  'mock-plumb-3': { name: 'Rui & Filhos', isVerified: false, rating: 4.4 },
+  'mock-elec-1': { name: 'Electro Solutions', isVerified: true, rating: 4.9 },
+  'mock-elec-2': { name: 'José Ramos', isVerified: true, rating: 4.7 },
+  'mock-elec-3': { name: 'G&M Electricidade', isVerified: false, rating: 4.5 },
+  'mock-clean-1': { name: 'CleanHome Elite', isVerified: true, rating: 4.9 },
+  'mock-clean-2': { name: 'Brilho Total', isVerified: true, rating: 4.7 },
+  'mock-mech-1': { name: 'AutoTech Premium', isVerified: true, rating: 4.9 },
+  'mock-mech-2': { name: 'Oficina Central', isVerified: true, rating: 4.6 },
+};
+
+function enrichProposal(p: ProposalData): ProposalData {
+  // If proId is a string (mock), build a synthetic proId object
+  if (typeof p.proId === 'string') {
+    const mock = MOCK_PRO_DATA[p.proId as string];
+    return {
+      ...p,
+      proId: {
+        _id: p.proId as string,
+        name: mock?.name ?? 'Professional',
+        isVerified: mock?.isVerified ?? false,
+        ratings: mock ? [{ score: mock.rating }] : [],
+      },
+    };
+  }
+  return p;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Proposal Card
+// ─────────────────────────────────────────────────────────────────────────────
+
+function ProposalCard({
+  proposal, locale, isOwner, onAction,
+}: {
+  proposal: ProposalData;
+  locale: string;
+  isOwner: boolean;
+  onAction: (id: string, action: 'accept' | 'reject') => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+  const pro = proposal.proId;
+  const proName = pro?.name ?? 'Professional';
+  const initials = proName.charAt(0).toUpperCase();
+  const proRating = pro?.rating ?? pro?.ratings?.[0]?.score;
+  const isPending = proposal.status === 'pending';
+  const isAccepted = proposal.status === 'accepted';
+
+  return (
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        padding: '20px',
+        background: isAccepted ? 'rgba(34,197,94,0.05)' : hovered ? 'var(--bg-secondary)' : 'var(--bg-primary)',
+        border: `1px solid ${isAccepted ? 'rgba(34,197,94,0.25)' : 'var(--border)'}`,
+        borderRadius: '14px',
+        transition: 'all 0.15s ease',
+        animation: 'fadeSlideIn 0.3s ease both',
+      }}
+    >
+      <div style={{ display: 'flex', gap: '14px', alignItems: 'flex-start' }}>
+        {/* Avatar */}
+        <Link
+          href={`/users/${pro?._id ?? ''}`}
+          style={{
+            width: '44px', height: '44px', borderRadius: '12px', flexShrink: 0,
+            background: 'var(--accent-light)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '17px', fontWeight: 800, color: 'var(--accent)',
+            textDecoration: 'none',
+          }}
+        >
+          {initials}
+        </Link>
+
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {/* Name + badge + price */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', marginBottom: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <Link
+                href={`/users/${pro?._id ?? ''}`}
+                style={{ fontSize: '15px', fontWeight: 700, textDecoration: 'none', color: 'var(--text-primary)' }}
+              >
+                {proName}
+              </Link>
+              {pro?.isVerified && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '10px', fontWeight: 600, color: '#22c55e' }}>
+                  <CheckCircle size={11} /> {locale === 'pt' ? 'Verificado' : 'Verified'}
+                </span>
+              )}
+              {proRating && (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '11px', color: 'var(--text-tertiary)' }}>
+                  <Star size={10} fill="currentColor" /> {proRating.toFixed(1)}
+                </span>
+              )}
+            </div>
+            <span style={{
+              fontSize: '20px', fontWeight: 800, color: 'var(--text-primary)',
+              fontFamily: 'var(--font-display)', flexShrink: 0,
+            }}>
+              €{proposal.price}
+            </span>
+          </div>
+
+          {/* Message */}
+          <p style={{
+            fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.7,
+            margin: '0 0 14px 0',
+          }}>
+            {proposal.message}
+          </p>
+
+          {/* Time + status */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+            <span style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
+              <Clock size={10} style={{ marginRight: '4px', verticalAlign: '-1px' }} />
+              {new Date(proposal.createdAt).toLocaleString(locale, { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' })}
+            </span>
+
+            {/* Status badge or action buttons */}
+            {isAccepted ? (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: '5px',
+                padding: '5px 14px', borderRadius: '99px',
+                background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)',
+                fontSize: '12px', fontWeight: 700, color: '#22c55e',
+              }}>
+                <CheckCircle size={12} /> {locale === 'pt' ? 'Aceite' : 'Accepted'}
+              </span>
+            ) : proposal.status === 'rejected' ? (
+              <span style={{
+                display: 'inline-flex', alignItems: 'center', gap: '5px',
+                padding: '5px 14px', borderRadius: '99px',
+                background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+                fontSize: '12px', fontWeight: 600, color: 'rgba(239,68,68,0.7)',
+              }}>
+                <XCircle size={12} /> {locale === 'pt' ? 'Rejeitada' : 'Declined'}
+              </span>
+            ) : isPending && isOwner ? (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={() => onAction(proposal._id, 'accept')}
+                  style={{
+                    padding: '7px 18px', background: 'var(--accent)', color: '#fff',
+                    border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: 700,
+                    cursor: 'pointer', transition: 'all 0.15s ease',
+                    fontFamily: 'var(--font-sans)',
+                  }}
+                >
+                  {locale === 'pt' ? '✓ Aceitar' : '✓ Accept'}
+                </button>
+                <button
+                  onClick={() => onAction(proposal._id, 'reject')}
+                  style={{
+                    padding: '7px 14px',
+                    background: 'transparent', color: 'var(--text-tertiary)',
+                    border: '1px solid var(--border)', borderRadius: '8px',
+                    fontSize: '12px', fontWeight: 600, cursor: 'pointer',
+                    transition: 'all 0.15s ease', fontFamily: 'var(--font-sans)',
+                  }}
+                >
+                  {locale === 'pt' ? 'Recusar' : 'Decline'}
+                </button>
+              </div>
+            ) : isPending ? (
+              <span style={{
+                padding: '5px 12px', borderRadius: '99px',
+                background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)',
+                fontSize: '11px', fontWeight: 600, color: 'var(--text-tertiary)',
+              }}>
+                {locale === 'pt' ? 'Pendente' : 'Pending'}
+              </span>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Main Page
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default function RequestDetailPage() {
   const { data: session } = useSession();
-  const tr = useTranslations('request');
-  const locale = useLocale();
+  const locale = useLocale() as 'pt' | 'en';
   const params = useParams();
   const id = params.id as string;
 
   const [request, setRequest] = useState<RequestDetail | null>(null);
+  const [proposals, setProposals] = useState<ProposalData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [accepting, setAccepting] = useState(false);
-  const [acceptResult, setAcceptResult] = useState<{ success: boolean; msg: string } | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [reviewScore, setReviewScore] = useState(5);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [completeLoading, setCompleteLoading] = useState(false);
+  const [proposalMessage, setProposalMessage] = useState('');
+  const [proposalPrice, setProposalPrice] = useState('');
+  const [proposalLoading, setProposalLoading] = useState(false);
+  const [proposalSent, setProposalSent] = useState(false);
+  const [actionError, setActionError] = useState('');
+  const [completeError, setCompleteError] = useState('');
+  const [reviewError, setReviewError] = useState('');
+  const [proposalSubmitError, setProposalSubmitError] = useState('');
 
+  const genericError = locale === 'pt' ? 'Ocorreu um erro. Tenta novamente.' : 'Something went wrong. Please try again.';
+
+  const userId = (session?.user as { id?: string })?.id;
+  const isOwner = request?.userId?._id === userId;
+  const isOpen = request?.status === 'open';
+  const isAccepted = request?.status === 'accepted';
+  const isClosed = request?.status === 'closed';
+  const isUrgent = request?.urgency === 'Urgent' || request?.urgency === 'urgent';
+  const displayPrice = request?.fixedPrice ?? request?.budget ?? 0;
   const userRole = (session?.user as { role?: string })?.role;
   const isPro = userRole === 'pro';
-  const userId = (session?.user as { id?: string })?.id;
-  const isOwner = request?.userId && (request.userId as unknown as { _id?: string })?._id === userId;
+  const alreadyProposed = proposals.some(p => p.proId?._id === userId);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch(`/api/requests?limit=100`);
-        if (res.ok) {
-          const data = await res.json();
-          const found = data.requests?.find((r: RequestDetail) => r._id === id);
-          if (found) setRequest(found);
-        }
-      } catch (err) {
-        console.error('Error loading:', err);
-      } finally {
-        setLoading(false);
+  // Load request
+  const loadRequest = useCallback(async () => {
+    try {
+      const res = await fetch(`/api/requests/${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.request) setRequest(data.request);
       }
+    } catch (err) {
+      console.error('Error loading request:', err);
     }
-    load();
   }, [id]);
 
-  const getCategoryLabel = (key: string) => {
-    const cat = categories.find((c) => c.key === key);
-    if (!cat) return key;
-    return locale === 'pt' ? cat.labelPT : cat.labelEN;
-  };
-
-  const handleAccept = async () => {
-    if (!session) return;
-    setAccepting(true);
-    setAcceptResult(null);
+  // Load proposals
+  const loadProposals = useCallback(async () => {
     try {
-      const res = await fetch(`/api/requests/${id}/accept`, { method: 'POST' });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setAcceptResult({
-          success: true,
-          msg: locale === 'pt'
-            ? '✅ Trabalho aceite! O cliente foi notificado. Entra em contacto.'
-            : '✅ Job accepted! The client has been notified. Reach out to them.',
-        });
-        // Refresh request
-        const refreshRes = await fetch(`/api/requests?limit=100`);
-        if (refreshRes.ok) {
-          const d = await refreshRes.json();
-          const found = d.requests?.find((r: RequestDetail) => r._id === id);
-          if (found) setRequest(found);
-        }
-      } else {
-        setAcceptResult({
-          success: false,
-          msg: locale === 'pt'
-            ? '❌ Tarde demais. Outro profissional já aceitou este trabalho.'
-            : '❌ Too late. Another professional already accepted this job.',
-        });
+      const res = await fetch(`/api/proposals?requestId=${id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setProposals((data.proposals ?? []).map(enrichProposal));
       }
-    } catch {
-      setAcceptResult({ success: false, msg: 'Error' });
+    } catch (err) {
+      console.error('Error loading proposals:', err);
+    }
+  }, [id]);
+
+  // Initial load
+  useEffect(() => {
+    async function init() {
+      await Promise.all([loadRequest(), loadProposals()]);
+      setLoading(false);
+    }
+    init();
+  }, [loadRequest, loadProposals]);
+
+  // Poll for new proposals every 15s while request is open
+  useEffect(() => {
+    if (!isOpen) return;
+    const interval = setInterval(loadProposals, 15000);
+    return () => clearInterval(interval);
+  }, [isOpen, loadProposals]);
+
+  // Handle proposal accept/reject
+  const handleProposalAction = async (proposalId: string, action: 'accept' | 'reject') => {
+    setActionLoading(proposalId);
+    setActionError('');
+    try {
+      const res = await fetch(`/api/proposals/${proposalId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+      if (res.ok) {
+        await Promise.all([loadRequest(), loadProposals()]);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setActionError(data.error || genericError);
+      }
+    } catch (err) {
+      console.error('Error updating proposal:', err);
+      setActionError(genericError);
     } finally {
-      setAccepting(false);
+      setActionLoading(null);
     }
   };
 
+  // Handle marking job as complete
+  const handleComplete = async () => {
+    setCompleteLoading(true);
+    setCompleteError('');
+    try {
+      const res = await fetch(`/api/requests/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'complete' }),
+      });
+      if (res.ok) {
+        await loadRequest();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setCompleteError(data.error || genericError);
+      }
+    } catch (err) {
+      console.error('Error completing job:', err);
+      setCompleteError(genericError);
+    } finally {
+      setCompleteLoading(false);
+    }
+  };
+
+  // Handle review submission
+  const handleReview = async () => {
+    const acceptedPro = proposals.find(p => p.status === 'accepted');
+    if (!acceptedPro?.proId?._id) return;
+
+    setReviewLoading(true);
+    setReviewError('');
+    try {
+      const res = await fetch(`/api/users/${acceptedPro.proId._id}/review`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ score: reviewScore, comment: reviewComment }),
+      });
+      if (res.ok) {
+        setReviewSubmitted(true);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setReviewError(data.error || genericError);
+      }
+    } catch (err) {
+      console.error('Error submitting review:', err);
+      setReviewError(genericError);
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
+  // ─── Loading ───
   if (loading) {
     return (
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '120px 24px', textAlign: 'center' }}>
-        <p style={{ color: 'var(--text-secondary)' }}>{locale === 'pt' ? 'A carregar...' : 'Loading...'}</p>
+      <div style={{ maxWidth: '740px', margin: '0 auto', padding: '120px 24px', textAlign: 'center' }}>
+        <div style={{
+          width: '36px', height: '36px', borderRadius: '50%',
+          border: '3px solid var(--accent)', borderTopColor: 'transparent',
+          animation: 'spin 1s linear infinite', margin: '0 auto 16px',
+        }} />
+        <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+          {locale === 'pt' ? 'A carregar...' : 'Loading...'}
+        </p>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   if (!request) {
     return (
-      <div style={{ maxWidth: '800px', margin: '0 auto', padding: '120px 24px', textAlign: 'center' }}>
-        <p style={{ color: 'var(--text-secondary)' }}>{locale === 'pt' ? 'Pedido não encontrado' : 'Request not found'}</p>
+      <div style={{ maxWidth: '740px', margin: '0 auto', padding: '120px 24px', textAlign: 'center' }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>
+          {locale === 'pt' ? 'Pedido não encontrado' : 'Request not found'}
+        </p>
       </div>
     );
   }
 
-  const displayPrice = request.fixedPrice ?? request.budget;
-  const isUrgent = request.urgency === 'urgent';
-  const isOpen = request.status === 'open';
-  const isAccepted = request.status === 'accepted';
+  const pendingProposals = proposals.filter(p => p.status === 'pending');
+  const acceptedProposal = proposals.find(p => p.status === 'accepted');
+
+  // Shared message-button row, rendered in both the Accepted and Closed states
+  // (contact should stay available after the job is marked complete, not just while active).
+  const messageButtons = acceptedProposal && (
+    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+      {isOwner && (
+        <Link
+          href={`/messages/${id}?with=${acceptedProposal.proId._id}&name=${encodeURIComponent(acceptedProposal.proId.name)}`}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '12px 28px',
+            background: 'transparent', color: 'var(--text-primary)',
+            border: '1px solid var(--border)', borderRadius: '10px',
+            fontSize: '14px', fontWeight: 700,
+            textDecoration: 'none',
+            transition: 'all 0.15s ease',
+            fontFamily: 'var(--font-sans)',
+          }}
+        >
+          <MessageSquare size={15} />
+          {locale === 'pt' ? 'Mensagem ao Profissional' : 'Message Pro'}
+        </Link>
+      )}
+      {isPro && acceptedProposal.proId._id === userId && request?.userId?._id && (
+        <Link
+          href={`/messages/${id}?with=${request.userId?._id}&name=${encodeURIComponent(request.userId?.name ?? '')}`}
+          style={{
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            padding: '12px 28px',
+            background: 'transparent', color: 'var(--text-primary)',
+            border: '1px solid var(--border)', borderRadius: '10px',
+            fontSize: '14px', fontWeight: 700,
+            textDecoration: 'none',
+            transition: 'all 0.15s ease',
+            fontFamily: 'var(--font-sans)',
+          }}
+        >
+          <MessageSquare size={15} />
+          {locale === 'pt' ? 'Mensagem ao Cliente' : 'Message Client'}
+        </Link>
+      )}
+    </div>
+  );
 
   return (
-    <div style={{ maxWidth: '800px', margin: '0 auto', padding: '100px 24px 60px' }}>
-      {/* Request Details Card */}
-      <Card
-        variant="glass"
-        hover={false}
+    <div style={{ maxWidth: '740px', margin: '0 auto', padding: '80px 24px 60px' }}>
+
+      {/* ── Back link ── */}
+      <Link
+        href="/concierge"
         style={{
-          padding: '32px',
-          marginBottom: '24px',
-          border: isUrgent ? '2px solid #f97316' : undefined,
-          position: 'relative',
-          overflow: 'hidden',
+          display: 'inline-flex', alignItems: 'center', gap: '6px',
+          fontSize: '13px', color: 'var(--text-tertiary)', textDecoration: 'none',
+          marginBottom: '24px', transition: 'color 0.15s ease',
         }}
+        onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)'}
+        onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--text-tertiary)'}
       >
+        <ArrowLeft size={14} />
+        {locale === 'pt' ? 'Voltar ao concierge' : 'Back to concierge'}
+      </Link>
+
+      {/* ── Request Card ── */}
+      <div style={{
+        background: 'var(--bg-secondary)',
+        border: `1px solid ${isUrgent ? 'rgba(249,115,22,0.4)' : 'var(--border)'}`,
+        borderRadius: '18px',
+        padding: '28px',
+        marginBottom: '20px',
+        position: 'relative', overflow: 'hidden',
+      }}>
         {isUrgent && (
-          <div
-            style={{
-              position: 'absolute',
-              top: 0, left: 0, right: 0,
-              height: '4px',
-              background: 'linear-gradient(90deg, #f97316, #ef4444)',
-            }}
-          />
+          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #f97316, #ef4444)' }} />
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+        {/* Badges */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
           {isUrgent && (
-            <Badge variant="warning" style={{ background: '#f97316', color: '#fff' }}>
-              <Zap size={10} style={{ display: 'inline', marginRight: '3px' }} />
-              {locale === 'pt' ? 'URGENTE' : 'URGENT'}
-            </Badge>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: '4px',
+              padding: '4px 10px', borderRadius: '6px',
+              background: 'rgba(249,115,22,0.1)', border: '1px solid rgba(249,115,22,0.3)',
+              fontSize: '10px', fontWeight: 700, color: '#f97316', textTransform: 'uppercase',
+            }}>
+              <Zap size={10} /> {locale === 'pt' ? 'Urgente' : 'Urgent'}
+            </span>
           )}
-          {request.isFeatured && <Badge variant="warning">⭐ {tr('featured')}</Badge>}
-          <Badge variant="accent">{getCategoryLabel(request.category)}</Badge>
-          <Badge variant={isOpen ? 'success' : isAccepted ? 'warning' : 'default'}>
-            {isOpen
-              ? (locale === 'pt' ? 'Aberto' : 'Open')
-              : isAccepted
-              ? (locale === 'pt' ? 'Aceite' : 'Accepted')
-              : tr(`status${request.status.charAt(0).toUpperCase() + request.status.slice(1).replace('_', '')}` as 'statusOpen')}
-          </Badge>
+          <span style={{
+            padding: '4px 10px', borderRadius: '6px',
+            background: isOpen ? 'rgba(34,197,94,0.08)' : isAccepted ? 'rgba(59,130,246,0.08)' : 'rgba(255,255,255,0.05)',
+            border: `1px solid ${isOpen ? 'rgba(34,197,94,0.2)' : isAccepted ? 'rgba(59,130,246,0.2)' : 'var(--border)'}`,
+            fontSize: '10px', fontWeight: 700, textTransform: 'uppercase',
+            color: isOpen ? '#22c55e' : isAccepted ? '#3b82f6' : 'var(--text-tertiary)',
+          }}>
+            {isOpen ? (locale === 'pt' ? 'Aberto' : 'Open') : isAccepted ? (locale === 'pt' ? 'Atribuído' : 'Assigned') : request.status}
+          </span>
+          <span style={{
+            padding: '4px 10px', borderRadius: '6px',
+            background: 'rgba(255,255,255,0.04)', border: '1px solid var(--border)',
+            fontSize: '10px', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'capitalize',
+          }}>
+            {request.subcategory?.replace(/-/g, ' ') || request.category}
+          </span>
         </div>
 
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 800, marginBottom: '12px' }}>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 800, marginBottom: '8px', letterSpacing: '-0.02em' }}>
           {request.title}
         </h1>
 
-        <p style={{ fontSize: '15px', color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: '20px' }}>
+        <p style={{ fontSize: '14px', color: 'var(--text-secondary)', lineHeight: 1.7, marginBottom: '18px' }}>
           {request.description}
         </p>
 
-        <div style={{ display: 'flex', gap: '20px', fontSize: '14px', color: 'var(--text-tertiary)', flexWrap: 'wrap', marginBottom: '20px' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Euro size={14} />
-            <strong style={{ color: 'var(--text-primary)', fontSize: '20px' }}>€{displayPrice}</strong>
-            <span style={{ fontSize: '12px' }}>{locale === 'pt' ? '(preço fixo)' : '(fixed price)'}</span>
-          </span>
-          {request.locationLabel && (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <MapPin size={14} /> {request.locationLabel}
+        <div style={{ display: 'flex', gap: '20px', fontSize: '13px', color: 'var(--text-tertiary)', flexWrap: 'wrap' }}>
+          {displayPrice > 0 && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <Euro size={13} /> <strong style={{ color: 'var(--text-primary)', fontSize: '16px' }}>€{displayPrice}</strong>
             </span>
           )}
-          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <Clock size={14} /> {new Date(request.createdAt).toLocaleDateString(locale)}
+          {request.locationLabel && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><MapPin size={13} /> {request.locationLabel}</span>
+          )}
+          <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <Clock size={13} /> {new Date(request.createdAt).toLocaleDateString(locale)}
           </span>
-          {request.userId && (
-            <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <User size={14} /> {request.userId.name}
-            </span>
+          {request.userId?.name && (
+            <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><User size={13} /> {request.userId.name}</span>
           )}
         </div>
+      </div>
 
-        {/* Intent Confirmed Badge */}
-        {request.intentConfirmed && (
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              background: 'rgba(34,197,94,0.1)',
-              border: '1px solid rgba(34,197,94,0.3)',
-              borderRadius: 'var(--radius-full)',
-              fontSize: '12px',
-              color: 'var(--success)',
-              fontWeight: 600,
-            }}
-          >
-            <ShieldCheck size={13} />
-            {locale === 'pt' ? 'Cliente confirmou orçamento' : 'Client confirmed budget'}
-          </div>
-        )}
-      </Card>
-
-      {/* ─── Status: Accepted — show winner ─── */}
-      {isAccepted && (
-        <Card variant="glass" hover={false} style={{ padding: '24px', marginBottom: '24px', textAlign: 'center' }}>
-          <CheckCircle size={40} color="var(--success)" style={{ margin: '0 auto 12px' }} />
-          <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>
-            {locale === 'pt' ? 'Trabalho Atribuído!' : 'Job Assigned!'}
+      {/* ── Accepted State ── */}
+      {isAccepted && acceptedProposal && (
+        <div style={{
+          background: 'rgba(34,197,94,0.05)',
+          border: '1px solid rgba(34,197,94,0.2)',
+          borderRadius: '16px',
+          padding: '24px', marginBottom: '20px', textAlign: 'center',
+        }}>
+          <CheckCircle size={36} color="#22c55e" style={{ marginBottom: '12px' }} />
+          <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
+            {locale === 'pt' ? 'Profissional Atribuído!' : 'Professional Assigned!'}
           </h2>
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
             {locale === 'pt'
-              ? 'Um profissional verificado aceitou este trabalho. Entrarão em contacto em breve.'
-              : 'A verified professional has accepted this job. They will contact you shortly.'}
+              ? `${acceptedProposal.proId.name} foi selecionado por €${acceptedProposal.price}. Entrarão em contacto em breve.`
+              : `${acceptedProposal.proId.name} was selected for €${acceptedProposal.price}. They will reach out shortly.`}
           </p>
-        </Card>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            {isOwner && (
+              <button
+                onClick={handleComplete}
+                disabled={completeLoading}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  padding: '12px 28px',
+                  background: 'var(--accent)', color: '#fff',
+                  border: 'none', borderRadius: '10px',
+                  fontSize: '14px', fontWeight: 700,
+                  cursor: completeLoading ? 'wait' : 'pointer',
+                  opacity: completeLoading ? 0.7 : 1,
+                  transition: 'all 0.15s ease',
+                  fontFamily: 'var(--font-sans)',
+                }}
+              >
+                <ThumbsUp size={15} />
+                {completeLoading
+                  ? (locale === 'pt' ? 'A processar...' : 'Processing...')
+                  : (locale === 'pt' ? 'Marcar como Concluído' : 'Mark as Complete')}
+              </button>
+            )}
+          </div>
+          {completeError && (
+            <div style={{
+              padding: '10px 14px', marginTop: '12px', borderRadius: 'var(--radius-md)',
+              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+              color: '#dc2626', fontSize: '13px', textAlign: 'left',
+            }}>
+              {completeError}
+            </div>
+          )}
+          <div style={{ marginTop: '10px' }}>
+            {messageButtons}
+          </div>
+        </div>
       )}
 
-      {/* ─── Status: Open — Accept button for pros ─── */}
-      {isOpen && isPro && (
-        <Card variant="glass" hover={false} style={{ padding: '28px' }}>
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 700, marginBottom: '8px' }}>
-            {locale === 'pt' ? 'Aceitar este Trabalho' : 'Accept This Job'}
-          </h3>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
+      {/* ── Closed State (Job Done) ── */}
+      {isClosed && (
+        <div style={{
+          background: 'rgba(59,130,246,0.05)',
+          border: '1px solid rgba(59,130,246,0.2)',
+          borderRadius: '16px',
+          padding: '24px', marginBottom: '20px', textAlign: 'center',
+        }}>
+          <ThumbsUp size={36} color="#3b82f6" style={{ marginBottom: '12px' }} />
+          <h2 style={{ fontSize: '18px', fontWeight: 800, marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
+            {locale === 'pt' ? 'Trabalho Concluído!' : 'Job Complete!'}
+          </h2>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
             {locale === 'pt'
-              ? `O cliente paga €${displayPrice} ao primeiro profissional verificado que aceitar. Sem negociação, sem espera.`
-              : `The client pays €${displayPrice} to the first verified pro who accepts. No negotiation, no waiting.`}
+              ? 'Este trabalho foi marcado como concluído. Obrigado por usar o Needer!'
+              : 'This job has been marked as complete. Thank you for using Needer!'}
           </p>
+          {messageButtons}
+        </div>
+      )}
 
-          {acceptResult && (
-            <div
-              style={{
-                padding: '12px 16px',
-                marginBottom: '16px',
-                borderRadius: 'var(--radius-md)',
-                background: acceptResult.success ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-                border: `1px solid ${acceptResult.success ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
-                color: acceptResult.success ? 'var(--success)' : 'var(--error)',
-                fontSize: '14px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
-            >
-              {acceptResult.success ? <CheckCircle size={16} /> : <XCircle size={16} />}
-              {acceptResult.msg}
+      {/* ── Review Form (shown when closed + owner + not yet reviewed) ── */}
+      {isClosed && isOwner && acceptedProposal && !reviewSubmitted && (
+        <div style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border)',
+          borderRadius: '16px',
+          padding: '24px', marginBottom: '20px',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <Star size={16} color="var(--accent)" />
+            <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0 }}>
+              {locale === 'pt'
+                ? `Avalia ${acceptedProposal.proId.name}`
+                : `Review ${acceptedProposal.proId.name}`}
+            </h3>
+          </div>
+
+          {/* Star selector */}
+          <div style={{ display: 'flex', gap: '6px', marginBottom: '14px' }}>
+            {[1, 2, 3, 4, 5].map(s => (
+              <button
+                key={s}
+                onClick={() => setReviewScore(s)}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  padding: '4px', transition: 'transform 0.1s ease',
+                  transform: reviewScore >= s ? 'scale(1.15)' : 'scale(1)',
+                }}
+              >
+                <Star
+                  size={28}
+                  color={reviewScore >= s ? '#facc15' : 'var(--border)'}
+                  fill={reviewScore >= s ? '#facc15' : 'none'}
+                />
+              </button>
+            ))}
+            <span style={{ alignSelf: 'center', marginLeft: '8px', fontSize: '14px', fontWeight: 700 }}>
+              {reviewScore}/5
+            </span>
+          </div>
+
+          {/* Comment */}
+          <textarea
+            value={reviewComment}
+            onChange={e => setReviewComment(e.target.value)}
+            placeholder={locale === 'pt' ? 'Como foi a experiência? (opcional)' : 'How was the experience? (optional)'}
+            rows={3}
+            style={{
+              width: '100%', padding: '12px 14px',
+              background: 'var(--bg-primary)',
+              border: '1px solid var(--border)',
+              borderRadius: '10px', resize: 'vertical',
+              fontSize: '14px', color: 'var(--text-primary)',
+              fontFamily: 'var(--font-sans)',
+              lineHeight: 1.6,
+              marginBottom: '14px',
+              boxSizing: 'border-box',
+            }}
+          />
+
+          {reviewError && (
+            <div style={{
+              padding: '10px 14px', marginBottom: '14px', borderRadius: 'var(--radius-md)',
+              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+              color: '#dc2626', fontSize: '13px',
+            }}>
+              {reviewError}
             </div>
           )}
 
-          {!acceptResult && (
-            <button
-              onClick={handleAccept}
-              disabled={accepting}
-              style={{
-                width: '100%',
-                padding: '16px',
-                background: isUrgent
-                  ? 'linear-gradient(135deg, #f97316, #ef4444)'
-                  : 'var(--accent)',
-                color: '#fff',
-                border: 'none',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '16px',
-                fontWeight: 800,
-                cursor: accepting ? 'not-allowed' : 'pointer',
-                opacity: accepting ? 0.7 : 1,
-                transition: 'all 0.15s ease',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                letterSpacing: '0.01em',
-              }}
-            >
-              {accepting ? (
-                locale === 'pt' ? 'A aceitar...' : 'Accepting...'
-              ) : (
-                <>
-                  <Zap size={18} />
-                  {locale === 'pt' ? `Aceitar este trabalho por €${displayPrice}` : `Accept this job for €${displayPrice}`}
-                </>
-              )}
-            </button>
-          )}
-        </Card>
-      )}
-
-      {/* ─── Status: Open — Waiting state for Needers ─── */}
-      {isOpen && !isPro && !isOwner && (
-        <Card hover={false} style={{ textAlign: 'center', padding: '40px' }}>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
-            {locale === 'pt' ? 'Apenas profissionais verificados podem aceitar este trabalho.' : 'Only verified professionals can accept this job.'}
-          </p>
-        </Card>
-      )}
-
-      {isOpen && isOwner && (
-        <Card variant="glass" hover={false} style={{ padding: '28px', textAlign: 'center' }}>
-          <div
+          <button
+            onClick={handleReview}
+            disabled={reviewLoading}
             style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '50%',
-              border: '3px solid var(--accent)',
-              borderTopColor: 'transparent',
-              animation: 'spin 1s linear infinite',
-              margin: '0 auto 16px',
+              display: 'inline-flex', alignItems: 'center', gap: '8px',
+              padding: '10px 24px',
+              background: 'var(--accent)', color: '#fff',
+              border: 'none', borderRadius: '10px',
+              fontSize: '13px', fontWeight: 700,
+              cursor: reviewLoading ? 'wait' : 'pointer',
+              opacity: reviewLoading ? 0.7 : 1,
+              fontFamily: 'var(--font-sans)',
+            }}
+          >
+            <SendIcon size={13} />
+            {reviewLoading
+              ? (locale === 'pt' ? 'A enviar...' : 'Submitting...')
+              : (locale === 'pt' ? 'Enviar Avaliação' : 'Submit Review')}
+          </button>
+        </div>
+      )}
+
+      {/* ── Review Submitted Confirmation ── */}
+      {reviewSubmitted && (
+        <div style={{
+          background: 'rgba(34,197,94,0.05)',
+          border: '1px solid rgba(34,197,94,0.2)',
+          borderRadius: '16px',
+          padding: '20px', marginBottom: '20px', textAlign: 'center',
+        }}>
+          <CheckCircle size={24} color="#22c55e" style={{ marginBottom: '8px' }} />
+          <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
+            {locale === 'pt' ? 'Avaliação enviada! Obrigado pelo teu feedback.' : 'Review submitted! Thank you for your feedback.'}
+          </p>
+        </div>
+      )}
+
+      {/* ── Waiting State (owner, open, no proposals yet) ── */}
+      {isOpen && isOwner && proposals.length === 0 && (
+        <div style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border)',
+          borderRadius: '16px',
+          padding: '32px', marginBottom: '20px', textAlign: 'center',
+        }}>
+          <Sparkles size={28} color="var(--accent)" style={{ marginBottom: '12px' }} />
+          <h3 style={{ fontSize: '16px', fontWeight: 700, marginBottom: '8px' }}>
+            {locale === 'pt' ? 'À espera de propostas...' : 'Waiting for proposals...'}
+          </h3>
+          <p style={{ fontSize: '13px', color: 'var(--text-tertiary)', lineHeight: 1.7 }}>
+            {locale === 'pt'
+              ? 'Os profissionais estão a ser notificados. Em média, a primeira proposta chega em ~8 minutos.'
+              : 'Professionals are being notified. On average, the first proposal arrives in ~8 minutes.'}
+          </p>
+          <div style={{
+            display: 'flex', gap: '6px', justifyContent: 'center', marginTop: '16px',
+          }}>
+            {[0, 1, 2].map(i => (
+              <div key={i} style={{
+                width: '8px', height: '8px', borderRadius: '50%',
+                background: 'var(--accent)', opacity: 0.5,
+                animation: `pulse 1.5s ease-in-out ${i * 0.3}s infinite`,
+              }} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Proposals Section ── */}
+      {proposals.length > 0 && (
+        <div style={{ marginBottom: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+            <MessageSquare size={16} color="var(--accent)" />
+            <h2 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>
+              {locale === 'pt'
+                ? `${proposals.length} Proposta${proposals.length > 1 ? 's' : ''}`
+                : `${proposals.length} Proposal${proposals.length > 1 ? 's' : ''}`}
+            </h2>
+            {isOpen && pendingProposals.length > 0 && (
+              <span style={{
+                padding: '3px 10px', borderRadius: '99px',
+                background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)',
+                fontSize: '11px', fontWeight: 700, color: '#22c55e',
+              }}>
+                {pendingProposals.length} {locale === 'pt' ? 'pendente' : 'pending'}
+              </span>
+            )}
+          </div>
+
+          {actionError && (
+            <div style={{
+              padding: '10px 14px', marginBottom: '12px', borderRadius: 'var(--radius-md)',
+              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+              color: '#dc2626', fontSize: '13px',
+            }}>
+              {actionError}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {proposals.map(p => (
+              <ProposalCard
+                key={p._id}
+                proposal={p}
+                locale={locale}
+                isOwner={!!isOwner}
+                onAction={handleProposalAction}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Pro Proposal Form (visible to pros on open requests) ── */}
+      {isOpen && isPro && !isOwner && !alreadyProposed && !proposalSent && (
+        <div style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border)',
+          borderRadius: '16px',
+          padding: '24px', marginBottom: '20px',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <FileText size={16} color="var(--accent)" />
+            <h3 style={{ fontSize: '15px', fontWeight: 700, margin: 0 }}>
+              {locale === 'pt' ? 'Enviar proposta' : 'Submit proposal'}
+            </h3>
+          </div>
+
+          <textarea
+            value={proposalMessage}
+            onChange={e => setProposalMessage(e.target.value)}
+            placeholder={locale === 'pt'
+              ? 'Apresenta-te e explica porque és a melhor escolha para este trabalho...'
+              : 'Introduce yourself and explain why you are the best choice for this job...'}
+            rows={4}
+            style={{
+              width: '100%', padding: '12px 14px',
+              background: 'var(--bg-primary)',
+              border: '1px solid var(--border)',
+              borderRadius: '10px', resize: 'vertical',
+              fontSize: '14px', color: 'var(--text-primary)',
+              fontFamily: 'var(--font-sans)',
+              lineHeight: 1.6, marginBottom: '12px',
+              boxSizing: 'border-box',
             }}
           />
-          <h3 style={{ fontWeight: 700, fontSize: '16px', marginBottom: '8px' }}>
-            {locale === 'pt' ? '⏳ À espera de um profissional...' : '⏳ Waiting for a professional...'}
-          </h3>
+
+          {proposalSubmitError && (
+            <div style={{
+              padding: '10px 14px', marginBottom: '12px', borderRadius: 'var(--radius-md)',
+              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+              color: '#dc2626', fontSize: '13px',
+            }}>
+              {proposalSubmitError}
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+            <div style={{ flex: '0 0 140px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, marginBottom: '4px', color: 'var(--text-secondary)' }}>
+                {locale === 'pt' ? 'Preço (€)' : 'Price (€)'}
+              </label>
+              <input
+                type="number"
+                min="1"
+                value={proposalPrice}
+                onChange={e => setProposalPrice(e.target.value)}
+                placeholder="€"
+                style={{
+                  width: '100%', padding: '10px 12px',
+                  background: 'var(--bg-primary)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '8px',
+                  fontSize: '16px', fontWeight: 700,
+                  color: 'var(--text-primary)',
+                  fontFamily: 'var(--font-sans)',
+                  boxSizing: 'border-box',
+                }}
+              />
+            </div>
+
+            <button
+              onClick={async () => {
+                if (!proposalMessage.trim() || !proposalPrice) return;
+                setProposalLoading(true);
+                setProposalSubmitError('');
+                try {
+                  const res = await fetch('/api/proposals', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      requestId: id,
+                      message: proposalMessage.trim(),
+                      price: parseFloat(proposalPrice),
+                    }),
+                  });
+                  if (res.ok) {
+                    setProposalSent(true);
+                    await loadProposals();
+                  } else {
+                    const data = await res.json().catch(() => ({}));
+                    setProposalSubmitError(data.error || genericError);
+                  }
+                } catch (err) {
+                  console.error('Error submitting proposal:', err);
+                  setProposalSubmitError(genericError);
+                } finally {
+                  setProposalLoading(false);
+                }
+              }}
+              disabled={proposalLoading || !proposalMessage.trim() || !proposalPrice}
+              style={{
+                padding: '10px 20px',
+                background: proposalMessage.trim() && proposalPrice ? 'var(--accent)' : 'var(--border)',
+                color: proposalMessage.trim() && proposalPrice ? '#fff' : 'var(--text-tertiary)',
+                border: 'none', borderRadius: '10px',
+                fontSize: '13px', fontWeight: 700,
+                cursor: proposalMessage.trim() && proposalPrice && !proposalLoading ? 'pointer' : 'not-allowed',
+                fontFamily: 'var(--font-sans)',
+                display: 'flex', alignItems: 'center', gap: '6px',
+              }}
+            >
+              <SendIcon size={13} />
+              {proposalLoading
+                ? (locale === 'pt' ? 'A enviar...' : 'Sending...')
+                : (locale === 'pt' ? 'Enviar proposta' : 'Send proposal')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Proposal Sent Confirmation (for pros) ── */}
+      {proposalSent && (
+        <div style={{
+          background: 'rgba(34,197,94,0.05)',
+          border: '1px solid rgba(34,197,94,0.2)',
+          borderRadius: '16px',
+          padding: '20px', marginBottom: '20px', textAlign: 'center',
+        }}>
+          <CheckCircle size={24} color="#22c55e" style={{ marginBottom: '8px' }} />
+          <p style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>
+            {locale === 'pt'
+              ? 'Proposta enviada! O cliente será notificado.'
+              : 'Proposal sent! The client will be notified.'}
+          </p>
+        </div>
+      )}
+
+      {/* ── Already Proposed (for pros) ── */}
+      {isOpen && isPro && !isOwner && alreadyProposed && !proposalSent && (
+        <div style={{
+          background: 'rgba(59,130,246,0.05)',
+          border: '1px solid rgba(59,130,246,0.2)',
+          borderRadius: '16px',
+          padding: '16px', marginBottom: '20px', textAlign: 'center',
+        }}>
           <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
             {locale === 'pt'
-              ? 'O primeiro profissional verificado a aceitar ficará com o trabalho. Serás notificado imediatamente.'
-              : 'The first verified pro to accept will get the job. You will be notified immediately.'}
+              ? 'Já enviaste uma proposta para este pedido.'
+              : 'You already submitted a proposal for this request.'}
           </p>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        </Card>
+        </div>
       )}
+
+      {/* Animations */}
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 0.3; transform: scale(0.8); }
+          50%      { opacity: 1;   transform: scale(1.1); }
+        }
+      `}</style>
     </div>
   );
 }

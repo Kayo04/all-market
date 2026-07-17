@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { Bell, Check, MessageSquare, FileText, Star, X } from 'lucide-react';
+import { Bell, Check, MessageSquare, FileText, Star, X, Sparkles } from 'lucide-react';
 
 interface NotificationItem {
   _id: string;
@@ -20,7 +20,10 @@ const typeIcons: Record<string, typeof Bell> = {
   proposal_accepted: Check,
   proposal_rejected: X,
   new_message: MessageSquare,
-  request_closed: Star,
+  request_closed: Check,
+  new_review: Star,
+  system: Bell,
+  new_request: Sparkles,
 };
 
 const typeColors: Record<string, string> = {
@@ -28,7 +31,10 @@ const typeColors: Record<string, string> = {
   proposal_accepted: '#22c55e',
   proposal_rejected: '#ef4444',
   new_message: '#8b5cf6',
-  request_closed: '#f59e0b',
+  request_closed: '#3b82f6',
+  new_review: '#f59e0b',
+  system: '#6b7280',
+  new_request: '#06b6d4',
 };
 
 export default function NotificationBell() {
@@ -37,6 +43,7 @@ export default function NotificationBell() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const fetchNotifications = async () => {
@@ -66,6 +73,12 @@ export default function NotificationBell() {
     return () => clearInterval(interval);
   }, [session]);
 
+  // Tick the "time ago" labels forward once a minute instead of reading Date.now() during render
+  useEffect(() => {
+    const interval = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -94,7 +107,7 @@ export default function NotificationBell() {
   };
 
   const timeAgo = (dateStr: string) => {
-    const diff = Date.now() - new Date(dateStr).getTime();
+    const diff = now - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
     if (mins < 1) return locale === 'pt' ? 'agora' : 'now';
     if (mins < 60) return `${mins}m`;

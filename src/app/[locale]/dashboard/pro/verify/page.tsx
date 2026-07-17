@@ -18,6 +18,7 @@ export default function VerifyPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
   const [form, setForm] = useState({
     businessName: '',
@@ -51,6 +52,7 @@ export default function VerifyPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setError('');
 
     try {
       const res = await fetch('/api/verified', {
@@ -62,9 +64,13 @@ export default function VerifyPage() {
       if (res.ok) {
         setSubmitted(true);
         setVerificationStatus('pending');
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setError(data.error || (locale === 'pt' ? 'Não foi possível submeter a verificação. Tenta novamente.' : 'Could not submit verification. Please try again.'));
       }
     } catch (err) {
       console.error('Error:', err);
+      setError(locale === 'pt' ? 'Não foi possível submeter a verificação. Tenta novamente.' : 'Could not submit verification. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -169,6 +175,15 @@ export default function VerifyPage() {
           </div>
 
           <Card variant="glass" hover={false} style={{ padding: '32px' }}>
+            {error && (
+              <div style={{
+                padding: '10px 14px', marginBottom: '16px', borderRadius: 'var(--radius-md)',
+                background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+                color: '#dc2626', fontSize: '13px',
+              }}>
+                {error}
+              </div>
+            )}
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <Input
                 label={locale === 'pt' ? 'Nome da Empresa' : 'Business Name'}

@@ -6,7 +6,10 @@ type NotificationType =
     | 'proposal_accepted'
     | 'proposal_rejected'
     | 'new_message'
-    | 'request_closed';
+    | 'request_closed'
+    | 'new_review'
+    | 'system'
+    | 'new_request';
 
 export async function createNotification(
     userId: string,

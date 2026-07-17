@@ -185,8 +185,8 @@ export default function HeroSection() {
                         }}
                     >
                         {locale === 'pt'
-                            ? 'Publica o que procuras. Vendedores premium contactam-te em minutos — sem pesquisa, sem intermediários.'
-                            : 'Post what you\'re looking for. Premium sellers reach out in minutes — no searching, no middlemen.'}
+                            ? 'Pára de procurar. Pede o que queres e quem tem o produto manda-te mensagem.'
+                            : 'Stop searching. Tell us what you want and sellers with the product message you.'}
                     </p>
 
                     {/* Input box */}
@@ -310,37 +310,6 @@ export default function HeroSection() {
                             >
                                 {s}
                             </button>
-                        ))}
-                    </div>
-
-                    {/* Trust / value props */}
-                    <div
-                        style={{
-                            display: 'flex',
-                            gap: '24px',
-                            justifyContent: 'center',
-                            flexWrap: 'wrap',
-                        }}
-                    >
-                        {[
-                            { icon: '🛡️', text: locale === 'pt' ? 'Vendedores verificados' : 'Verified sellers' },
-                            { icon: '⚡', text: locale === 'pt' ? 'Resposta em minutos' : 'Response in minutes' },
-                            { icon: '🏆', text: locale === 'pt' ? 'Melhores preços garantidos' : 'Best prices guaranteed' },
-                        ].map(({ icon, text }) => (
-                            <div
-                                key={text}
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    fontSize: '12px',
-                                    color: 'rgba(255,255,255,0.40)',
-                                    fontWeight: 500,
-                                }}
-                            >
-                                <span style={{ fontSize: '14px' }}>{icon}</span>
-                                {text}
-                            </div>
                         ))}
                     </div>
                 </div>

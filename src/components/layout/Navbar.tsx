@@ -5,10 +5,9 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter, usePathname } from '@/i18n/navigation';
 
 import { useSession, signOut } from 'next-auth/react';
-import { Menu, X, Globe, MessageSquare, Search, Settings } from 'lucide-react';
+import { Menu, X, MessageSquare, Search, Settings, Globe } from 'lucide-react';
 import NotificationBell from '@/components/layout/NotificationBell';
-import PreferencesModal from '@/components/layout/PreferencesModal';
-import { useCurrency } from '@/context/CurrencyContext';
+
 
 export default function Navbar() {
   const t = useTranslations('nav');
@@ -20,8 +19,6 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [scrollY, setScrollY] = useState(0);
-  const [showPrefs, setShowPrefs] = useState(false);
-  const { currency } = useCurrency();
 
 
 
@@ -156,30 +153,6 @@ export default function Navbar() {
           }}
           className="desktop-nav"
         >
-          {/* Language/Currency Toggle */}
-          <button
-            onClick={() => setShowPrefs(true)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px',
-              padding: '6px 10px',
-              fontSize: '12px',
-              fontWeight: 500,
-              color: 'var(--text-tertiary)',
-              background: 'transparent',
-              border: 'none',
-              borderRadius: 'var(--radius-md)',
-              cursor: 'pointer',
-              transition: 'color var(--transition-fast)',
-            }}
-            title="Language & Currency"
-          >
-            <Globe size={13} />
-            {locale.toUpperCase()} · {currency}
-          </button>
-
-
 
           {/* ✦ Find a Pro CTA → /concierge */}
           <Link
@@ -408,7 +381,7 @@ export default function Navbar() {
               style={{
                 margin: '4px',
                 padding: '8px 14px',
-                background: 'var(--primary)',
+                background: 'var(--accent)',
                 border: 'none',
                 color: '#ffffff',
                 borderRadius: 'var(--radius-md)',
@@ -463,7 +436,7 @@ export default function Navbar() {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <Link href="/auth/register?role=pro" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', background: 'var(--primary)', color: '#ffffff', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontSize: '14px', fontWeight: 700, textAlign: 'center' }}>
+              <Link href="/auth/register?role=pro" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', background: 'var(--accent)', color: '#ffffff', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontSize: '14px', fontWeight: 700, textAlign: 'center' }}>
                 {locale === 'pt' ? 'Torne-se um Profissional' : 'Become a Professional'}
               </Link>
               <Link href="/auth/login" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', textDecoration: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: 'var(--radius-md)', fontSize: '14px', fontWeight: 500, textAlign: 'center' }}>
@@ -486,7 +459,6 @@ export default function Navbar() {
       `}</style>
     </header>
       <div style={{ height: '56px', flexShrink: 0 }} />
-      {showPrefs && <PreferencesModal onClose={() => setShowPrefs(false)} />}
     </>
   );
 }

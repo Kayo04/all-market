@@ -20,7 +20,7 @@ export async function GET(request: Request) {
 
         const proposals = await Proposal.find({ requestId })
             .sort({ createdAt: -1 })
-            .populate('proId', 'name avatar isVerified ratings')
+            .populate('proId', 'name avatar isVerified ratings rating locationLabel')
             .lean();
 
         return NextResponse.json({ proposals });

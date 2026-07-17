@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useLocale } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { Send, ArrowLeft } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -24,7 +24,10 @@ export default function ChatThreadPage() {
   const locale = useLocale();
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const requestId = params.requestId as string;
+  const withUserId = searchParams.get('with');
+  const withUserName = searchParams.get('name');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [messages, setMessages] = useState<MessageItem[]>([]);
@@ -72,12 +75,15 @@ export default function ChatThreadPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Find the other person in the conversation
+  // Find the other person in the conversation. Falls back to the `with`/`name` query
+  // params when no messages exist yet, so a fresh conversation can be started.
   const otherUser = messages.length > 0
     ? messages[0].senderId._id === userId
       ? messages[0].receiverId
       : messages[0].senderId
-    : null;
+    : withUserId
+      ? { _id: withUserId, name: withUserName ?? '' }
+      : null;
 
   const handleSend = async () => {
     if (!newMessage.trim() || !otherUser) return;

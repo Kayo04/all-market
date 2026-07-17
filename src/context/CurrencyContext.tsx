@@ -29,12 +29,16 @@ function detectCurrency(): Currency {
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
   const [currency, setCurrencyState] = useState<Currency>('EUR');
 
-  // On mount: load from localStorage or auto-detect from browser locale
+  // On mount: load from localStorage or auto-detect from browser locale.
+  // Deferred to an effect since localStorage/navigator aren't available during SSR —
+  // the extra render after mount is unavoidable for this pattern.
   useEffect(() => {
     const saved = localStorage.getItem('needer_currency') as Currency | null;
     if (saved && ['EUR', 'USD', 'GBP'].includes(saved)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrencyState(saved);
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrencyState(detectCurrency());
     }
   }, []);

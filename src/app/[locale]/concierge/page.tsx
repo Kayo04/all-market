@@ -3,8 +3,9 @@
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useLocale } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
-import { Link } from '@/i18n/navigation';
-import { ArrowLeft, Star, CheckCircle, Zap, Send, Shield, Award } from 'lucide-react';
+import { useSession } from 'next-auth/react';
+import { Link, useRouter } from '@/i18n/navigation';
+import { ArrowLeft, Star, CheckCircle, Zap, Send, Shield, Award, ExternalLink } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -20,11 +21,12 @@ interface Pro {
   locationLabel: string;
 }
 
-interface ResultBlock {
+interface ResultBlockData {
   query: string;
   message: string;
   pros: Pro[];
   urgency: string;
+  requestId?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -129,8 +131,9 @@ function TrustBadge({ isSponsored, locale }: { isSponsored: boolean; locale: str
 // ─────────────────────────────────────────────────────────────────────────────
 // Pro card
 // ─────────────────────────────────────────────────────────────────────────────
-function ProCard({ pro, index, locale }: { pro: Pro; index: number; locale: string }) {
+function ProCard({ pro, index, locale, requestId, query }: { pro: Pro; index: number; locale: string; requestId?: string; query: string }) {
   const [hovered, setHovered] = useState(false);
+  const router = useRouter();
 
   return (
     <div
@@ -174,12 +177,20 @@ function ProCard({ pro, index, locale }: { pro: Pro; index: number; locale: stri
       {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px', flexWrap: 'wrap' }}>
-          <span style={{
-            fontSize: '14px', fontWeight: 600, color: '#ffffff',
-            whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-          }}>
+          <Link
+            href={`/users/${pro._id}`}
+            style={{
+              fontSize: '14px', fontWeight: 600, color: '#ffffff',
+              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+              textDecoration: 'none', borderBottom: '1px solid transparent',
+              transition: 'border-color 0.15s ease',
+            }}
+            onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderBottomColor = 'rgba(255,255,255,0.4)'}
+            onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderBottomColor = 'transparent'}
+            onClick={e => e.stopPropagation()}
+          >
             {pro.name}
-          </span>
+          </Link>
           {pro.isVerified && (
             <span style={{
               display: 'inline-flex', alignItems: 'center', gap: '3px',
@@ -215,7 +226,15 @@ function ProCard({ pro, index, locale }: { pro: Pro; index: number; locale: stri
       </div>
 
       {/* CTA */}
-      <button style={{
+      <button 
+        onClick={() => {
+          if (requestId) {
+            router.push(`/requests/${requestId}`);
+          } else {
+            router.push(`/auth/login?redirect=/concierge&q=${encodeURIComponent(query)}`);
+          }
+        }}
+        style={{
         padding: '9px 18px', flexShrink: 0,
         background: hovered ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.07)',
         border: '1px solid rgba(255,255,255,0.12)',
@@ -233,7 +252,7 @@ function ProCard({ pro, index, locale }: { pro: Pro; index: number; locale: stri
 // ─────────────────────────────────────────────────────────────────────────────
 // Result block — query becomes an H2, pros slide in below
 // ─────────────────────────────────────────────────────────────────────────────
-function ResultBlock({ block, locale, index }: { block: ResultBlock; locale: string; index: number }) {
+function ResultBlock({ block, locale, index }: { block: ResultBlockData; locale: string; index: number }) {
   return (
     <div style={{
       paddingBottom: '48px',
@@ -289,9 +308,57 @@ function ResultBlock({ block, locale, index }: { block: ResultBlock; locale: str
       {/* Pro cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
         {block.pros.map((pro, i) => (
-          <ProCard key={pro._id} pro={pro} index={i} locale={locale} />
+          <ProCard key={pro._id} pro={pro} index={i} locale={locale} requestId={block.requestId} query={block.query} />
         ))}
       </div>
+
+      {/* Confirmation / View Request */}
+      {block.requestId && (
+        <div style={{
+          marginTop: '20px', padding: '18px 20px',
+          background: 'rgba(34,197,94,0.06)',
+          border: '1px solid rgba(34,197,94,0.18)',
+          borderRadius: '12px',
+          animation: 'riseIn 0.35s ease 0.3s both',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <CheckCircle size={15} color="#22c55e" />
+            <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
+              {locale === 'pt' ? 'Pedido publicado! Os profissionais estão a ser notificados.' : 'Request posted! Professionals are being notified.'}
+            </span>
+          </div>
+          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', marginBottom: '14px', lineHeight: 1.6 }}>
+            {locale === 'pt'
+              ? 'Em média, a primeira proposta chega em ~8 minutos. Serás notificado quando responderam.'
+              : 'On average, the first proposal arrives in ~8 minutes. You will be notified when they respond.'}
+          </p>
+          <Link
+            href={`/requests/${block.requestId}`}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              padding: '8px 16px',
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.14)',
+              borderRadius: '8px',
+              fontSize: '12px', fontWeight: 600,
+              color: 'rgba(255,255,255,0.8)',
+              textDecoration: 'none',
+              transition: 'all 0.15s ease',
+            }}
+            onMouseEnter={e => {
+              (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.14)';
+              (e.currentTarget as HTMLElement).style.color = '#ffffff';
+            }}
+            onMouseLeave={e => {
+              (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)';
+              (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.8)';
+            }}
+          >
+            <ExternalLink size={12} />
+            {locale === 'pt' ? 'Ver pedido e propostas →' : 'View request & proposals →'}
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
@@ -303,7 +370,7 @@ function ConciergePage() {
   const locale = useLocale() as 'pt' | 'en';
   const searchParams = useSearchParams();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<ResultBlock[]>([]);
+  const [results, setResults] = useState<ResultBlockData[]>([]);
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -345,6 +412,7 @@ function ConciergePage() {
         message: data.message,
         pros: data.pros ?? [],
         urgency: data.urgency,
+        requestId: data.requestId,
       }]);
     } catch {
       setResults(prev => [...prev, {

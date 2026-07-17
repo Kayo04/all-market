@@ -4,6 +4,8 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import UserModel from '@/lib/models/User';
 import RequestModel from '@/lib/models/Request';
+import ProposalModel from '@/lib/models/Proposal';
+import { createNotification } from '@/lib/notifications';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -353,6 +355,70 @@ const MOCK_PROS_GENERIC: MockPro[] = [
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Mock proposal injection — auto-creates proposals for demo completeness
+// Only fires when using mock pros (i.e. DB has no real pros yet)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const PROPOSAL_MESSAGES = [
+    { en: "Hi! I'm available right now and can start immediately. I have extensive experience with this type of work. Looking forward to helping you!", pt: "Olá! Estou disponível agora mesmo e posso começar imediatamente. Tenho vasta experiência neste tipo de trabalho. Estou ansioso por ajudar!" },
+    { en: "Hello! I saw your request and it's exactly the kind of job I specialize in. I can offer a competitive rate and guarantee quality work. Let me know!", pt: "Olá! Vi o seu pedido e é exatamente o tipo de trabalho em que me especializo. Posso oferecer um preço competitivo e garantir qualidade. Contacte-me!" },
+    { en: "Good day! I'd love to help with this. I'm a verified professional with great reviews. I can come by today if needed.", pt: "Bom dia! Adoraria ajudar com isto. Sou um profissional verificado com ótimas avaliações. Posso ir hoje se necessário." },
+];
+
+async function injectMockProposals(requestId: string, pros: MockPro[], locale: string, budget: number) {
+    // Only inject for mock pros (real DB pros shouldn't get fake proposals)
+    const mockPros = pros.filter(p => p._id.startsWith('mock-'));
+    if (mockPros.length === 0) return;
+
+    // Create 2-3 proposals with staggered delays
+    const count = Math.min(mockPros.length, Math.floor(Math.random() * 2) + 2);
+    for (let i = 0; i < count; i++) {
+        const pro = mockPros[i];
+        const delay = 3000 + Math.random() * 7000; // 3-10 seconds
+        const priceVariation = 0.85 + Math.random() * 0.30;
+        const price = budget > 0 ? Math.round(budget * priceVariation) : Math.round(30 + Math.random() * 70);
+        const msgTemplate = PROPOSAL_MESSAGES[i % PROPOSAL_MESSAGES.length];
+        const message = locale === 'pt' ? msgTemplate.pt : msgTemplate.en;
+
+        setTimeout(async () => {
+            try {
+                await dbConnect();
+
+                // Upsert the mock pro as a real User so we have a valid ObjectId
+                const dbPro = await UserModel.findOneAndUpdate(
+                    { email: `${pro._id}@mock.needer.com` },
+                    {
+                        $setOnInsert: {
+                            name: pro.name,
+                            email: `${pro._id}@mock.needer.com`,
+                            password: 'mock-no-login',
+                            role: 'pro',
+                            proCategory: pro.proCategory,
+                            isVerified: pro.isVerified,
+                            hasSponsoredSpot: pro.hasSponsoredSpot,
+                            rating: pro.rating,
+                            locationLabel: pro.locationLabel,
+                            bio: `Professional ${pro.proCategory} services. Demo account.`,
+                            skills: [pro.proCategory],
+                        },
+                    },
+                    { upsert: true, new: true }
+                );
+
+                await ProposalModel.create({
+                    requestId,
+                    proId: dbPro._id,
+                    message,
+                    price,
+                });
+            } catch (err) {
+                console.warn('[ai-match] Mock proposal injection failed:', err);
+            }
+        }, delay);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // POST /api/ai-match
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -434,7 +500,32 @@ export async function POST(request: Request) {
                     locationLabel: parsed.city,
                     userId,
                 });
-                requestId = doc._id.toString();
+                // `requestId` is captured by the closure below, which makes TypeScript widen every
+                // read of the outer `let` back to `string | undefined` — read straight off `doc`
+                // instead of round-tripping through `requestId` so this stays typed as `string`.
+                const persistedRequestId = doc._id.toString();
+                requestId = persistedRequestId;
+
+                // Auto-inject mock proposals for demo completeness
+                if (pros.length > 0 && pros[0]._id?.toString().startsWith('mock-')) {
+                    injectMockProposals(persistedRequestId, pros as MockPro[], locale, parsed.budget ?? 0);
+                }
+
+                // Notify real pros whose proCategory matches this request (independent of the
+                // display-limited `pros` slots, which may be capped/mock — notify everyone who qualifies)
+                if (parsed.type === 'service') {
+                    const matchingPros = await UserModel.find({ role: 'pro', proCategory: parsed.subcategory })
+                        .select('_id')
+                        .lean();
+
+                    const notifyContent = locale === 'pt'
+                        ? `Novo pedido na tua categoria: "${query.slice(0, 80)}"`
+                        : `New request in your category: "${query.slice(0, 80)}"`;
+
+                    await Promise.all(
+                        matchingPros.map(p => createNotification(p._id.toString(), 'new_request', notifyContent, persistedRequestId))
+                    );
+                }
             } catch (err) {
                 // Don't crash the AI response if request persistence fails
                 console.warn('[ai-match] Could not persist request:', err);

@@ -16,9 +16,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Reading localStorage must wait until after mount (SSR has no localStorage) — rendering
+    // 'light' on both server and first client pass keeps hydration consistent, then this
+    // effect swaps in the real value. That's an unavoidable extra render for this pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     const saved = localStorage.getItem('needer-theme') as Theme | null;
     if (saved) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTheme(saved);
       document.documentElement.setAttribute('data-theme', saved);
     } else {
