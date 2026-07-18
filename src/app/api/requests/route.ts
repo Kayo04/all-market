@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import RequestModel from '@/lib/models/Request';
-import UserModel from '@/lib/models/User';
 
 // GET: List/filter requests (with geospatial queries)
 export async function GET(request: Request) {
@@ -51,30 +50,13 @@ export async function GET(request: Request) {
             };
         }
 
-        // ── Sniper Bidding filter ─────────────────────────────────────────
-        // Non-premium users only see requests after their 1-hour sniper window.
-        // Premium snipers (isPremiumSniper=true) can see ALL fresh requests.
-        // Only applies when browsing (not when fetching own requests with mine=1).
-        if (mine !== '1') {
-            const session = await getServerSession(authOptions);
-            let isPremiumSniper = false;
-
-            if (session?.user) {
-                const userId = (session.user as { id: string }).id;
-                const user = await UserModel.findById(userId).select('isPremiumSniper').lean() as { isPremiumSniper?: boolean } | null;
-                isPremiumSniper = user?.isPremiumSniper ?? false;
-            }
-
-            if (!isPremiumSniper) {
-                // Show only requests past their sniper window, OR legacy requests without a publicReleaseDate
-                query.$or = [
-                    { publicReleaseDate: { $lte: new Date() } },
-                    { publicReleaseDate: null },
-                    { publicReleaseDate: { $exists: false } },
-                ];
-            }
-            // isPremiumSniper=true → no filter, they see everything
-        }
+        // ── Sniper Bidding filter — disabled until Phase 5 (billing) ships ──
+        // isPremiumSniper can never be true today (no purchase flow exists yet),
+        // so gating on it would hide every fresh request from every visitor,
+        // indefinitely, with no way through. Request.publicReleaseDate is still
+        // stamped on creation (+1h) so this filter can be re-enabled once the
+        // premium tier is actually purchasable — see api/requests/route.ts git
+        // history for the previous implementation.
 
         // Featured requests first, then by date
         const requests = await RequestModel.find(query)

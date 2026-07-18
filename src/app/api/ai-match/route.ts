@@ -33,8 +33,8 @@ Given a natural language request in any language, extract structured data and wr
 
 Return ONLY a valid JSON object with this exact shape:
 {
-  "category": "home-repairs|tech-digital|tutoring|events|wellness|business|design|writing|cleaning|automotive|beauty",
-  "subcategory": "electricians|plumbers|painters|locksmiths|furniture-assembly|websites|social-media|computer-repair|math|english|music|exam-prep|photographers|djs|catering|venue-rental|personal-trainers|massage|dog-walking|accounting|legal|logo|illustration|copywriting|translation|house-cleaning|office-cleaning|mechanic|car-wash|hairdresser|makeup",
+  "category": "home-repairs|tech-digital|tutoring|events|wellness|business|design|writing|cleaning|automotive|beauty|equipment",
+  "subcategory": "electricians|plumbers|painters|locksmiths|furniture-assembly|websites|social-media|computer-repair|math|english|music|exam-prep|photographers|djs|catering|venue-rental|personal-trainers|massage|dog-walking|accounting|legal|logo|illustration|copywriting|translation|house-cleaning|office-cleaning|mechanic|car-wash|hairdresser|makeup|automotive|gaming|smartphones|laptops|product",
   "type": "service|product",
   "urgency": "Normal|High|Urgent",
   "budget": <number_in_euros_or_null>,
@@ -46,6 +46,7 @@ Return ONLY a valid JSON object with this exact shape:
 Rules:
 - urgency: "Urgent" = emergency/now/sparks/flood/broken; "High" = today/soon/this week; "Normal" = default
 - type: "product" when user wants to BUY a physical object; "service" when they need someone to DO something
+- when type is "product", category MUST be "equipment" (never a service category) — subcategory is "automotive" for vehicles, "gaming" for consoles/games, "smartphones" for phones, "laptops" for computers, or "product" for anything else
 - budget: extract the euro amount as a plain number (handle "k" as ×1000); null if not mentioned
 - city: detect Portuguese city names (Porto, Lisboa, Braga, Coimbra, Faro, Aveiro, Setúbal, Guimarães); default to "Porto"
 - responseMessage: empathetic, confirms understanding, mentions the city and urgency if relevant`;

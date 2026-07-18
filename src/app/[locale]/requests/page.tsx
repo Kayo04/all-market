@@ -4,15 +4,11 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Search, MapPin, Euro, Clock, Zap, CheckCircle, XCircle } from 'lucide-react';
+import { Search, MapPin, Euro, Clock, Zap, ArrowRight } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { categories } from '@/lib/categories';
-import { useSession } from 'next-auth/react';
-
-// Services only — products hidden
-const serviceCategories = categories.filter((c) => c.type === 'service');
 
 interface RequestItem {
   _id: string;
@@ -37,7 +33,6 @@ export default function BrowseRequestsPage() {
   const t = useTranslations('request');
   const locale = useLocale();
   const searchParams = useSearchParams();
-  const { data: session } = useSession();
 
   const urlQuery = searchParams.get('q') || '';
 
@@ -45,16 +40,7 @@ export default function BrowseRequestsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [searchTerm, setSearchTerm] = useState(urlQuery);
-  const [accepting, setAccepting] = useState<string | null>(null);
-  const [acceptResult, setAcceptResult] = useState<{ id: string; success: boolean; msg: string } | null>(null);
   const prevCountRef = useRef(0);
-
-  const userRole = (session?.user as { role?: string })?.role;
-  const isPro = userRole === 'pro';
-  // isPremiumSniper is checked server-side; on the client we infer it by
-  // the presence of fresh requests (publicReleaseDate in the future)
-  const isPremiumSniper = !!(session?.user as { isPremiumSniper?: boolean })?.isPremiumSniper;
-  void isPremiumSniper; // referenced in badge logic below
 
   const fetchRequests = useCallback(async (category?: string) => {
     setLoading(true);
@@ -85,27 +71,6 @@ export default function BrowseRequestsPage() {
     return () => clearInterval(interval);
   }, [selectedCategory, fetchRequests]);
 
-  const handleAccept = async (requestId: string) => {
-    if (!session) return;
-    setAccepting(requestId);
-    setAcceptResult(null);
-    try {
-      const res = await fetch(`/api/requests/${requestId}/accept`, { method: 'POST' });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setAcceptResult({ id: requestId, success: true, msg: locale === 'pt' ? '✅ Trabalho aceite! O cliente foi notificado.' : '✅ Job accepted! Client notified.' });
-        // Remove from list
-        setRequests((prev) => prev.filter((r) => r._id !== requestId));
-      } else {
-        setAcceptResult({ id: requestId, success: false, msg: locale === 'pt' ? '❌ Tarde demais — outro profissional aceitou primeiro.' : '❌ Too late — another pro accepted first.' });
-      }
-    } catch {
-      setAcceptResult({ id: requestId, success: false, msg: 'Error' });
-    } finally {
-      setAccepting(null);
-    }
-  };
-
   const getCategoryLabel = (key: string) => {
     const cat = categories.find((c) => c.key === key);
     if (!cat) return key;
@@ -122,16 +87,13 @@ export default function BrowseRequestsPage() {
     return `${Math.floor(hours / 24)}d`;
   };
 
-  // Filter client-side
+  // Filter client-side — both services and products show here
   const filtered = requests.filter((r) => {
-    const matchesSearch = searchTerm
-      ? r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        r.description.toLowerCase().includes(searchTerm.toLowerCase())
-      : true;
-    // services only — no products in browse
-    const catType = categories.find((c) => c.key === r.category)?.type;
-    const isService = !catType || catType === 'service';
-    return matchesSearch && isService;
+    if (!searchTerm) return true;
+    return (
+      r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.description.toLowerCase().includes(searchTerm.toLowerCase())
+    );
   });
 
   // Urgent first, then by date
@@ -173,38 +135,13 @@ export default function BrowseRequestsPage() {
             marginBottom: '8px',
           }}
         >
-          {isPro
-            ? (locale === 'pt' ? '⚡ Trabalhos Disponíveis' : '⚡ Available Jobs')
-            : (locale === 'pt' ? 'Pedidos Abertos' : 'Open Requests')}
+          {locale === 'pt' ? 'Pedidos Abertos' : 'Open Requests'}
         </h1>
-        {isPro && (
-          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
-            {locale === 'pt'
-              ? 'O primeiro profissional verificado a aceitar fica com o trabalho. Seja rápido.'
-              : 'First verified pro to accept gets the job. Be fast.'}
-          </p>
-        )}
-
-        {/* Accept result toast */}
-        {acceptResult && (
-          <div
-            style={{
-              padding: '12px 16px',
-              marginBottom: '16px',
-              borderRadius: 'var(--radius-md)',
-              background: acceptResult.success ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)',
-              border: `1px solid ${acceptResult.success ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
-              color: acceptResult.success ? 'var(--success)' : 'var(--error)',
-              fontSize: '14px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
-          >
-            {acceptResult.success ? <CheckCircle size={16} /> : <XCircle size={16} />}
-            {acceptResult.msg}
-          </div>
-        )}
+        <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+          {locale === 'pt'
+            ? 'O que as pessoas estão à procura agora — serviços e produtos. Consegues ajudar?'
+            : "What people are looking for right now — services and products. Can you help?"}
+        </p>
 
         {/* Search & Category Filter */}
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -219,7 +156,7 @@ export default function BrowseRequestsPage() {
             <input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder={locale === 'pt' ? 'Pesquisar trabalhos...' : 'Search jobs...'}
+              placeholder={locale === 'pt' ? 'Pesquisar pedidos...' : 'Search requests...'}
               style={{
                 width: '100%', padding: '10px 14px 10px 40px', fontSize: '14px',
                 fontFamily: 'var(--font-sans)', backgroundColor: 'var(--bg-input)',
@@ -240,7 +177,7 @@ export default function BrowseRequestsPage() {
             }}
           >
             <option value="">{locale === 'pt' ? 'Todas as categorias' : 'All categories'}</option>
-            {serviceCategories.map((cat) => (
+            {categories.map((cat) => (
               <option key={cat.key} value={cat.key}>
                 {locale === 'pt' ? cat.labelPT : cat.labelEN}
               </option>
@@ -259,11 +196,11 @@ export default function BrowseRequestsPage() {
           <Search size={48} color="var(--text-tertiary)" style={{ margin: '0 auto 16px' }} />
           <p style={{ fontSize: '16px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
             {locale === 'pt'
-              ? 'Sem trabalhos encontrados. Sê o primeiro a publicar!'
-              : 'No jobs found. Be the first to post!'}
+              ? 'Sem pedidos encontrados. Sê o primeiro a publicar!'
+              : 'No requests found. Be the first to post!'}
           </p>
-          <Link href="/requests/new" style={{ textDecoration: 'none' }}>
-            <Button>{locale === 'pt' ? 'Publicar Trabalho' : 'Post a Job'}</Button>
+          <Link href="/concierge" style={{ textDecoration: 'none' }}>
+            <Button>{locale === 'pt' ? 'Publicar Pedido' : 'Post a Request'}</Button>
           </Link>
         </Card>
       ) : (
@@ -271,7 +208,6 @@ export default function BrowseRequestsPage() {
           {sorted.map((req) => {
             const displayPrice = req.fixedPrice ?? req.budget;
             const isUrgent = req.urgency === 'Urgent';
-            const isAccepting = accepting === req._id;
             // Sniper window: this request is still within its 1-hour head start
             const isFresh = !!(req.publicReleaseDate && new Date(req.publicReleaseDate).getTime() > Date.now());
 
@@ -342,7 +278,7 @@ export default function BrowseRequestsPage() {
                   </p>
                 </Link>
 
-                <div style={{ display: 'flex', gap: '14px', fontSize: '13px', color: 'var(--text-tertiary)', marginBottom: isPro ? '14px' : '0' }}>
+                <div style={{ display: 'flex', gap: '14px', fontSize: '13px', color: 'var(--text-tertiary)', marginBottom: '14px' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700, color: 'var(--text-primary)', fontSize: '15px' }}>
                     <Euro size={13} />€{displayPrice}
                   </span>
@@ -356,43 +292,31 @@ export default function BrowseRequestsPage() {
                   </span>
                 </div>
 
-                {/* Accept button — only for logged-in pros */}
-                {isPro && (
-                  <button
-                    onClick={() => handleAccept(req._id)}
-                    disabled={isAccepting}
-                    style={{
-                      width: '100%',
-                      padding: '11px',
-                      background: isUrgent
-                        ? 'linear-gradient(135deg, #f97316, #ef4444)'
-                        : 'var(--accent)',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: 'var(--radius-md)',
-                      fontSize: '14px',
-                      fontWeight: 700,
-                      cursor: isAccepting ? 'not-allowed' : 'pointer',
-                      opacity: isAccepting ? 0.7 : 1,
-                      transition: 'opacity 0.15s ease, transform 0.1s ease',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px',
-                    }}
-                    onMouseEnter={(e) => { if (!isAccepting) (e.currentTarget as HTMLElement).style.opacity = '0.9'; }}
-                    onMouseLeave={(e) => { if (!isAccepting) (e.currentTarget as HTMLElement).style.opacity = '1'; }}
-                  >
-                    {isAccepting ? (
-                      locale === 'pt' ? 'A aceitar...' : 'Accepting...'
-                    ) : (
-                      <>
-                        <Zap size={14} />
-                        {locale === 'pt' ? `Aceitar por €${displayPrice}` : `Accept for €${displayPrice}`}
-                      </>
-                    )}
-                  </button>
-                )}
+                {/* View & respond — routes to the request detail page, where the real proposal flow lives */}
+                <Link
+                  href={`/requests/${req._id}`}
+                  style={{
+                    width: '100%',
+                    padding: '11px',
+                    background: isUrgent
+                      ? 'linear-gradient(135deg, #f97316, #ef4444)'
+                      : 'var(--accent)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    textDecoration: 'none',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  {locale === 'pt' ? 'Ver e Responder' : 'View & Respond'}
+                  <ArrowRight size={14} />
+                </Link>
               </Card>
             );
           })}
