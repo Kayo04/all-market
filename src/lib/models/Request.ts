@@ -19,6 +19,8 @@ const RequestSchema = new Schema(
             coordinates: { type: [Number], required: true },
         },
         locationLabel: { type: String, default: '' },
+        // Public URLs under /uploads/requests/ — see src/app/api/upload/route.ts
+        images: [{ type: String }],
         status: {
             type: String,
             enum: ['open', 'accepted', 'in_progress', 'closed'],

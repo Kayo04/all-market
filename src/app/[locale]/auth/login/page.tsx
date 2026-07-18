@@ -3,15 +3,23 @@
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useTranslations } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { Link, useRouter } from '@/i18n/navigation';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
 
+// Only follow same-site relative paths — never an absolute/protocol-relative URL (open-redirect guard)
+function safeCallbackUrl(url: string | null): string | null {
+  if (!url || !url.startsWith('/') || url.startsWith('//')) return null;
+  return url;
+}
+
 export default function LoginPage() {
   const t = useTranslations('auth');
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -33,7 +41,13 @@ export default function LoginPage() {
       if (result?.error) {
         setError(result.error);
       } else {
-        router.push('/dashboard');
+        const callbackUrl = safeCallbackUrl(searchParams.get('callbackUrl'));
+        if (callbackUrl) {
+          // Full path already includes the locale prefix — bypass the locale-aware router to avoid double-prefixing
+          window.location.href = callbackUrl;
+        } else {
+          router.push('/dashboard');
+        }
       }
     } catch {
       setError('Something went wrong');

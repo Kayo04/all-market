@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useLocale } from 'next-intl';
 import { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import {
   MapPin, Euro, Clock, User, CheckCircle, Zap,
@@ -30,6 +30,7 @@ interface RequestDetail {
   createdAt: string;
   userId?: { _id?: string; name: string };
   acceptedByProId?: { name: string } | null;
+  images?: string[];
 }
 
 interface ProposalData {
@@ -145,7 +146,7 @@ function ProposalCard({
                   <CheckCircle size={11} /> {locale === 'pt' ? 'Verificado' : 'Verified'}
                 </span>
               )}
-              {proRating && (
+              {!!proRating && proRating > 0 && (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '11px', color: 'var(--text-tertiary)' }}>
                   <Star size={10} fill="currentColor" /> {proRating.toFixed(1)}
                 </span>
@@ -244,6 +245,17 @@ export default function RequestDetailPage() {
   const locale = useLocale() as 'pt' | 'en';
   const params = useParams();
   const id = params.id as string;
+  const router = useRouter();
+
+  // Goes back to wherever the user actually came from (Browse Requests, concierge, a
+  // direct link, etc.) instead of a hardcoded destination that's wrong most of the time.
+  const goBack = () => {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
+      router.back();
+    } else {
+      router.push(`/${locale}/requests`);
+    }
+  };
 
   const [request, setRequest] = useState<RequestDetail | null>(null);
   const [proposals, setProposals] = useState<ProposalData[]>([]);
@@ -483,19 +495,22 @@ export default function RequestDetailPage() {
     <div style={{ maxWidth: '740px', margin: '0 auto', padding: '80px 24px 60px' }}>
 
       {/* ── Back link ── */}
-      <Link
-        href="/concierge"
+      <button
+        type="button"
+        onClick={goBack}
         style={{
           display: 'inline-flex', alignItems: 'center', gap: '6px',
           fontSize: '13px', color: 'var(--text-tertiary)', textDecoration: 'none',
           marginBottom: '24px', transition: 'color 0.15s ease',
+          background: 'none', border: 'none', padding: 0, cursor: 'pointer',
+          fontFamily: 'var(--font-sans)',
         }}
         onMouseEnter={e => (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)'}
         onMouseLeave={e => (e.currentTarget as HTMLElement).style.color = 'var(--text-tertiary)'}
       >
         <ArrowLeft size={14} />
-        {locale === 'pt' ? 'Voltar ao concierge' : 'Back to concierge'}
-      </Link>
+        {locale === 'pt' ? 'Voltar' : 'Back'}
+      </button>
 
       {/* ── Request Card ── */}
       <div style={{
@@ -539,6 +554,24 @@ export default function RequestDetailPage() {
             {request.subcategory?.replace(/-/g, ' ') || request.category}
           </span>
         </div>
+
+        {request.images && request.images.length > 0 && (
+          <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', overflowX: 'auto' }}>
+            {request.images.map((url, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={url}
+                src={url}
+                alt={`${request.title} ${i + 1}`}
+                style={{
+                  width: '140px', height: '140px', objectFit: 'cover',
+                  borderRadius: 'var(--radius-md)', flexShrink: 0,
+                  border: '1px solid var(--border)',
+                }}
+              />
+            ))}
+          </div>
+        )}
 
         <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 800, marginBottom: '8px', letterSpacing: '-0.02em' }}>
           {request.title}

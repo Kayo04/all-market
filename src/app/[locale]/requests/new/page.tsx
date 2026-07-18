@@ -1,17 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useTranslations, useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/i18n/navigation';
-import { ArrowLeft, ArrowRight, MapPin, Euro, Send, Zap, Clock, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, MapPin, Euro, Send, Zap, Clock, ShieldCheck, ImagePlus, X, Loader2 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { categories } from '@/lib/categories';
 
-// Only service categories — products removed per pivot
-const serviceCategories = categories.filter((c) => c.type === 'service');
+// Preserves in-progress form data across the login redirect (see handleSubmit) —
+// sessionStorage so it never survives past the tab/session.
+const DRAFT_KEY = 'needer_request_draft';
 
 export default function NewRequestPage() {
   const { data: session } = useSession();
@@ -19,27 +21,90 @@ export default function NewRequestPage() {
   const tc = useTranslations('common');
   const locale = useLocale();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const initialCategory = categories.find((c) => c.key === searchParams.get('category'))?.key || '';
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageError, setImageError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
     title: '',
     description: '',
-    category: '',
+    category: initialCategory,
     subcategory: '',
     fixedPrice: '',
     location: locale === 'pt' ? 'Porto, Portugal' : 'Porto, Portugal',
-    urgency: 'standard' as 'urgent' | 'standard',
+    urgency: 'Normal' as 'Urgent' | 'Normal',
     intentConfirmed: false,
+    images: [] as string[],
   });
 
-  const selectedCat = serviceCategories.find((c) => c.key === form.category);
+  const MAX_IMAGES = 5;
+
+  // Restore a draft saved before an unauthenticated user was sent to log in
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        sessionStorage.removeItem(DRAFT_KEY);
+        const draft = JSON.parse(raw);
+        setForm((f) => ({ ...f, ...draft }));
+        setStep(4);
+      }
+    } catch {
+      // corrupt or inaccessible storage — ignore, user just re-fills the form
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const selectedCat = categories.find((c) => c.key === form.category);
+
+  const handleImageSelect = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setImageError('');
+    const slotsLeft = MAX_IMAGES - form.images.length;
+    const toUpload = Array.from(files).slice(0, slotsLeft);
+
+    setImageUploading(true);
+    try {
+      for (const file of toUpload) {
+        const body = new FormData();
+        body.append('file', file);
+        const res = await fetch('/api/upload', { method: 'POST', body });
+        if (res.ok) {
+          const data = await res.json();
+          setForm((f) => ({ ...f, images: [...f.images, data.url] }));
+        } else {
+          const data = await res.json().catch(() => ({}));
+          setImageError(data.error || (locale === 'pt' ? 'Falha ao enviar imagem.' : 'Failed to upload image.'));
+        }
+      }
+    } catch {
+      setImageError(locale === 'pt' ? 'Falha ao enviar imagem.' : 'Failed to upload image.');
+    } finally {
+      setImageUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const removeImage = (url: string) => {
+    setForm((f) => ({ ...f, images: f.images.filter((i) => i !== url) }));
+  };
 
   const handleSubmit = async () => {
     if (!session) {
-      router.push('/auth/login');
+      try {
+        sessionStorage.setItem(DRAFT_KEY, JSON.stringify(form));
+      } catch {
+        // storage unavailable (private browsing, quota) — proceed anyway, just without the draft
+      }
+      const returnTo = window.location.pathname + window.location.search;
+      window.location.href = `/${locale}/auth/login?callbackUrl=${encodeURIComponent(returnTo)}`;
       return;
     }
 
@@ -66,6 +131,7 @@ export default function NewRequestPage() {
           intentConfirmed: form.intentConfirmed,
           location: { type: 'Point', coordinates: [0, 0] },
           locationLabel: form.location,
+          images: form.images,
         }),
       });
 
@@ -143,8 +209,8 @@ export default function NewRequestPage() {
             </h2>
             <p style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '20px' }}>
               {locale === 'pt'
-                ? 'Apenas serviços. Reparações de emergência em destaque.'
-                : 'Services only. Emergency repairs featured.'}
+                ? 'Serviços ou produtos. Reparações de emergência em destaque.'
+                : 'Services or products. Emergency repairs featured.'}
             </p>
 
             <div
@@ -154,7 +220,7 @@ export default function NewRequestPage() {
                 gap: '10px',
               }}
             >
-              {serviceCategories.map((cat) => {
+              {categories.map((cat) => {
                 const isEmergency = cat.key === 'home-repairs';
                 return (
                   <button
@@ -283,6 +349,73 @@ export default function NewRequestPage() {
               />
             </div>
 
+            {/* Photos */}
+            <div>
+              <label style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-secondary)', display: 'block', marginBottom: '10px' }}>
+                {locale === 'pt' ? 'Fotos (opcional)' : 'Photos (optional)'}
+              </label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+                {form.images.map((url) => (
+                  <div
+                    key={url}
+                    style={{
+                      position: 'relative', width: '76px', height: '76px',
+                      borderRadius: 'var(--radius-md)', overflow: 'hidden',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(url)}
+                      aria-label={locale === 'pt' ? 'Remover imagem' : 'Remove image'}
+                      style={{
+                        position: 'absolute', top: '3px', right: '3px',
+                        width: '20px', height: '20px', borderRadius: '50%',
+                        background: 'rgba(0,0,0,0.6)', color: '#fff',
+                        border: 'none', cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+
+                {form.images.length < MAX_IMAGES && (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={imageUploading}
+                    style={{
+                      width: '76px', height: '76px',
+                      borderRadius: 'var(--radius-md)',
+                      border: '1px dashed var(--border)',
+                      background: 'var(--bg-card)',
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      gap: '4px', cursor: imageUploading ? 'wait' : 'pointer',
+                      color: 'var(--text-tertiary)',
+                    }}
+                  >
+                    {imageUploading ? <Loader2 size={18} className="animate-spin" /> : <ImagePlus size={18} />}
+                    <span style={{ fontSize: '10px' }}>{form.images.length}/{MAX_IMAGES}</span>
+                  </button>
+                )}
+              </div>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                multiple
+                onChange={(e) => handleImageSelect(e.target.files)}
+                style={{ display: 'none' }}
+              />
+              {imageError && (
+                <p style={{ fontSize: '12px', color: 'var(--error)', marginTop: '6px' }}>{imageError}</p>
+              )}
+            </div>
+
             {/* Urgency toggle */}
             <div>
               <label style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-secondary)', display: 'block', marginBottom: '10px' }}>
@@ -291,12 +424,12 @@ export default function NewRequestPage() {
               <div style={{ display: 'flex', gap: '10px' }}>
                 <button
                   type="button"
-                  onClick={() => setForm({ ...form, urgency: 'urgent' })}
+                  onClick={() => setForm({ ...form, urgency: 'Urgent' })}
                   style={{
                     flex: 1,
                     padding: '14px',
-                    background: form.urgency === 'urgent' ? 'rgba(249,115,22,0.1)' : 'var(--bg-card)',
-                    border: `2px solid ${form.urgency === 'urgent' ? '#f97316' : 'var(--border)'}`,
+                    background: form.urgency === 'Urgent' ? 'rgba(249,115,22,0.1)' : 'var(--bg-card)',
+                    border: `2px solid ${form.urgency === 'Urgent' ? '#f97316' : 'var(--border)'}`,
                     borderRadius: 'var(--radius-md)',
                     cursor: 'pointer',
                     display: 'flex',
@@ -306,8 +439,8 @@ export default function NewRequestPage() {
                     transition: 'all var(--transition-fast)',
                   }}
                 >
-                  <Zap size={20} color={form.urgency === 'urgent' ? '#f97316' : 'var(--text-tertiary)'} />
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: form.urgency === 'urgent' ? '#f97316' : 'var(--text-primary)' }}>
+                  <Zap size={20} color={form.urgency === 'Urgent' ? '#f97316' : 'var(--text-tertiary)'} />
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: form.urgency === 'Urgent' ? '#f97316' : 'var(--text-primary)' }}>
                     {locale === 'pt' ? 'AGORA' : 'RIGHT NOW'}
                   </span>
                   <span style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
@@ -316,12 +449,12 @@ export default function NewRequestPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setForm({ ...form, urgency: 'standard' })}
+                  onClick={() => setForm({ ...form, urgency: 'Normal' })}
                   style={{
                     flex: 1,
                     padding: '14px',
-                    background: form.urgency === 'standard' ? 'var(--accent-light)' : 'var(--bg-card)',
-                    border: `2px solid ${form.urgency === 'standard' ? 'var(--accent)' : 'var(--border)'}`,
+                    background: form.urgency === 'Normal' ? 'var(--accent-light)' : 'var(--bg-card)',
+                    border: `2px solid ${form.urgency === 'Normal' ? 'var(--accent)' : 'var(--border)'}`,
                     borderRadius: 'var(--radius-md)',
                     cursor: 'pointer',
                     display: 'flex',
@@ -331,8 +464,8 @@ export default function NewRequestPage() {
                     transition: 'all var(--transition-fast)',
                   }}
                 >
-                  <Clock size={20} color={form.urgency === 'standard' ? 'var(--accent)' : 'var(--text-tertiary)'} />
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: form.urgency === 'standard' ? 'var(--accent)' : 'var(--text-primary)' }}>
+                  <Clock size={20} color={form.urgency === 'Normal' ? 'var(--accent)' : 'var(--text-tertiary)'} />
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: form.urgency === 'Normal' ? 'var(--accent)' : 'var(--text-primary)' }}>
                     {locale === 'pt' ? 'FLEXÍVEL' : 'FLEXIBLE'}
                   </span>
                   <span style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
@@ -384,11 +517,18 @@ export default function NewRequestPage() {
             <Input
               label={locale === 'pt' ? 'Preço Fixo (€)' : 'Fixed Price (€)'}
               type="number"
+              min="1"
+              step="1"
               value={form.fixedPrice}
               onChange={(e) => setForm({ ...form, fixedPrice: e.target.value })}
               placeholder={locale === 'pt' ? 'Ex: 80' : 'E.g.: 80'}
               icon={<Euro size={16} />}
             />
+            {form.fixedPrice !== '' && parseFloat(form.fixedPrice) <= 0 && (
+              <p style={{ fontSize: '12px', color: 'var(--error)', marginTop: '-8px' }}>
+                {locale === 'pt' ? 'O preço tem de ser maior que €0.' : 'Price must be greater than €0.'}
+              </p>
+            )}
 
             <Input
               label={t('location')}
@@ -402,7 +542,11 @@ export default function NewRequestPage() {
               <Button variant="ghost" onClick={() => setStep(2)} icon={<ArrowLeft size={16} />}>
                 {tc('back')}
               </Button>
-              <Button onClick={() => setStep(4)} disabled={!form.fixedPrice || !form.location} icon={<ArrowRight size={16} />}>
+              <Button
+                onClick={() => setStep(4)}
+                disabled={!form.fixedPrice || parseFloat(form.fixedPrice) <= 0 || !form.location}
+                icon={<ArrowRight size={16} />}
+              >
                 {tc('next')}
               </Button>
             </div>
@@ -435,11 +579,24 @@ export default function NewRequestPage() {
               <div style={{ fontSize: '13px', color: 'var(--text-tertiary)', marginBottom: '8px' }}>
                 {locale === 'pt' ? 'Resumo do Pedido' : 'Job Summary'}
               </div>
+              {form.images.length > 0 && (
+                <div style={{ display: 'flex', gap: '6px', marginBottom: '10px' }}>
+                  {form.images.map((url) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={url}
+                      src={url}
+                      alt=""
+                      style={{ width: '48px', height: '48px', borderRadius: 'var(--radius-sm)', objectFit: 'cover' }}
+                    />
+                  ))}
+                </div>
+              )}
               <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px' }}>{form.title}</div>
               <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: 'var(--text-secondary)' }}>
                 <span>€{form.fixedPrice}</span>
                 <span>{form.location}</span>
-                {form.urgency === 'urgent' && (
+                {form.urgency === 'Urgent' && (
                   <span style={{ color: '#f97316', fontWeight: 600 }}>
                     🔥 {locale === 'pt' ? 'Urgente' : 'Urgent'}
                   </span>

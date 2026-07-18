@@ -34,7 +34,6 @@ interface UserProfile {
   hasSponsoredSpot?: boolean;
   rating?: number;
   ratings?: ReviewData[];
-  phone?: string;
   createdAt: string;
 }
 

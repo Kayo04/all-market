@@ -270,7 +270,7 @@ export default function ClientDashboard() {
             )}
           </p>
         </div>
-        <Link href="/auth/register" style={{ textDecoration: 'none', flexShrink: 0 }}>
+        <Link href="/pro" style={{ textDecoration: 'none', flexShrink: 0 }}>
           <button style={{
             padding: '10px 20px', borderRadius: '10px',
             border: '1px solid var(--border)', background: 'transparent',

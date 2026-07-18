@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import RequestModel from '@/lib/models/Request';
+import { getCategoryType } from '@/lib/categories';
 
 // GET: List/filter requests (with geospatial queries)
 export async function GET(request: Request) {
@@ -110,11 +111,19 @@ export async function POST(request: Request) {
             locationLabel,
             itemCondition,
             acceptsTrades,
+            images,
         } = body;
 
         if (!title || !description || !category || !subcategory || budget === undefined || !location) {
             return NextResponse.json(
                 { error: 'Missing required fields' },
+                { status: 400 }
+            );
+        }
+
+        if (typeof budget !== 'number' || !Number.isFinite(budget) || budget <= 0) {
+            return NextResponse.json(
+                { error: 'Price must be greater than €0' },
                 { status: 400 }
             );
         }
@@ -128,6 +137,7 @@ export async function POST(request: Request) {
             subcategory,
             budget,
             fixedPrice: fixedPrice ?? budget,
+            type: getCategoryType(category),
             urgency: urgency || 'Normal',
             intentConfirmed: intentConfirmed === true,
             location,
@@ -135,6 +145,7 @@ export async function POST(request: Request) {
             userId,
             itemCondition: itemCondition || undefined,
             acceptsTrades: acceptsTrades !== undefined ? acceptsTrades : undefined,
+            images: Array.isArray(images) ? images.filter((i) => typeof i === 'string').slice(0, 5) : [],
         });
 
         return NextResponse.json(

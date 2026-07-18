@@ -63,6 +63,9 @@ export default function NotificationBell() {
   useEffect(() => {
     if (!session) return;
 
+    // Async fetch-on-mount: setState happens after the awaited response, not
+    // synchronously in this effect body — a standard fetch-then-poll pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchNotifications();
     const interval = setInterval(() => {
       if (document.visibilityState === 'visible') {

@@ -37,3 +37,8 @@ There is no test suite configured in this repo.
 - i18n: all user-facing text must have both EN and PT variants. Older/core components use `next-intl` message keys (`messages/en.json`, `messages/pt.json`); most newer feature code instead inlines `locale === 'pt' ? 'PT text' : 'EN text'` — match whichever pattern the file you're editing already uses.
 - Styling is mixed: most of the app uses Tailwind CSS, but the concierge flow and request-detail pages use React inline styles for a dark, premium look — follow the existing pattern within a given file rather than converting wholesale.
 - Monetization fields (`hasSponsoredSpot`, `isPremiumSniper`, `publicReleaseDate`) exist in the DB schema and are read by the match engine, but there is no billing/payment integration yet — don't assume a Stripe layer exists.
+
+## Continuidade de sessão
+- No ARRANQUE: lê `PROGRESS.md` por inteiro antes de qualquer ação e resume-me em 2 linhas onde ficámos.
+- Ao FECHAR (quando eu disser "wrap" ou correr /wrapup): atualiza `PROGRESS.md` — estado atual, próximos passos priorizados, decisões novas.
+- Remove passos já feitos. Mantém <40 linhas. Não apagues decisões importantes; move o obsoleto para o fim.

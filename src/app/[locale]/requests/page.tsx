@@ -1,14 +1,49 @@
 'use client';
 
-import { useTranslations, useLocale } from 'next-intl';
+import type React from 'react';
+import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Search, MapPin, Euro, Clock, Zap, ArrowRight } from 'lucide-react';
+import {
+  Search, MapPin, Clock, Zap, Star,
+  Wrench, Monitor, BookOpen, PartyPopper, Heart, Gamepad2,
+  Briefcase, Palette, PenTool, Sparkles, Car, Scissors,
+} from 'lucide-react';
 import Card from '@/components/ui/Card';
-import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import { categories } from '@/lib/categories';
+
+// Category → visual tile (icon + tint) — stands in for a photo until listings support image uploads
+const CATEGORY_ICONS: Record<string, React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>> = {
+  'home-repairs': Wrench,
+  'tech-digital': Monitor,
+  'tutoring': BookOpen,
+  'events': PartyPopper,
+  'wellness': Heart,
+  'equipment': Gamepad2,
+  'business': Briefcase,
+  'design': Palette,
+  'writing': PenTool,
+  'cleaning': Sparkles,
+  'automotive': Car,
+  'beauty': Scissors,
+};
+
+const CATEGORY_TINTS: Record<string, string> = {
+  'home-repairs': '#f97316',
+  'tech-digital': '#3b82f6',
+  'tutoring': '#8b5cf6',
+  'events': '#ec4899',
+  'wellness': '#14b8a6',
+  'equipment': '#6366f1',
+  'business': '#64748b',
+  'design': '#d946ef',
+  'writing': '#f59e0b',
+  'cleaning': '#06b6d4',
+  'automotive': '#ef4444',
+  'beauty': '#f43f5e',
+};
 
 interface RequestItem {
   _id: string;
@@ -25,12 +60,12 @@ interface RequestItem {
   createdAt: string;
   publicReleaseDate?: string;   // ISO date — set to createdAt + 1h
   type?: string;
+  images?: string[];
   userId?: { name: string; avatar?: string };
   acceptedByProId?: string | null;
 }
 
 export default function BrowseRequestsPage() {
-  const t = useTranslations('request');
   const locale = useLocale();
   const searchParams = useSearchParams();
 
@@ -124,7 +159,7 @@ export default function BrowseRequestsPage() {
   void useSniperCountdown; // used inline per-card below
 
   return (
-    <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '100px 24px 60px' }}>
+    <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '100px 24px 60px' }}>
       {/* Header */}
       <div style={{ marginBottom: '28px' }}>
         <h1
@@ -204,120 +239,137 @@ export default function BrowseRequestsPage() {
           </Link>
         </Card>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(155px, 1fr))', gap: '16px 12px' }}>
           {sorted.map((req) => {
             const displayPrice = req.fixedPrice ?? req.budget;
             const isUrgent = req.urgency === 'Urgent';
             // Sniper window: this request is still within its 1-hour head start
             const isFresh = !!(req.publicReleaseDate && new Date(req.publicReleaseDate).getTime() > Date.now());
+            const Icon = CATEGORY_ICONS[req.category];
+            const tint = CATEGORY_TINTS[req.category] || 'var(--accent)';
 
             return (
-              <Card
+              <Link
                 key={req._id}
-                style={{
-                  padding: '20px',
-                  height: '100%',
-                  border: isUrgent ? '2px solid #f97316' : undefined,
-                  position: 'relative',
-                  overflow: 'hidden',
-                }}
+                href={`/requests/${req._id}`}
+                style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
               >
-                {/* Urgent pulse bar */}
-                {isUrgent && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: 0, left: 0, right: 0,
-                      height: '3px',
-                      background: 'linear-gradient(90deg, #f97316, #ef4444)',
-                    }}
-                  />
-                )}
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
-                  {isFresh && (
-                    <Badge
-                      variant="warning"
-                      style={{
-                        background: 'linear-gradient(90deg, #d4af37, #f0d060)',
-                        color: '#1a1200',
-                        fontWeight: 800,
-                        fontSize: '10px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '4px',
-                      }}
-                    >
-                      <Zap size={10} style={{ display: 'inline' }} />
-                      {locale === 'pt' ? '⚡ SNIPER HEAD START' : '⚡ SNIPER HEAD START'}
-                    </Badge>
-                  )}
-                  {isUrgent && (
-                    <Badge variant="warning" style={{ background: '#f97316', color: '#fff' }}>
-                      <Zap size={10} style={{ display: 'inline', marginRight: '3px' }} />
-                      {locale === 'pt' ? 'URGENTE' : 'URGENT'}
-                    </Badge>
-                  )}
-                  {req.isFeatured && <Badge variant="warning">⭐</Badge>}
-                  <Badge variant="accent">{getCategoryLabel(req.category)}</Badge>
-                  <Badge variant="success">
-                    {t(`status${req.status.charAt(0).toUpperCase() + req.status.slice(1).replace('_', '')}` as 'statusOpen')}
-                  </Badge>
-                </div>
-
-                <Link href={`/requests/${req._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: '8px' }}>{req.title}</h3>
-                  <p
-                    style={{
-                      fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5,
-                      display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden', marginBottom: '12px',
-                    }}
-                  >
-                    {req.description}
-                  </p>
-                </Link>
-
-                <div style={{ display: 'flex', gap: '14px', fontSize: '13px', color: 'var(--text-tertiary)', marginBottom: '14px' }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 700, color: 'var(--text-primary)', fontSize: '15px' }}>
-                    <Euro size={13} />€{displayPrice}
-                  </span>
-                  {req.locationLabel && (
-                    <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <MapPin size={12} /> {req.locationLabel}
-                    </span>
-                  )}
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', marginLeft: 'auto' }}>
-                    <Clock size={12} /> {timeAgo(req.createdAt)}
-                  </span>
-                </div>
-
-                {/* View & respond — routes to the request detail page, where the real proposal flow lives */}
-                <Link
-                  href={`/requests/${req._id}`}
+                <div
                   style={{
-                    width: '100%',
-                    padding: '11px',
-                    background: isUrgent
-                      ? 'linear-gradient(135deg, #f97316, #ef4444)'
-                      : 'var(--accent)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: 'var(--radius-md)',
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    textDecoration: 'none',
-                    boxSizing: 'border-box',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
+                    borderRadius: 'var(--radius-lg)',
+                    overflow: 'hidden',
+                    background: 'var(--bg-card)',
+                    border: '1px solid var(--border)',
+                    transition: 'box-shadow var(--transition-fast), transform var(--transition-fast)',
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                    (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
                   }}
                 >
-                  {locale === 'pt' ? 'Ver e Responder' : 'View & Respond'}
-                  <ArrowRight size={14} />
-                </Link>
-              </Card>
+                  {/* Photo when uploaded, otherwise a category-tinted icon stand-in */}
+                  <div
+                    style={{
+                      position: 'relative',
+                      aspectRatio: '1 / 1',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      overflow: 'hidden',
+                      background: req.images?.[0] ? 'var(--bg-tertiary)' : `linear-gradient(160deg, ${tint}22, ${tint}0d)`,
+                    }}
+                  >
+                    {req.images?.[0] ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={req.images[0]}
+                        alt={req.title}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      Icon && <Icon size={40} color={tint} strokeWidth={1.5} />
+                    )}
+
+                    {isUrgent && (
+                      <div
+                        style={{
+                          position: 'absolute', top: '8px', left: '8px',
+                          display: 'flex', alignItems: 'center', gap: '3px',
+                          padding: '4px 8px', borderRadius: 'var(--radius-full)',
+                          background: '#f97316', color: '#fff',
+                          fontSize: '10px', fontWeight: 800,
+                        }}
+                      >
+                        <Zap size={10} />
+                        {locale === 'pt' ? 'URGENTE' : 'URGENT'}
+                      </div>
+                    )}
+                    {req.isFeatured && (
+                      <div
+                        style={{
+                          position: 'absolute', top: '8px', right: '8px',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          width: '24px', height: '24px', borderRadius: '50%',
+                          background: 'rgba(255,255,255,0.9)',
+                        }}
+                      >
+                        <Star size={12} color="#d4af37" fill="#d4af37" />
+                      </div>
+                    )}
+                    {isFresh && (
+                      <div
+                        style={{
+                          position: 'absolute', bottom: '8px', left: '8px',
+                          display: 'flex', alignItems: 'center', gap: '3px',
+                          padding: '3px 7px', borderRadius: 'var(--radius-full)',
+                          background: 'linear-gradient(90deg, #d4af37, #f0d060)',
+                          color: '#1a1200', fontSize: '9px', fontWeight: 800,
+                        }}
+                      >
+                        <Zap size={9} />
+                        {locale === 'pt' ? 'SNIPER' : 'SNIPER'}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Info */}
+                  <div style={{ padding: '10px 12px 12px' }}>
+                    <div style={{ fontSize: '17px', fontWeight: 800, marginBottom: '3px' }}>
+                      €{displayPrice}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: '13px', fontWeight: 500, color: 'var(--text-primary)',
+                        lineHeight: 1.35, marginBottom: '6px',
+                        display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                      }}
+                    >
+                      {req.title}
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {req.locationLabel && (
+                          <>
+                            <MapPin size={11} style={{ flexShrink: 0 }} /> {req.locationLabel}
+                          </>
+                        )}
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '3px', flexShrink: 0 }}>
+                        <Clock size={11} /> {timeAgo(req.createdAt)}
+                      </span>
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-tertiary)', marginTop: '4px' }}>
+                      {getCategoryLabel(req.category)}
+                    </div>
+                  </div>
+                </div>
+              </Link>
             );
           })}
         </div>

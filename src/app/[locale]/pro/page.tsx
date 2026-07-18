@@ -51,7 +51,7 @@ export default function BecomeProPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch(`/api/users/${user?.id}`, {
+      const res = await fetch(`/api/users/${user?.id}/profile`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -8,6 +8,7 @@ import AuthProvider from '@/context/AuthProvider';
 import Navbar from '@/components/layout/Navbar';
 import CategoryBar from '@/components/layout/CategoryBar';
 import Footer from '@/components/layout/Footer';
+import CookieBanner from '@/components/layout/CookieBanner';
 
 type Props = {
   children: React.ReactNode;
@@ -43,6 +44,7 @@ export default async function LocaleLayout({ children, params }: Props) {
                     {children}
                   </main>
                   <Footer />
+                  <CookieBanner />
                 </div>
               </CurrencyProvider>
             </ThemeProvider>

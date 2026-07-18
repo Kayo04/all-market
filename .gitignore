@@ -36,6 +36,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# user-uploaded content (stored on local disk — see src/app/api/upload/route.ts)
+/public/uploads/
+
+# session continuity notes (local only, not for github)
+/PROGRESS.md
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

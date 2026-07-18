@@ -38,7 +38,6 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrencyState(saved);
     } else {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setCurrencyState(detectCurrency());
     }
   }, []);

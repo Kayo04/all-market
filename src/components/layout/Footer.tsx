@@ -61,7 +61,7 @@ export default function Footer() {
             {t('colPros')}
           </h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <Link href="/auth/register" style={{ fontSize: '14px', color: '#62646a', textDecoration: 'none' }}>{t('proLinks.becomePro')}</Link>
+            <Link href="/pro" style={{ fontSize: '14px', color: '#62646a', textDecoration: 'none' }}>{t('proLinks.becomePro')}</Link>
             <span style={{ fontSize: '14px', color: '#62646a', cursor: 'pointer' }}>{t('proLinks.neederPro')}</span>
             <span style={{ fontSize: '14px', color: '#62646a', cursor: 'pointer' }}>{t('proLinks.community')}</span>
             <span style={{ fontSize: '14px', color: '#62646a', cursor: 'pointer' }}>{t('proLinks.resources')}</span>
@@ -90,8 +90,8 @@ export default function Footer() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <span style={{ fontSize: '14px', color: '#62646a', cursor: 'pointer' }}>{t('supportLinks.help')}</span>
             <span style={{ fontSize: '14px', color: '#62646a', cursor: 'pointer' }}>{t('supportLinks.contact')}</span>
-            <span style={{ fontSize: '14px', color: '#62646a', cursor: 'pointer' }}>{t('supportLinks.terms')}</span>
-            <span style={{ fontSize: '14px', color: '#62646a', cursor: 'pointer' }}>{t('supportLinks.privacy')}</span>
+            <Link href="/terms" style={{ fontSize: '14px', color: '#62646a', textDecoration: 'none' }}>{t('supportLinks.terms')}</Link>
+            <Link href="/privacy" style={{ fontSize: '14px', color: '#62646a', textDecoration: 'none' }}>{t('supportLinks.privacy')}</Link>
           </div>
         </div>
       </div>

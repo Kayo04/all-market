@@ -37,6 +37,12 @@ export async function PATCH(
             }
         }
 
+        // Self-service role change is only ever an upgrade to 'pro' (see /pro page) —
+        // never allow this endpoint to be used to set any other role value.
+        if (body.role === 'pro') {
+            update.role = 'pro';
+        }
+
         if (Object.keys(update).length === 0) {
             return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });
         }
