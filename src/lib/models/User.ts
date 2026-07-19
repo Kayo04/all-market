@@ -6,6 +6,10 @@ const UserSchema = new Schema(
         email: { type: String, required: true, unique: true, lowercase: true, trim: true },
         password: { type: String, required: true },
         role: { type: String, enum: ['client', 'pro'], default: 'client', required: true },
+        // Consent record for accountability (GDPR Art. 5(2)) — set once, at registration
+        termsAcceptedAt: { type: Date },
+        // Set by DELETE /api/users/[id] — see that route for what "deleted" means here
+        isDeleted: { type: Boolean, default: false },
         isVerified: { type: Boolean, default: false },
         location: {
             type: { type: String, enum: ['Point'], default: 'Point' },

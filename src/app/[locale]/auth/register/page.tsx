@@ -19,6 +19,7 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState<'client' | 'pro'>('client');
+  const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -34,13 +35,19 @@ export default function RegisterPage() {
       setError(locale === 'pt' ? 'A password deve ter pelo menos 6 caracteres' : 'Password must be at least 6 characters');
       return;
     }
+    if (!agreed) {
+      setError(locale === 'pt'
+        ? 'Tens de aceitar os Termos e a Política de Privacidade.'
+        : 'You must agree to the Terms and Privacy Policy.');
+      return;
+    }
 
     setLoading(true);
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, password, role }),
+        body: JSON.stringify({ name, email, phone, password, role, agreedToTerms: agreed }),
       });
 
       const data = await res.json();
@@ -219,10 +226,32 @@ export default function RegisterPage() {
             required
           />
 
+          {/* Consent — required before an account can be created */}
+          <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', cursor: 'pointer' }}>
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              required
+              style={{ width: '16px', height: '16px', marginTop: '2px', flexShrink: 0, cursor: 'pointer' }}
+            />
+            <span style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+              {locale === 'pt' ? 'Li e aceito os ' : 'I agree to the '}
+              <Link href="/terms" target="_blank" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                {locale === 'pt' ? 'Termos de Serviço' : 'Terms of Service'}
+              </Link>
+              {locale === 'pt' ? ' e a ' : ' and '}
+              <Link href="/privacy" target="_blank" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                {locale === 'pt' ? 'Política de Privacidade' : 'Privacy Policy'}
+              </Link>
+              {locale === 'pt' ? '.' : '.'}
+            </span>
+          </label>
+
           {/* Submit — black, no green */}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !agreed}
             style={{
               marginTop: '4px',
               width: '100%',
@@ -230,19 +259,19 @@ export default function RegisterPage() {
               fontSize: '15px',
               fontFamily: 'var(--font-sans)',
               fontWeight: 600,
-              background: loading ? '#555' : '#111111',
+              background: loading ? '#555' : !agreed ? '#999' : '#111111',
               color: '#ffffff',
               border: 'none',
               borderRadius: 'var(--radius-md)',
-              cursor: loading ? 'not-allowed' : 'pointer',
+              cursor: loading || !agreed ? 'not-allowed' : 'pointer',
               transition: 'background 0.15s ease',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
             }}
-            onMouseEnter={(e) => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#333'; }}
-            onMouseLeave={(e) => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#111111'; }}
+            onMouseEnter={(e) => { if (!loading && agreed) (e.currentTarget as HTMLButtonElement).style.background = '#333'; }}
+            onMouseLeave={(e) => { if (!loading && agreed) (e.currentTarget as HTMLButtonElement).style.background = '#111111'; }}
           >
             {loading ? (
               <>

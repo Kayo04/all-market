@@ -26,7 +26,7 @@ export const authOptions: AuthOptions = {
                 await dbConnect();
 
                 const user = await User.findOne({ email: credentials.email.toLowerCase() });
-                if (!user) {
+                if (!user || user.isDeleted) {
                     throw new Error('No account found with this email');
                 }
 

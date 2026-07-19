@@ -28,6 +28,7 @@ export default function BecomeProPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   // Pro fields (both cases)
   const [proCategory, setProCategory] = useState('');
@@ -92,6 +93,12 @@ export default function BecomeProPage() {
       setError(locale === 'pt' ? 'Escolhe a tua área profissional' : 'Please choose your professional area');
       return;
     }
+    if (!agreed) {
+      setError(locale === 'pt'
+        ? 'Tens de aceitar os Termos e a Política de Privacidade.'
+        : 'You must agree to the Terms and Privacy Policy.');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
@@ -100,7 +107,7 @@ export default function BecomeProPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name, email, phone, password, role: 'pro',
-          locationLabel: location,
+          locationLabel: location, agreedToTerms: agreed,
         }),
       });
       const data = await res.json();
@@ -279,7 +286,28 @@ export default function BecomeProPage() {
               {proFields}
             </div>
 
-            <Button type="submit" fullWidth size="md" loading={loading} style={{ marginTop: '4px' }}>
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                required
+                style={{ width: '16px', height: '16px', marginTop: '2px', flexShrink: 0, cursor: 'pointer' }}
+              />
+              <span style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                {locale === 'pt' ? 'Li e aceito os ' : 'I agree to the '}
+                <Link href="/terms" target="_blank" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                  {locale === 'pt' ? 'Termos de Serviço' : 'Terms of Service'}
+                </Link>
+                {locale === 'pt' ? ' e a ' : ' and '}
+                <Link href="/privacy" target="_blank" style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
+                  {locale === 'pt' ? 'Política de Privacidade' : 'Privacy Policy'}
+                </Link>
+                .
+              </span>
+            </label>
+
+            <Button type="submit" fullWidth size="md" loading={loading} disabled={!agreed} style={{ marginTop: '4px' }}>
               {locale === 'pt' ? 'Criar conta profissional' : 'Create professional account'}
             </Button>
 

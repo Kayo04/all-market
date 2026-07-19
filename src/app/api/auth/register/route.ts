@@ -6,11 +6,18 @@ import User from '@/lib/models/User';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { name, email, password, phone, role, locationLabel } = body;
+        const { name, email, password, phone, role, locationLabel, agreedToTerms } = body;
 
         if (!name || !email || !password) {
             return NextResponse.json(
                 { error: 'Name, email and password are required' },
+                { status: 400 }
+            );
+        }
+
+        if (agreedToTerms !== true) {
+            return NextResponse.json(
+                { error: 'You must agree to the Terms of Service and Privacy Policy' },
                 { status: 400 }
             );
         }
@@ -40,6 +47,7 @@ export async function POST(request: Request) {
             phone: phone || '',
             locationLabel: locationLabel || '',
             location: { type: 'Point', coordinates: [0, 0] },
+            termsAcceptedAt: new Date(),
         });
 
         return NextResponse.json(

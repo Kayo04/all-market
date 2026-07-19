@@ -3,9 +3,10 @@
 import { useTheme } from '@/context/ThemeContext';
 import { useCurrency, Currency } from '@/context/CurrencyContext';
 import { useLocale } from 'next-intl';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
-import { Moon, Sun, Monitor, ArrowLeft, Check, Globe, DollarSign } from 'lucide-react';
+import { Moon, Sun, Monitor, ArrowLeft, Check, Globe, DollarSign, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -68,11 +69,38 @@ export default function SettingsPage() {
   const locale = useLocale() as 'pt' | 'en';
   const router = useRouter();
   const pathname = usePathname();
+  const { data: session } = useSession();
   const [saved, setSaved] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const flash = (key: string) => {
     setSaved(key);
     setTimeout(() => setSaved(null), 1800);
+  };
+
+  const DELETE_KEYWORD = locale === 'pt' ? 'APAGAR' : 'DELETE';
+
+  const handleDeleteAccount = async () => {
+    const userId = (session?.user as { id?: string } | undefined)?.id;
+    if (!userId) return;
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      const res = await fetch(`/api/users/${userId}`, { method: 'DELETE' });
+      if (res.ok) {
+        await signOut({ callbackUrl: '/' });
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setDeleteError(data.error || (locale === 'pt' ? 'Algo correu mal.' : 'Something went wrong.'));
+        setDeleting(false);
+      }
+    } catch {
+      setDeleteError(locale === 'pt' ? 'Algo correu mal.' : 'Something went wrong.');
+      setDeleting(false);
+    }
   };
 
   const selectTheme = (value: ThemeOption) => {
@@ -256,6 +284,118 @@ export default function SettingsPage() {
           </div>
           {saved === 'currency' && <SavedNote locale={locale} />}
         </section>
+
+        {session?.user && (
+          <>
+            <Divider />
+
+            {/* ── DANGER ZONE ── */}
+            <section>
+              <SectionHeader icon={<AlertTriangle size={14} />} label={locale === 'pt' ? 'Zona de Perigo' : 'Danger Zone'} />
+
+              {!showDeleteConfirm ? (
+                <div style={{
+                  padding: '18px 20px',
+                  background: 'var(--bg-secondary)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '14px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  gap: '16px', flexWrap: 'wrap',
+                }}>
+                  <div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '3px' }}>
+                      {locale === 'pt' ? 'Apagar conta' : 'Delete account'}
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
+                      {locale === 'pt'
+                        ? 'Remove permanentemente os teus dados pessoais. Esta ação não pode ser desfeita.'
+                        : 'Permanently erases your personal data. This cannot be undone.'}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowDeleteConfirm(true)}
+                    style={{
+                      padding: '10px 18px', borderRadius: '10px',
+                      border: '1px solid rgba(239,68,68,0.4)', background: 'transparent',
+                      color: '#dc2626', fontSize: '13px', fontWeight: 600,
+                      cursor: 'pointer', fontFamily: 'var(--font-sans)', flexShrink: 0,
+                    }}
+                  >
+                    {locale === 'pt' ? 'Apagar conta' : 'Delete account'}
+                  </button>
+                </div>
+              ) : (
+                <div style={{
+                  padding: '20px',
+                  background: 'rgba(239,68,68,0.05)',
+                  border: '1px solid rgba(239,68,68,0.3)',
+                  borderRadius: '14px',
+                }}>
+                  <p style={{ fontSize: '13px', color: 'var(--text-primary)', lineHeight: 1.6, marginBottom: '14px' }}>
+                    {locale === 'pt'
+                      ? `Isto vai apagar permanentemente o teu nome, email, telefone, biografia e foto de perfil. Os teus pedidos e propostas passados ficam, mas deixam de estar associados a ti. Não é possível desfazer. Escreve "${DELETE_KEYWORD}" para confirmar.`
+                      : `This permanently erases your name, email, phone, bio, and profile photo. Your past requests and proposals remain, but are no longer linked to you. This cannot be undone. Type "${DELETE_KEYWORD}" to confirm.`}
+                  </p>
+
+                  {deleteError && (
+                    <div style={{
+                      padding: '10px 14px', marginBottom: '12px', borderRadius: 'var(--radius-md)',
+                      background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+                      color: '#dc2626', fontSize: '13px',
+                    }}>
+                      {deleteError}
+                    </div>
+                  )}
+
+                  <input
+                    type="text"
+                    value={deleteConfirmText}
+                    onChange={(e) => setDeleteConfirmText(e.target.value)}
+                    placeholder={DELETE_KEYWORD}
+                    style={{
+                      width: '100%', padding: '10px 14px', marginBottom: '14px',
+                      fontSize: '14px', fontFamily: 'var(--font-sans)',
+                      backgroundColor: 'var(--bg-input)', color: 'var(--text-primary)',
+                      border: '1px solid var(--border)', borderRadius: 'var(--radius-md)',
+                      outline: 'none', boxSizing: 'border-box',
+                    }}
+                  />
+
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                      onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(''); setDeleteError(''); }}
+                      disabled={deleting}
+                      style={{
+                        padding: '10px 18px', borderRadius: '10px',
+                        border: '1px solid var(--border)', background: 'transparent',
+                        color: 'var(--text-secondary)', fontSize: '13px', fontWeight: 600,
+                        cursor: deleting ? 'not-allowed' : 'pointer', fontFamily: 'var(--font-sans)',
+                      }}
+                    >
+                      {locale === 'pt' ? 'Cancelar' : 'Cancel'}
+                    </button>
+                    <button
+                      onClick={handleDeleteAccount}
+                      disabled={deleteConfirmText !== DELETE_KEYWORD || deleting}
+                      style={{
+                        padding: '10px 18px', borderRadius: '10px', border: 'none',
+                        background: deleteConfirmText === DELETE_KEYWORD ? '#dc2626' : 'var(--border)',
+                        color: deleteConfirmText === DELETE_KEYWORD ? '#fff' : 'var(--text-tertiary)',
+                        fontSize: '13px', fontWeight: 700,
+                        cursor: deleteConfirmText === DELETE_KEYWORD && !deleting ? 'pointer' : 'not-allowed',
+                        fontFamily: 'var(--font-sans)',
+                      }}
+                    >
+                      {deleting
+                        ? (locale === 'pt' ? 'A apagar...' : 'Deleting...')
+                        : (locale === 'pt' ? 'Apagar permanentemente' : 'Permanently delete')}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </section>
+          </>
+        )}
 
         {/* Coming soon footer */}
         <Divider />
