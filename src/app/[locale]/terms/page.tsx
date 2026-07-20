@@ -69,7 +69,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
       {
         heading: '9. Suspension and termination',
         body: [
-          'We may suspend or terminate an account that violates these terms. You may stop using the service and request account deletion at any time by contacting support@needer.com.',
+          'We may suspend or terminate an account that violates these terms. You may stop using the service and delete your account at any time from your Settings page, or by contacting support@needer.com.',
         ],
       },
       {
@@ -144,7 +144,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
       {
         heading: '9. Suspensão e encerramento',
         body: [
-          'Podemos suspender ou encerrar uma conta que viole estes termos. Podes deixar de usar o serviço e pedir a eliminação da conta a qualquer momento contactando support@needer.com.',
+          'Podemos suspender ou encerrar uma conta que viole estes termos. Podes deixar de usar o serviço e eliminar a tua conta a qualquer momento na página de Definições, ou contactando support@needer.com.',
         ],
       },
       {
