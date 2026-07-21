@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import RequestModel from '@/lib/models/Request';
+import Proposal from '@/lib/models/Proposal';
 import { getCategoryType } from '@/lib/categories';
 
 // GET: List/filter requests (with geospatial queries)
@@ -69,8 +70,22 @@ export async function GET(request: Request) {
 
         const total = await RequestModel.countDocuments(query);
 
+        // Proposal counts aren't stored on the request document, so tally them
+        // separately for the page of results being returned.
+        const proposalCounts = await Proposal.aggregate([
+            { $match: { requestId: { $in: requests.map((r) => r._id) } } },
+            { $group: { _id: '$requestId', count: { $sum: 1 } } },
+        ]);
+        const countByRequestId = new Map(
+            proposalCounts.map((p) => [p._id.toString(), p.count])
+        );
+        const requestsWithCounts = requests.map((r) => ({
+            ...r,
+            proposalCount: countByRequestId.get(r._id.toString()) || 0,
+        }));
+
         return NextResponse.json({
-            requests,
+            requests: requestsWithCounts,
             pagination: {
                 page,
                 limit,
