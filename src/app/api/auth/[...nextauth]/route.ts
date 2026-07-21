@@ -55,7 +55,20 @@ export const authOptions: AuthOptions = {
                 token.role = (user as ExtendedUser).role;
                 token.isVerified = (user as ExtendedUser).isVerified;
                 token.id = user.id;
+                return token;
             }
+
+            // Re-checked on every session read (not just at login) so a self-deleted
+            // account's existing JWT stops working immediately instead of staying
+            // valid for up to 30 days.
+            await dbConnect();
+            const dbUser = await User.findById(token.id).select('isDeleted role isVerified').lean();
+            if (!dbUser || dbUser.isDeleted) {
+                throw new Error('Account no longer exists');
+            }
+            token.role = dbUser.role;
+            token.isVerified = dbUser.isVerified;
+
             return token;
         },
         async session({ session, token }: { session: Session; token: JWT }) {
