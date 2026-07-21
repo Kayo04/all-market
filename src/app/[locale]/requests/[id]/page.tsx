@@ -2,7 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useLocale } from 'next-intl';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
 import {
@@ -49,6 +49,12 @@ interface DraftItem {
   defaultPrice?: number;
 }
 
+interface CompareResult {
+  recommendedProposalId: string;
+  summary: string;
+  highlights?: string[];
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Mock proposal enrichment for demo (mock proId fields)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -88,12 +94,13 @@ function enrichProposal(p: ProposalData): ProposalData {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ProposalCard({
-  proposal, locale, isOwner, onAction,
+  proposal, locale, isOwner, onAction, isAiPick,
 }: {
   proposal: ProposalData;
   locale: string;
   isOwner: boolean;
   onAction: (id: string, action: 'accept' | 'reject') => void;
+  isAiPick?: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
   const pro = proposal.proId;
@@ -110,7 +117,7 @@ function ProposalCard({
       style={{
         padding: '20px',
         background: isAccepted ? 'rgba(34,197,94,0.05)' : hovered ? 'var(--bg-secondary)' : 'var(--bg-primary)',
-        border: `1px solid ${isAccepted ? 'rgba(34,197,94,0.25)' : 'var(--border)'}`,
+        border: `1px solid ${isAccepted ? 'rgba(34,197,94,0.25)' : isAiPick ? 'rgba(34,197,94,0.35)' : 'var(--border)'}`,
         borderRadius: '14px',
         transition: 'all 0.15s ease',
         animation: 'fadeSlideIn 0.3s ease both',
@@ -141,6 +148,16 @@ function ProposalCard({
               >
                 {proName}
               </Link>
+              {isAiPick && (
+                <span style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '3px',
+                  padding: '2px 8px', borderRadius: '99px',
+                  background: 'rgba(34,197,94,0.12)', border: '1px solid rgba(34,197,94,0.3)',
+                  fontSize: '10px', fontWeight: 700, color: '#22c55e',
+                }}>
+                  ✨ {locale === 'pt' ? 'Escolha da IA' : 'AI Pick'}
+                </span>
+              )}
               {pro?.isVerified && (
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', fontSize: '10px', fontWeight: 600, color: '#22c55e' }}>
                   <CheckCircle size={11} /> {locale === 'pt' ? 'Verificado' : 'Verified'}
@@ -276,6 +293,9 @@ export default function RequestDetailPage() {
   const [proposalSubmitError, setProposalSubmitError] = useState('');
   const [drafts, setDrafts] = useState<DraftItem[]>([]);
   const [selectedDraftId, setSelectedDraftId] = useState('');
+  const [compareResult, setCompareResult] = useState<CompareResult | null>(null);
+  const [compareLoading, setCompareLoading] = useState(false);
+  const [compareError, setCompareError] = useState('');
 
   const genericError = locale === 'pt' ? 'Ocorreu um erro. Tenta novamente.' : 'Something went wrong. Please try again.';
 
@@ -332,6 +352,18 @@ export default function RequestDetailPage() {
     return () => clearInterval(interval);
   }, [isOpen, loadProposals]);
 
+  // Invalidate a stale AI comparison when the proposal set changes size (e.g. a new
+  // proposal arrives via the 15s poll) — never auto-refire, just clear so the user
+  // knows to click "Compare with AI" again.
+  const prevProposalsCountRef = useRef(proposals.length);
+  useEffect(() => {
+    if (proposals.length !== prevProposalsCountRef.current) {
+      prevProposalsCountRef.current = proposals.length;
+      setCompareResult(null);
+      setCompareError('');
+    }
+  }, [proposals.length]);
+
   // Load the pro's saved draft templates for the proposal form (optional — failure just hides the dropdown)
   useEffect(() => {
     if (!isPro || isOwner || !request) return;
@@ -364,6 +396,30 @@ export default function RequestDetailPage() {
       setActionError(genericError);
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  // Handle AI proposal comparison
+  const handleCompare = async () => {
+    setCompareLoading(true);
+    setCompareError('');
+    try {
+      const res = await fetch('/api/proposals/compare', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requestId: id, locale }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setCompareResult(data);
+      } else {
+        setCompareError(data.error || genericError);
+      }
+    } catch (err) {
+      console.error('Error comparing proposals:', err);
+      setCompareError(genericError);
+    } finally {
+      setCompareLoading(false);
     }
   };
 
@@ -817,23 +873,93 @@ export default function RequestDetailPage() {
       {/* ── Proposals Section ── */}
       {proposals.length > 0 && (
         <div style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
-            <MessageSquare size={16} color="var(--accent)" />
-            <h2 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>
-              {locale === 'pt'
-                ? `${proposals.length} Proposta${proposals.length > 1 ? 's' : ''}`
-                : `${proposals.length} Proposal${proposals.length > 1 ? 's' : ''}`}
-            </h2>
-            {isOpen && pendingProposals.length > 0 && (
-              <span style={{
-                padding: '3px 10px', borderRadius: '99px',
-                background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)',
-                fontSize: '11px', fontWeight: 700, color: '#22c55e',
-              }}>
-                {pendingProposals.length} {locale === 'pt' ? 'pendente' : 'pending'}
-              </span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <MessageSquare size={16} color="var(--accent)" />
+              <h2 style={{ fontSize: '16px', fontWeight: 700, margin: 0 }}>
+                {locale === 'pt'
+                  ? `${proposals.length} Proposta${proposals.length > 1 ? 's' : ''}`
+                  : `${proposals.length} Proposal${proposals.length > 1 ? 's' : ''}`}
+              </h2>
+              {isOpen && pendingProposals.length > 0 && (
+                <span style={{
+                  padding: '3px 10px', borderRadius: '99px',
+                  background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)',
+                  fontSize: '11px', fontWeight: 700, color: '#22c55e',
+                }}>
+                  {pendingProposals.length} {locale === 'pt' ? 'pendente' : 'pending'}
+                </span>
+              )}
+            </div>
+
+            {isOwner && isOpen && pendingProposals.length >= 2 && (
+              <button
+                onClick={handleCompare}
+                disabled={compareLoading}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: '6px',
+                  padding: '8px 16px',
+                  background: 'rgba(34,197,94,0.1)',
+                  border: '1px solid rgba(34,197,94,0.3)',
+                  borderRadius: '8px',
+                  fontSize: '12px', fontWeight: 700, color: '#22c55e',
+                  cursor: compareLoading ? 'wait' : 'pointer',
+                  opacity: compareLoading ? 0.7 : 1,
+                  fontFamily: 'var(--font-sans)',
+                }}
+              >
+                <Sparkles size={13} />
+                {compareLoading
+                  ? (locale === 'pt' ? 'A comparar...' : 'Comparing...')
+                  : compareResult
+                    ? (locale === 'pt' ? '↻ Comparar novamente' : '↻ Compare again')
+                    : (locale === 'pt' ? '✨ Comparar com IA' : '✨ Compare with AI')}
+              </button>
             )}
           </div>
+
+          {compareError && (
+            <div style={{
+              padding: '10px 14px', marginBottom: '12px', borderRadius: 'var(--radius-md)',
+              background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+              color: '#dc2626', fontSize: '13px',
+            }}>
+              {compareError}
+            </div>
+          )}
+
+          {compareResult && pendingProposals.length >= 2 && (
+            <div style={{
+              background: 'rgba(34,197,94,0.05)',
+              border: '1px solid rgba(34,197,94,0.2)',
+              borderRadius: '14px',
+              padding: '18px 20px',
+              marginBottom: '16px',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                <Sparkles size={15} color="#22c55e" />
+                <h3 style={{ fontSize: '13px', fontWeight: 800, margin: 0, color: '#22c55e', textTransform: 'uppercase', letterSpacing: '0.02em' }}>
+                  {locale === 'pt' ? 'Recomendação da IA' : 'AI Recommendation'}
+                </h3>
+              </div>
+              <p style={{ fontSize: '14px', color: 'var(--text-primary)', lineHeight: 1.7, margin: compareResult.highlights?.length ? '0 0 10px 0' : 0 }}>
+                {compareResult.summary}
+              </p>
+              {!!compareResult.highlights?.length && (
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {compareResult.highlights.map((h, i) => (
+                    <span key={i} style={{
+                      padding: '4px 10px', borderRadius: '99px',
+                      background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)',
+                      fontSize: '11px', fontWeight: 600, color: '#22c55e',
+                    }}>
+                      {h}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {actionError && (
             <div style={{
@@ -853,6 +979,7 @@ export default function RequestDetailPage() {
                 locale={locale}
                 isOwner={!!isOwner}
                 onAction={handleProposalAction}
+                isAiPick={compareResult?.recommendedProposalId === p._id}
               />
             ))}
           </div>
