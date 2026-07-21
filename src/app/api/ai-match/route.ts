@@ -253,7 +253,6 @@ async function geminiCategorize(query: string, locale: string): Promise<ParsedQu
                         responseMimeType: 'application/json',
                         temperature: 0.2,
                         maxOutputTokens: 800,
-                        thinkingConfig: { thinkingBudget: 0 },
                     },
                 }),
             }
@@ -279,14 +278,14 @@ async function geminiCategorize(query: string, locale: string): Promise<ParsedQu
 // Central categorize() — the single switch point
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function categorize(query: string, locale: string): Promise<ParsedQuery> {
+async function categorize(query: string, locale: string): Promise<{ parsed: ParsedQuery; usingLiveAI: boolean }> {
     // If GEMINI_API_KEY is set, try the live model first; gracefully fall back to mock on any error
     if (process.env.GEMINI_API_KEY) {
         const result = await geminiCategorize(query, locale);
-        if (result) return result;
+        if (result) return { parsed: result, usingLiveAI: true };
     }
-    // No key → always mock
-    return mockCategorize(query, locale);
+    // No key, or Gemini call failed → mock
+    return { parsed: mockCategorize(query, locale), usingLiveAI: false };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -440,7 +439,7 @@ export async function POST(request: Request) {
         }
 
         // ── 1. Categorize ──────────────────────────────────────────────────
-        const parsed = await categorize(query, locale);
+        const { parsed, usingLiveAI } = await categorize(query, locale);
 
         await dbConnect();
 
@@ -552,7 +551,7 @@ export async function POST(request: Request) {
             pros,
             requestId,
             isProduct: parsed.type === 'product',
-            usingLiveAI: !!process.env.GEMINI_API_KEY, // debug flag — can remove in production
+            usingLiveAI, // debug flag — can remove in production
         });
     } catch (error) {
         console.error('[ai-match] Unhandled error:', error);
