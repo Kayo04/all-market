@@ -92,8 +92,7 @@ e:\Needer.com\all-market\
 │   │       ├── requests/
 │   │       │   ├── route.ts     ← GET: List requests, POST: Create request
 │   │       │   └── [id]/
-│   │       │       ├── route.ts ← GET: Single request, PATCH: Mark complete
-│   │       │       └── accept/  ← POST: Instant accept (legacy)
+│   │       │       └── route.ts ← GET: Single request, PATCH: Mark complete
 │   │       ├── proposals/
 │   │       │   ├── route.ts     ← GET: List proposals, POST: Submit proposal
 │   │       │   └── [id]/

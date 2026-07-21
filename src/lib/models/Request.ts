@@ -43,7 +43,7 @@ const RequestSchema = new Schema(
         // From v1 Uber pivot — intent confirmation before posting
         intentConfirmed: { type: Boolean, default: false },
         userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-        // Instant-accept: set atomically via /api/requests/[id]/accept
+        // Set when the client accepts one of the pro's proposals — see api/proposals/[id]/route.ts
         acceptedByProId: { type: Schema.Types.ObjectId, ref: 'User', default: null },
         isFeatured: { type: Boolean, default: false },
         // Product-specific fields (kept for future expansion)
