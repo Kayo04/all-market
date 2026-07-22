@@ -59,7 +59,6 @@ export default function NewRequestPage() {
     } catch {
       // corrupt or inaccessible storage — ignore, user just re-fills the form
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const selectedCat = categories.find((c) => c.key === form.category);

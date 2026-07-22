@@ -94,13 +94,15 @@ function enrichProposal(p: ProposalData): ProposalData {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function ProposalCard({
-  proposal, locale, isOwner, onAction, isAiPick,
+  proposal, locale, isOwner, onAction, isAiPick, actionsDisabled, isActionLoading,
 }: {
   proposal: ProposalData;
   locale: string;
   isOwner: boolean;
   onAction: (id: string, action: 'accept' | 'reject') => void;
   isAiPick?: boolean;
+  actionsDisabled?: boolean;
+  isActionLoading?: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
   const pro = proposal.proId;
@@ -215,26 +217,28 @@ function ProposalCard({
               <div style={{ display: 'flex', gap: '8px' }}>
                 <button
                   onClick={() => onAction(proposal._id, 'accept')}
+                  disabled={actionsDisabled}
                   style={{
                     padding: '7px 18px', background: 'var(--accent)', color: '#fff',
                     border: 'none', borderRadius: '8px', fontSize: '12px', fontWeight: 700,
-                    cursor: 'pointer', transition: 'all 0.15s ease',
-                    fontFamily: 'var(--font-sans)',
+                    cursor: actionsDisabled ? 'default' : 'pointer', transition: 'all 0.15s ease',
+                    fontFamily: 'var(--font-sans)', opacity: actionsDisabled ? 0.6 : 1,
                   }}
                 >
-                  {locale === 'pt' ? '✓ Aceitar' : '✓ Accept'}
+                  {isActionLoading ? (locale === 'pt' ? 'A aceitar…' : 'Accepting…') : (locale === 'pt' ? '✓ Aceitar' : '✓ Accept')}
                 </button>
                 <button
                   onClick={() => onAction(proposal._id, 'reject')}
+                  disabled={actionsDisabled}
                   style={{
                     padding: '7px 14px',
                     background: 'transparent', color: 'var(--text-tertiary)',
                     border: '1px solid var(--border)', borderRadius: '8px',
-                    fontSize: '12px', fontWeight: 600, cursor: 'pointer',
-                    transition: 'all 0.15s ease', fontFamily: 'var(--font-sans)',
+                    fontSize: '12px', fontWeight: 600, cursor: actionsDisabled ? 'default' : 'pointer',
+                    transition: 'all 0.15s ease', fontFamily: 'var(--font-sans)', opacity: actionsDisabled ? 0.6 : 1,
                   }}
                 >
-                  {locale === 'pt' ? 'Recusar' : 'Decline'}
+                  {isActionLoading ? (locale === 'pt' ? 'A recusar…' : 'Declining…') : (locale === 'pt' ? 'Recusar' : 'Decline')}
                 </button>
               </div>
             ) : isPending ? (
@@ -980,6 +984,8 @@ export default function RequestDetailPage() {
                 isOwner={!!isOwner}
                 onAction={handleProposalAction}
                 isAiPick={compareResult?.recommendedProposalId === p._id}
+                actionsDisabled={!!actionLoading}
+                isActionLoading={actionLoading === p._id}
               />
             ))}
           </div>

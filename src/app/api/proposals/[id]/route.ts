@@ -54,20 +54,42 @@ export async function PUT(
         }
 
         if (action === 'accept') {
-            // Update proposal status
-            await Proposal.findByIdAndUpdate(id, { status: 'accepted' });
+            // Claim the REQUEST atomically first (not just the proposal). Two
+            // different pending proposals being accepted nearly simultaneously
+            // (two tabs, or a race before the UI disables its buttons) both pass
+            // a plain findById/status check — reproduced this in testing and got
+            // two proposals on one request both left as "accepted". Only the
+            // first accept to flip status:'open' -> 'accepted' may proceed; the
+            // loser gets a clean 409 instead of silently corrupting the pair.
+            const requestClaim = await RequestModel.updateOne(
+                { _id: proposalData.requestId, status: 'open' },
+                { status: 'accepted', acceptedByProId: proposalData.proId }
+            );
+            if (requestClaim.matchedCount === 0) {
+                return NextResponse.json(
+                    { error: 'This request already has an accepted proposal.' },
+                    { status: 409 }
+                );
+            }
+
+            // Having won the request-level claim, flip this proposal (kept
+            // status-guarded for defense-in-depth / a clean error message).
+            const acceptResult = await Proposal.updateOne(
+                { _id: id, status: 'pending' },
+                { status: 'accepted' }
+            );
+            if (acceptResult.matchedCount === 0) {
+                return NextResponse.json(
+                    { error: 'This proposal is no longer pending — it may have already been rejected.' },
+                    { status: 409 }
+                );
+            }
 
             // Reject all other pending proposals for this request
             await Proposal.updateMany(
                 { requestId: proposalData.requestId, _id: { $ne: proposalData._id }, status: 'pending' },
                 { status: 'rejected' }
             );
-
-            // Update request status
-            await RequestModel.findByIdAndUpdate(proposalData.requestId, {
-                status: 'accepted',
-                acceptedByProId: proposalData.proId,
-            });
 
             // Notify the pro
             const pro = await User.findById(proposalData.proId).select('name').lean();
@@ -84,8 +106,18 @@ export async function PUT(
                 message: `Proposal accepted. ${proName} will be notified.`,
             });
         } else {
-            // Reject
-            await Proposal.findByIdAndUpdate(id, { status: 'rejected' });
+            // Reject — same atomic guard so a stray double-click can't fire two
+            // "not selected" notifications for the same proposal.
+            const rejectResult = await Proposal.updateOne(
+                { _id: id, status: 'pending' },
+                { status: 'rejected' }
+            );
+            if (rejectResult.matchedCount === 0) {
+                return NextResponse.json(
+                    { error: 'This proposal is no longer pending.' },
+                    { status: 409 }
+                );
+            }
 
             await createNotification(
                 proposalData.proId.toString(),

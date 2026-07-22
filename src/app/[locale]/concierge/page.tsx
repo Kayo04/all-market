@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useLocale } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { ArrowLeft, Star, CheckCircle, Zap, Send, Shield, Award, ExternalLink } from 'lucide-react';
 
