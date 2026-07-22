@@ -21,6 +21,7 @@ export default function Button({
   fullWidth = false,
   children,
   disabled,
+  style,
   ...props
 }: ButtonProps) {
   const baseStyles: React.CSSProperties = {
@@ -69,7 +70,7 @@ export default function Button({
 
   return (
     <button
-      style={{ ...baseStyles, ...sizeStyles[size], ...variantStyles[variant] }}
+      style={{ ...baseStyles, ...sizeStyles[size], ...variantStyles[variant], ...style }}
       disabled={disabled || loading}
       onMouseEnter={(e) => {
         if (variant === 'primary') {
