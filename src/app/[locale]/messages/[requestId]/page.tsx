@@ -70,9 +70,14 @@ export default function ChatThreadPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, status, requestId]);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom — scroll only the message list's own scroll container
+  // (its parent, the Card), not scrollIntoView, which also drags the whole page
+  // down to bring the sentinel into view.
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    const scrollParent = messagesEndRef.current?.parentElement;
+    if (scrollParent) {
+      scrollParent.scrollTop = scrollParent.scrollHeight;
+    }
   }, [messages]);
 
   // Find the other person in the conversation. Falls back to the `with`/`name` query

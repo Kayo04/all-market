@@ -37,6 +37,7 @@ interface UserProfile {
   bio?: string;
   skills?: string[];
   locationLabel?: string;
+  isVerified?: boolean;
 }
 
 export default function ProDashboard() {
@@ -195,42 +196,44 @@ export default function ProDashboard() {
       </div>
 
       {/* Get Verified Card */}
-      <div style={{ marginBottom: '24px' }}>
-        <Card
-          style={{
-            padding: '18px',
-            background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.06))',
-            border: '1px solid rgba(59, 130, 246, 0.2)',
-          }}
-          hover={false}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
-            <div style={{
-              width: '42px', height: '42px', borderRadius: 'var(--radius-md)',
-              background: 'linear-gradient(135deg, #1dbf73, #10b981)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}>
-              <span style={{ fontSize: '18px' }}>✦</span>
-            </div>
-            <div style={{ flex: 1, minWidth: '180px' }}>
-              <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>
-                {t('Get Verified', 'Torna-te Verificado')}
+      {!profile?.isVerified && (
+        <div style={{ marginBottom: '24px' }}>
+          <Card
+            style={{
+              padding: '18px',
+              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.06))',
+              border: '1px solid rgba(59, 130, 246, 0.2)',
+            }}
+            hover={false}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+              <div style={{
+                width: '42px', height: '42px', borderRadius: 'var(--radius-md)',
+                background: 'linear-gradient(135deg, #1dbf73, #10b981)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <span style={{ fontSize: '18px' }}>✦</span>
               </div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
-                {t(
-                  'The verified badge boosts credibility and gives you priority in results.',
-                  'O selo verificado aumenta a credibilidade e dá-te prioridade nos resultados.'
-                )}
+              <div style={{ flex: 1, minWidth: '180px' }}>
+                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>
+                  {t('Get Verified', 'Torna-te Verificado')}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  {t(
+                    'The verified badge boosts credibility and gives you priority in results.',
+                    'O selo verificado aumenta a credibilidade e dá-te prioridade nos resultados.'
+                  )}
+                </div>
               </div>
+              <Link href="/dashboard/pro/verify" style={{ textDecoration: 'none' }}>
+                <Button size="sm" style={{ background: 'linear-gradient(135deg, #1dbf73, #10b981)' }}>
+                  {t('Get Started', 'Começar')}
+                </Button>
+              </Link>
             </div>
-            <Link href="/dashboard/pro/verify" style={{ textDecoration: 'none' }}>
-              <Button size="sm" style={{ background: 'linear-gradient(135deg, #1dbf73, #10b981)' }}>
-                {t('Get Started', 'Começar')}
-              </Button>
-            </Link>
-          </div>
-        </Card>
-      </div>
+          </Card>
+        </div>
+      )}
 
       {/* Public Profile Card */}
       {userId && (
