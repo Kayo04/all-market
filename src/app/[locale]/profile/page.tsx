@@ -2,9 +2,9 @@
 
 import { useSession } from 'next-auth/react';
 import { useLocale } from 'next-intl';
-import { useRouter } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { useEffect, useState } from 'react';
-import { User, MapPin, Tag, Save, CheckCircle } from 'lucide-react';
+import { User, MapPin, Tag, Save, CheckCircle, ExternalLink, Copy } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -18,6 +18,7 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const [form, setForm] = useState({
     name: '',
     bio: '',
@@ -46,7 +47,7 @@ export default function ProfilePage() {
             name: u.name || '',
             bio: u.bio || '',
             skills: (u.skills || []).join(', '),
-            locationLabel: u.location?.label || '',
+            locationLabel: u.locationLabel || '',
           });
         }
       } catch (err) {
@@ -119,6 +120,40 @@ export default function ProfilePage() {
           </Badge>
         )}
       </div>
+
+      {role === 'pro' && userId && (
+        <Card variant="glass" hover={false} style={{ padding: '18px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', flexWrap: 'wrap' }}>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>
+              {locale === 'pt' ? 'O teu perfil público' : 'Your public profile'}
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+              {locale === 'pt'
+                ? 'Mostra aos clientes que és um profissional. Partilha este link.'
+                : 'Show clients you’re a professional. Share this link.'}
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <Link href={`/users/${userId}`} target="_blank" style={{ textDecoration: 'none' }}>
+              <Button size="sm" variant="secondary" icon={<ExternalLink size={13} />}>
+                {locale === 'pt' ? 'Ver perfil' : 'View profile'}
+              </Button>
+            </Link>
+            <Button
+              size="sm"
+              variant="ghost"
+              icon={<Copy size={13} />}
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}/${locale}/users/${userId}`).catch(() => {});
+                setLinkCopied(true);
+                setTimeout(() => setLinkCopied(false), 2000);
+              }}
+            >
+              {linkCopied ? (locale === 'pt' ? 'Copiado!' : 'Copied!') : (locale === 'pt' ? 'Copiar link' : 'Copy link')}
+            </Button>
+          </div>
+        </Card>
+      )}
 
       <Card variant="glass" hover={false} style={{ padding: '32px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>

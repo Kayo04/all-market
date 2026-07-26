@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Link, useRouter, usePathname } from '@/i18n/navigation';
 
 import { useSession, signOut } from 'next-auth/react';
-import { Menu, X, MessageSquare, Search, Settings, Globe } from 'lucide-react';
+import { Menu, X, MessageSquare, Search, Settings, Globe, User as UserIcon } from 'lucide-react';
 import NotificationBell from '@/components/layout/NotificationBell';
 
 
@@ -48,6 +48,8 @@ export default function Navbar() {
   };
 
   const isLoggedIn = !!session?.user;
+  const isPro = (session?.user as { role?: string })?.role === 'pro';
+  const userId = (session?.user as { id?: string })?.id;
 
   return (
     <>
@@ -229,6 +231,21 @@ export default function Navbar() {
               >
                 {t('dashboard')}
               </Link>
+              {isPro && userId && (
+                <Link
+                  href={`/users/${userId}`}
+                  style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    width: '32px', height: '32px',
+                    background: 'transparent', border: 'none',
+                    borderRadius: 'var(--radius-md)', textDecoration: 'none',
+                    color: 'var(--text-tertiary)', transition: 'color var(--transition-fast)',
+                  }}
+                  title={locale === 'pt' ? 'O meu perfil público' : 'My public profile'}
+                >
+                  <UserIcon size={15} />
+                </Link>
+              )}
               <Link
                 href="/settings"
                 style={{
@@ -454,6 +471,11 @@ export default function Navbar() {
               <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', background: 'var(--text-primary)', color: 'var(--bg-primary)', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontSize: '14px', fontWeight: 500, textAlign: 'center' }}>
                 {t('dashboard')}
               </Link>
+              {isPro && userId && (
+                <Link href={`/users/${userId}`} onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontSize: '14px', fontWeight: 500, textAlign: 'center' }}>
+                  {locale === 'pt' ? 'O meu perfil público' : 'My public profile'}
+                </Link>
+              )}
               <button onClick={() => { signOut({ callbackUrl: '/' }); setIsMenuOpen(false); }} style={{ padding: '8px 14px', background: 'transparent', border: '1px solid var(--border)', color: 'var(--text-secondary)', borderRadius: 'var(--radius-md)', cursor: 'pointer', fontSize: '14px', fontWeight: 500 }}>
                 {t('logout')}
               </button>

@@ -57,10 +57,10 @@ export async function PUT(
         if (name) updateData.name = name;
         if (bio !== undefined) updateData.bio = bio;
         if (skills) updateData.skills = skills;
-        if (locationLabel) updateData['location.label'] = locationLabel;
+        if (locationLabel) updateData.locationLabel = locationLabel;
 
         const user = await User.findByIdAndUpdate(id, updateData, { new: true })
-            .select('name role isVerified bio skills location avatar')
+            .select('name role isVerified bio skills locationLabel avatar')
             .lean();
 
         return NextResponse.json({ message: 'Profile updated', user });

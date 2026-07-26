@@ -115,12 +115,19 @@ export default function BecomeProPage() {
         setError(data.error || 'Registration failed');
         return;
       }
-      // Update proCategory + bio + skills after registration
       const loginResult = await signIn('credentials', { email, password, redirect: false });
       if (!loginResult?.error) {
-        // Update with pro details
-        const meRes = await fetch('/api/auth/register', { method: 'GET' }).catch(() => null);
-        void meRes; // we'll rely on the session for the id
+        // Save the pro details collected on this form now that we're authenticated
+        await fetch(`/api/users/${data.user.id}/profile`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            proCategory,
+            bio,
+            locationLabel: location,
+            skills: skills.split(',').map((s) => s.trim()).filter(Boolean),
+          }),
+        });
         setSuccess(true);
         setTimeout(() => router.push('/dashboard/pro'), 1500);
       } else {

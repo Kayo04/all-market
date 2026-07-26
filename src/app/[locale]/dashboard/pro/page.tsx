@@ -6,7 +6,7 @@ import { Link } from '@/i18n/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import {
   Zap, MapPin, Euro, Clock, Send, TrendingUp, Target,
-  FileEdit, CheckCircle, AlertCircle,
+  FileEdit, CheckCircle, AlertCircle, ExternalLink, Copy,
 } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
@@ -46,6 +46,7 @@ export default function ProDashboard() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<ProStats>({ totalSent: 0, accepted: 0, pending: 0, acceptanceRate: 0 });
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const t = (en: string, pt: string) => locale === 'pt' ? pt : en;
 
@@ -230,6 +231,51 @@ export default function ProDashboard() {
           </div>
         </Card>
       </div>
+
+      {/* Public Profile Card */}
+      {userId && (
+        <div style={{ marginBottom: '24px' }}>
+          <Card style={{ padding: '18px' }} hover={false}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+              <div style={{
+                width: '42px', height: '42px', borderRadius: 'var(--radius-md)',
+                background: 'linear-gradient(135deg, var(--accent), #004d16)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+              }}>
+                <ExternalLink size={18} color="#fff" />
+              </div>
+              <div style={{ flex: 1, minWidth: '180px' }}>
+                <div style={{ fontWeight: 700, fontSize: '14px', marginBottom: '2px' }}>
+                  {t('Your Public Profile', 'O Teu Perfil Público')}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', lineHeight: 1.4 }}>
+                  {t(
+                    'Show clients you’re a professional. Share this link.',
+                    'Mostra aos clientes que és um profissional. Partilha este link.'
+                  )}
+                </div>
+              </div>
+              <Link href={`/users/${userId}`} target="_blank" style={{ textDecoration: 'none' }}>
+                <Button size="sm" variant="secondary" icon={<ExternalLink size={13} />}>
+                  {t('View', 'Ver')}
+                </Button>
+              </Link>
+              <Button
+                size="sm"
+                variant="ghost"
+                icon={<Copy size={13} />}
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/${locale}/users/${userId}`).catch(() => {});
+                  setLinkCopied(true);
+                  setTimeout(() => setLinkCopied(false), 2000);
+                }}
+              >
+                {linkCopied ? t('Copied!', 'Copiado!') : t('Copy link', 'Copiar link')}
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Opportunities Feed */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
