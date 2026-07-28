@@ -39,7 +39,7 @@ const CASES = [
   },
 ];
 
-const ICON_BG = '#1e3d2f';
+const ICON_BG = '#003912';
 
 export default function UseCaseShowcase() {
   const locale = useLocale();
@@ -122,15 +122,16 @@ export default function UseCaseShowcase() {
           text-transform: uppercase;
           letter-spacing: 0.09em;
           color: var(--text-tertiary);
-          margin-bottom: 4px;
+          margin-bottom: 6px;
         }
 
         .uc-box-sub {
-          font-family: var(--font-sans);
-          font-size: 15px;
-          font-weight: 500;
+          font-family: var(--font-display);
+          font-size: clamp(20px, 3vw, 26px);
+          font-weight: 600;
+          font-style: italic;
           color: var(--text-primary);
-          line-height: 1.4;
+          line-height: 1.3;
         }
 
         /* 4 cols on desktop, 2 on tablet, 1 on mobile */
@@ -147,10 +148,10 @@ export default function UseCaseShowcase() {
           justify-content: space-between;
           gap: 8px;
           padding: 18px;
-          border-radius: 12px;
+          border-radius: var(--radius-lg);
           text-decoration: none;
           border: 1px solid transparent;
-          background: #e8f5ee;
+          background: var(--bg-tertiary);
           height: 180px;
           transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
           cursor: pointer;

@@ -5,8 +5,8 @@ import { Euro, Zap, ShieldCheck } from 'lucide-react';
 
 const steps = [
   { icon: Euro, key: 'step1', num: '01', color: 'var(--accent)' },
-  { icon: Zap, key: 'step2', num: '02', color: '#f97316' },
-  { icon: ShieldCheck, key: 'step3', num: '03', color: '#22c55e' },
+  { icon: Zap, key: 'step2', num: '02', color: 'var(--accent-warm)' },
+  { icon: ShieldCheck, key: 'step3', num: '03', color: 'var(--accent)' },
 ];
 
 export default function HowItWorks() {
@@ -23,8 +23,8 @@ export default function HowItWorks() {
       <h2
         style={{
           fontFamily: 'var(--font-display)',
-          fontSize: '36px',
-          fontWeight: 700,
+          fontSize: 'clamp(30px, 4vw, 40px)',
+          fontWeight: 600,
           marginBottom: '48px',
           letterSpacing: '-0.02em',
           textAlign: 'center',
@@ -37,11 +37,7 @@ export default function HowItWorks() {
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gap: '1px',
-          background: 'var(--border)',
-          borderRadius: 'var(--radius-lg)',
-          overflow: 'hidden',
-          border: '1px solid var(--border)',
+          gap: '16px',
         }}
       >
         {steps.map((step) => {
@@ -51,7 +47,9 @@ export default function HowItWorks() {
               key={step.key}
               style={{
                 background: 'var(--bg-card)',
-                padding: '36px 28px',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '32px 28px',
               }}
             >
               <div

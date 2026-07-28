@@ -209,23 +209,29 @@
     "budget": "Fixed Price"
   },
   "proSection": {
-    "title": "The premium professional services solution for businesses.",
-    "apply": "Apply Now",
+    "titlePrefix": "Everything a professional ",
+    "titleAccent": "needs",
+    "titleSuffix": " to grow.",
+    "apply": "Become a Professional",
+    "previewLabel": "Your public profile",
+    "previewRole": "Electrician · Porto",
+    "previewSkill1": "Wiring",
+    "previewSkill2": "Emergency Repairs",
     "feat1": {
-      "title": "Dedicated hiring experts",
-      "desc": "A personal account manager to find the right talent for every need."
+      "title": "A public profile that sells you",
+      "desc": "Reviews, skills, and completed jobs, all on one link you can share anywhere."
     },
     "feat2": {
-      "title": "Satisfaction guarantee",
-      "desc": "Vetted professionals ensuring high-quality deliveries or your money back."
+      "title": "Get verified",
+      "desc": "A trust badge that boosts credibility and gets you priority in results."
     },
     "feat3": {
-      "title": "Advanced management tools",
-      "desc": "Access to an exclusive Pro Dashboard to manage complex workflows and teams."
+      "title": "Reusable proposal templates",
+      "desc": "Save your best pitch once, send it in one click on the next job."
     },
     "feat4": {
-      "title": "Flexible payment models",
-      "desc": "Options for project-based or hourly rates for long-term collaboration."
+      "title": "Opportunities matched to you",
+      "desc": "See new requests in your category the moment clients post them."
     }
   },
   "preFooter": {

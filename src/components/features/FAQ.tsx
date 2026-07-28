@@ -79,11 +79,11 @@ export default function FAQ() {
           <h2
             style={{
               fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(26px, 4vw, 36px)',
-              fontWeight: 800,
+              fontSize: 'clamp(28px, 4vw, 38px)',
+              fontWeight: 600,
               color: 'var(--text-primary)',
               marginBottom: '12px',
-              letterSpacing: '-0.02em',
+              letterSpacing: '-0.01em',
             }}
           >
             {locale === 'pt' ? 'Perguntas Frequentes' : 'Frequently Asked Questions'}
@@ -107,7 +107,7 @@ export default function FAQ() {
                   borderRadius: '12px',
                   overflow: 'hidden',
                   transition: 'border-color 0.2s ease',
-                  borderColor: isOpen ? '#003912' : 'var(--border)',
+                  borderColor: isOpen ? 'var(--accent)' : 'var(--border)',
                 }}
               >
                 {/* Question row */}
@@ -119,7 +119,7 @@ export default function FAQ() {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     padding: '20px 24px',
-                    background: isOpen ? 'rgba(0,57,18,0.04)' : 'var(--bg-card)',
+                    background: isOpen ? 'var(--accent-light)' : 'var(--bg-card)',
                     border: 'none',
                     cursor: 'pointer',
                     textAlign: 'left',
@@ -140,7 +140,7 @@ export default function FAQ() {
                   </span>
                   <ChevronDown
                     size={20}
-                    color={isOpen ? '#003912' : 'var(--text-tertiary)'}
+                    color={isOpen ? 'var(--accent)' : 'var(--text-tertiary)'}
                     style={{
                       flexShrink: 0,
                       transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',

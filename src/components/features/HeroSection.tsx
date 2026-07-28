@@ -101,7 +101,7 @@ export default function HeroSection() {
                 style={{
                     position: 'absolute',
                     inset: 0,
-                    background: 'linear-gradient(to bottom, rgba(5,5,8,0.6) 0%, rgba(5,5,8,0.85) 100%)',
+                    background: 'linear-gradient(to bottom, rgba(27,20,14,0.55) 0%, rgba(23,17,12,0.88) 100%)',
                     zIndex: 1,
                 }}
             />
@@ -140,7 +140,7 @@ export default function HeroSection() {
                                 width: '7px',
                                 height: '7px',
                                 borderRadius: '50%',
-                                background: '#22c55e',
+                                background: '#e08a4f',
                                 animation: 'pulseDot 2s ease-in-out infinite',
                             }}
                         />
@@ -161,17 +161,17 @@ export default function HeroSection() {
                     <h1
                         style={{
                             fontFamily: 'var(--font-display)',
-                            fontSize: 'clamp(36px, 6vw, 62px)',
-                            fontWeight: 800,
-                            color: '#ffffff',
-                            lineHeight: 1.07,
-                            letterSpacing: '-0.035em',
-                            marginBottom: '16px',
+                            fontSize: 'clamp(38px, 6vw, 66px)',
+                            fontWeight: 600,
+                            color: '#fdfbf6',
+                            lineHeight: 1.06,
+                            letterSpacing: '-0.02em',
+                            marginBottom: '18px',
                         }}
                     >
                         {locale === 'pt'
-                            ? <>O que <span style={{ color: '#4ade80' }}>precisas</span> hoje?</>
-                            : <>What do you <span style={{ color: '#4ade80' }}>need</span> today?</>}
+                            ? <>O que <em style={{ color: '#7fd1a0', fontStyle: 'italic', fontWeight: 500 }}>precisas</em> hoje?</>
+                            : <>What do you <em style={{ color: '#7fd1a0', fontStyle: 'italic', fontWeight: 500 }}>need</em> today?</>}
                     </h1>
 
                     {/* Subtitle */}
@@ -193,11 +193,11 @@ export default function HeroSection() {
                     <div
                         style={{
                             position: 'relative',
-                            background: 'rgba(255,255,255,0.05)',
-                            border: '1.5px solid rgba(255,255,255,0.16)',
-                            borderRadius: '18px',
+                            background: 'rgba(253,251,246,0.06)',
+                            border: '1.5px solid rgba(253,251,246,0.18)',
+                            borderRadius: '20px',
                             backdropFilter: 'blur(20px)',
-                            boxShadow: '0 8px 48px rgba(0,0,0,0.45)',
+                            boxShadow: '0 8px 48px rgba(0,0,0,0.4)',
                             marginBottom: '20px',
                             transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
                         }}
@@ -244,17 +244,17 @@ export default function HeroSection() {
                                 width: '40px',
                                 height: '40px',
                                 background: query.trim()
-                                    ? 'linear-gradient(135deg, #16a34a, #22c55e)'
-                                    : 'rgba(255,255,255,0.10)',
+                                    ? 'linear-gradient(135deg, #2f9e5c, #4cb87a)'
+                                    : 'rgba(253,251,246,0.10)',
                                 border: 'none',
-                                borderRadius: '12px',
+                                borderRadius: '14px',
                                 color: '#fff',
                                 cursor: query.trim() ? 'pointer' : 'not-allowed',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 transition: 'background 0.2s ease, transform 0.15s ease',
-                                boxShadow: query.trim() ? '0 4px 16px rgba(34,197,94,0.35)' : 'none',
+                                boxShadow: query.trim() ? '0 4px 16px rgba(47,158,92,0.35)' : 'none',
                             }}
                             onMouseEnter={(e) => {
                                 if (query.trim())

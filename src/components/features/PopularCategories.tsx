@@ -10,8 +10,8 @@ const CARD_WIDTH = 220;
 const CARD_GAP = 16;
 const SCROLL_AMOUNT = CARD_WIDTH + CARD_GAP;
 
-// Light mint green for the image inset — floats image with visible light space around it
-const IMAGE_SECTION_BG = '#c8ead4';
+// Warm cream for the image inset — floats image with visible light space around it
+const IMAGE_SECTION_BG = '#e9dfc9';
 
 export default function PopularCategories() {
   const locale = useLocale();
@@ -118,9 +118,9 @@ export default function PopularCategories() {
 
         .pc-title {
           font-family: var(--font-display);
-          font-size: 28px;
-          font-weight: 700;
-          letter-spacing: -0.02em;
+          font-size: clamp(26px, 3vw, 32px);
+          font-weight: 600;
+          letter-spacing: -0.01em;
           color: var(--text-primary);
         }
 

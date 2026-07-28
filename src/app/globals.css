@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700;9..144,800&family=Fraunces:ital,opsz,wght@1,9..144,500&display=swap');
 @import "tailwindcss";
 
 /* ─── Design Tokens ──────────────────────────────────────── */
 :root {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Outfit', 'Inter', system-ui, sans-serif;
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
 
   --transition-fast: 120ms ease;
   --transition-base: 200ms ease;
@@ -12,79 +12,87 @@
 
   --radius-sm: 4px;
   --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
   --radius-full: 9999px;
 }
 
-/* ─── Dark Theme (Default) ───────────────────────────────── */
+/* ─── Dark Theme (Default) — warm espresso, not cold void ── */
 [data-theme="dark"] {
-  --bg-primary: #09090b;
-  --bg-secondary: #111113;
-  --bg-tertiary: #19191d;
-  --bg-card: #141416;
-  --bg-card-hover: #1c1c20;
-  --bg-elevated: #1a1a1e;
-  --bg-input: #19191d;
+  --bg-primary: #1b1712;
+  --bg-secondary: #221c15;
+  --bg-tertiary: #2a2219;
+  --bg-card: #201b15;
+  --bg-card-hover: #2a2319;
+  --bg-elevated: #251f17;
+  --bg-input: #2a2219;
 
-  --text-primary: #ececef;
-  --text-secondary: #8b8b94;
-  --text-tertiary: #5a5a65;
-  --text-inverse: #09090b;
+  --text-primary: #f3ecdd;
+  --text-secondary: #b7a88f;
+  --text-tertiary: #7c6f5c;
+  --text-inverse: #1b1712;
 
-  --accent: #003912;
-  --accent-hover: #002b0d;
-  --accent-light: rgba(0, 57, 18, 0.08);
-  --accent-glow: rgba(0, 57, 18, 0.12);
+  --accent: #2f9e5c;
+  --accent-hover: #268049;
+  --accent-light: rgba(47, 158, 92, 0.12);
+  --accent-glow: rgba(47, 158, 92, 0.18);
 
-  --border: #222228;
-  --border-hover: #333339;
-  --border-accent: rgba(0, 57, 18, 0.3);
+  --accent-warm: #e08a4f;
+  --accent-warm-hover: #cc7640;
+  --accent-warm-light: rgba(224, 138, 79, 0.14);
 
-  --success: #22c55e;
-  --warning: #eab308;
-  --error: #ef4444;
-  --info: #003912;
-  --verified: #eab308;
+  --border: #362d22;
+  --border-hover: #453923;
+  --border-accent: rgba(47, 158, 92, 0.3);
+
+  --success: #3f9e5c;
+  --warning: #d6a24b;
+  --error: #e0604a;
+  --info: #2f9e5c;
+  --verified: #d6a24b;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
   --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
-/* ─── Light Theme ────────────────────────────────────────── */
+/* ─── Light Theme — warm paper, not cold clinical white ──── */
 [data-theme="light"] {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
+  --bg-primary: #fdfbf6;
+  --bg-secondary: #f7f1e7;
+  --bg-tertiary: #f0e8d8;
   --bg-card: #ffffff;
-  --bg-card-hover: #f9fafb;
+  --bg-card-hover: #fbf7ef;
   --bg-elevated: #ffffff;
-  --bg-input: #f3f4f6;
+  --bg-input: #f3ece0;
 
-  --text-primary: #111113;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  --text-inverse: #ffffff;
+  --text-primary: #2a241d;
+  --text-secondary: #6e6255;
+  --text-tertiary: #a3927d;
+  --text-inverse: #fdfbf6;
 
   --accent: #003912;
   --accent-hover: #002b0d;
   --accent-light: rgba(0, 57, 18, 0.06);
   --accent-glow: rgba(0, 57, 18, 0.08);
 
-  --border: #e5e7eb;
-  --border-hover: #d1d5db;
+  --accent-warm: #c1622d;
+  --accent-warm-hover: #a34f22;
+  --accent-warm-light: rgba(193, 98, 45, 0.1);
+
+  --border: #e9dfc9;
+  --border-hover: #d8c9a8;
   --border-accent: rgba(0, 57, 18, 0.3);
 
-  --success: #16a34a;
-  --warning: #ca8a04;
-  --error: #dc2626;
+  --success: #3f8f5b;
+  --warning: #b8842a;
+  --error: #c0392b;
   --info: #003912;
-  --verified: #ca8a04;
+  --verified: #b8842a;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-sm: 0 1px 2px rgba(43, 31, 20, 0.05);
+  --shadow-md: 0 2px 8px rgba(43, 31, 20, 0.07);
+  --shadow-lg: 0 4px 20px rgba(43, 31, 20, 0.1);
 }
 
 /* ─── Base Styles ────────────────────────────────────────── */

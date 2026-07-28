@@ -209,23 +209,29 @@
         "budget": "Preço Fixo"
     },
     "proSection": {
-        "title": "A solução profissional premium para empresas.",
-        "apply": "Candidatar Agora",
+        "titlePrefix": "Tudo o que um profissional ",
+        "titleAccent": "precisa",
+        "titleSuffix": " para crescer.",
+        "apply": "Torna-te Profissional",
+        "previewLabel": "O teu perfil público",
+        "previewRole": "Eletricista · Porto",
+        "previewSkill1": "Instalações Elétricas",
+        "previewSkill2": "Reparações de Emergência",
         "feat1": {
-            "title": "Especialistas de contratação dedicados",
-            "desc": "Um gestor de conta pessoal para encontrar o talento certo para cada necessidade."
+            "title": "Um perfil público que te vende",
+            "desc": "Avaliações, competências e trabalhos concluídos, tudo num link que podes partilhar em qualquer lugar."
         },
         "feat2": {
-            "title": "Garantia de satisfação",
-            "desc": "Profissionais verificados garantindo entregas de alta qualidade ou devolvemos o dinheiro."
+            "title": "Torna-te verificado",
+            "desc": "Um selo de confiança que aumenta a credibilidade e dá-te prioridade nos resultados."
         },
         "feat3": {
-            "title": "Ferramentas avançadas de gestão",
-            "desc": "Acesso a um Painel Pro exclusivo para gerir fluxos de trabalho complexos e equipas."
+            "title": "Modelos de proposta reutilizáveis",
+            "desc": "Guarda a tua melhor proposta uma vez, envia-a com um clique no próximo trabalho."
         },
         "feat4": {
-            "title": "Modelos de pagamento flexíveis",
-            "desc": "Opções de tarifas por projeto ou à hora para colaboração a longo prazo."
+            "title": "Oportunidades à tua medida",
+            "desc": "Vê novos pedidos na tua categoria assim que os clientes os publicam."
         }
     },
     "preFooter": {
