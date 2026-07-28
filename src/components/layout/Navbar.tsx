@@ -85,7 +85,7 @@ export default function Navbar() {
             fontFamily: 'var(--font-display)',
             fontWeight: 800,
             fontSize: '28px',
-            color: '#404145',
+            color: 'var(--text-primary)',
             letterSpacing: '-0.02em',
             flexShrink: 0,
             marginRight: 'auto',
@@ -103,7 +103,7 @@ export default function Navbar() {
             display: 'flex',
             alignItems: 'stretch',
             borderRadius: '8px',
-            border: '1px solid #d0d0d0',
+            border: '1px solid var(--border)',
             overflow: 'hidden',
             transition: 'opacity 0.3s ease, transform 0.3s ease',
             opacity: showSearch ? 1 : 0,
@@ -121,7 +121,7 @@ export default function Navbar() {
               padding: '8px 14px',
               fontSize: '13px',
               fontFamily: 'var(--font-sans)',
-              background: '#ffffff',
+              background: 'var(--bg-card)',
               border: 'none',
               color: 'var(--text-primary)',
               outline: 'none',
@@ -132,7 +132,7 @@ export default function Navbar() {
             type="submit"
             style={{
               padding: '0 18px',
-              background: '#111111',
+              background: 'var(--accent)',
               color: '#ffffff',
               border: 'none',
               cursor: 'pointer',
@@ -165,8 +165,8 @@ export default function Navbar() {
               alignItems: 'center',
               gap: '6px',
               padding: '7px 16px',
-              background: 'linear-gradient(135deg, #003912, #005a1a)',
-              border: '1px solid rgba(0,100,30,0.45)',
+              background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))',
+              border: '1px solid var(--border-accent)',
               borderRadius: '99px',
               color: '#ffffff',
               fontSize: '13px',
@@ -312,20 +312,20 @@ export default function Navbar() {
                   padding: '6px 12px',
                   fontSize: '13px',
                   fontWeight: 500,
-                  color: '#000000',
-                  background: '#ffffff',
-                  border: '1px solid #000000',
+                  color: 'var(--text-primary)',
+                  background: 'var(--bg-primary)',
+                  border: '1px solid var(--text-primary)',
                   borderRadius: 'var(--radius-md)',
                   textDecoration: 'none',
                   transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = '#000000';
-                  (e.currentTarget as HTMLElement).style.color = '#ffffff';
+                  (e.currentTarget as HTMLElement).style.background = 'var(--text-primary)';
+                  (e.currentTarget as HTMLElement).style.color = 'var(--bg-primary)';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.background = '#ffffff';
-                  (e.currentTarget as HTMLElement).style.color = '#000000';
+                  (e.currentTarget as HTMLElement).style.background = 'var(--bg-primary)';
+                  (e.currentTarget as HTMLElement).style.color = 'var(--text-primary)';
                 }}
               >
                 {t('register')}
@@ -419,8 +419,8 @@ export default function Navbar() {
               justifyContent: 'center',
               gap: '6px',
               padding: '10px 16px',
-              background: 'linear-gradient(135deg, #003912, #005a1a)',
-              border: '1px solid rgba(0,100,30,0.45)',
+              background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))',
+              border: '1px solid var(--border-accent)',
               borderRadius: '99px',
               color: '#ffffff',
               fontSize: '14px',
@@ -488,7 +488,7 @@ export default function Navbar() {
               <Link href="/auth/login" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', textDecoration: 'none', border: '1px solid var(--border)', color: 'var(--text-primary)', borderRadius: 'var(--radius-md)', fontSize: '14px', fontWeight: 500, textAlign: 'center' }}>
                 {t('login')}
               </Link>
-              <Link href="/auth/register" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', background: '#ffffff', color: '#000000', border: '1px solid #000000', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontSize: '14px', fontWeight: 500, textAlign: 'center', transition: 'all 0.2s ease' }}>
+              <Link href="/auth/register" onClick={() => setIsMenuOpen(false)} style={{ padding: '8px 14px', background: 'var(--bg-primary)', color: 'var(--text-primary)', border: '1px solid var(--text-primary)', borderRadius: 'var(--radius-md)', textDecoration: 'none', fontSize: '14px', fontWeight: 500, textAlign: 'center', transition: 'all 0.2s ease' }}>
                 {t('register')}
               </Link>
             </div>
