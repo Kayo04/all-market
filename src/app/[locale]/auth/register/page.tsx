@@ -259,8 +259,8 @@ export default function RegisterPage() {
               fontSize: '15px',
               fontFamily: 'var(--font-sans)',
               fontWeight: 600,
-              background: loading ? '#555' : !agreed ? '#999' : '#111111',
-              color: '#ffffff',
+              background: loading ? 'var(--text-tertiary)' : !agreed ? 'var(--border-hover)' : 'var(--text-primary)',
+              color: 'var(--bg-primary)',
               border: 'none',
               borderRadius: 'var(--radius-md)',
               cursor: loading || !agreed ? 'not-allowed' : 'pointer',
@@ -270,8 +270,8 @@ export default function RegisterPage() {
               justifyContent: 'center',
               gap: '8px',
             }}
-            onMouseEnter={(e) => { if (!loading && agreed) (e.currentTarget as HTMLButtonElement).style.background = '#333'; }}
-            onMouseLeave={(e) => { if (!loading && agreed) (e.currentTarget as HTMLButtonElement).style.background = '#111111'; }}
+            onMouseEnter={(e) => { if (!loading && agreed) (e.currentTarget as HTMLButtonElement).style.background = 'var(--text-secondary)'; }}
+            onMouseLeave={(e) => { if (!loading && agreed) (e.currentTarget as HTMLButtonElement).style.background = 'var(--text-primary)'; }}
           >
             {loading ? (
               <>

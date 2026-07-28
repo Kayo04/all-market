@@ -60,27 +60,28 @@ export default function PreferencesModal({ onClose }: Props) {
       >
         {/* Modal */}
         <div style={{
-          background: '#ffffff', borderRadius: '12px',
+          background: 'var(--bg-card)', borderRadius: 'var(--radius-lg)',
           width: '440px', maxWidth: '90vw',
           padding: '28px 32px 32px',
           position: 'relative',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.18)',
+          border: '1px solid var(--border)',
+          boxShadow: 'var(--shadow-lg)',
         }}>
           {/* Title + close */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-            <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#1a1a1a' }}>
+            <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: '19px', fontWeight: 600, color: 'var(--text-primary)' }}>
               Select your preferences
             </h2>
             <button
               onClick={onClose}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#666', padding: '4px' }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-tertiary)', padding: '4px' }}
             >
               <X size={20} />
             </button>
           </div>
 
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid #e8e8e8', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', gap: 0, borderBottom: '1px solid var(--border)', marginBottom: '20px' }}>
             {(['language', 'currency'] as const).map((t) => (
               <button
                 key={t}
@@ -90,8 +91,8 @@ export default function PreferencesModal({ onClose }: Props) {
                   marginRight: '24px',
                   background: 'none', border: 'none', cursor: 'pointer',
                   fontSize: '15px', fontWeight: 500,
-                  color: tab === t ? '#003912' : '#777',
-                  borderBottom: tab === t ? '2px solid #003912' : '2px solid transparent',
+                  color: tab === t ? 'var(--accent)' : 'var(--text-tertiary)',
+                  borderBottom: tab === t ? '2px solid var(--accent)' : '2px solid transparent',
                   marginBottom: '-1px',
                   textTransform: 'capitalize',
                   transition: 'color 0.15s ease',
@@ -115,15 +116,15 @@ export default function PreferencesModal({ onClose }: Props) {
                         width: '100%', textAlign: 'left',
                         display: 'flex', alignItems: 'center', gap: '12px',
                         padding: '12px 8px', background: 'none', border: 'none',
-                        cursor: 'pointer', borderRadius: '8px',
-                        fontSize: '15px', color: active ? '#1a1a1a' : '#444',
+                        cursor: 'pointer', borderRadius: 'var(--radius-md)',
+                        fontSize: '15px', color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
                         fontWeight: active ? 600 : 400,
                         transition: 'background 0.1s ease',
                       }}
-                      onMouseEnter={(e) => { (e.currentTarget).style.background = '#f5f5f5'; }}
+                      onMouseEnter={(e) => { (e.currentTarget).style.background = 'var(--bg-card-hover)'; }}
                       onMouseLeave={(e) => { (e.currentTarget).style.background = 'none'; }}
                     >
-                      <span style={{ width: '16px', color: '#003912', flexShrink: 0 }}>
+                      <span style={{ width: '16px', color: 'var(--accent)', flexShrink: 0 }}>
                         {active && <Check size={15} strokeWidth={2.5} />}
                       </span>
                       {lang.label}
@@ -144,18 +145,18 @@ export default function PreferencesModal({ onClose }: Props) {
                         width: '100%', textAlign: 'left',
                         display: 'flex', alignItems: 'center', gap: '12px',
                         padding: '12px 8px', background: 'none', border: 'none',
-                        cursor: 'pointer', borderRadius: '8px',
-                        fontSize: '15px', color: active ? '#1a1a1a' : '#444',
+                        cursor: 'pointer', borderRadius: 'var(--radius-md)',
+                        fontSize: '15px', color: active ? 'var(--text-primary)' : 'var(--text-secondary)',
                         fontWeight: active ? 600 : 400,
                         transition: 'background 0.1s ease',
                       }}
-                      onMouseEnter={(e) => { (e.currentTarget).style.background = '#f5f5f5'; }}
+                      onMouseEnter={(e) => { (e.currentTarget).style.background = 'var(--bg-card-hover)'; }}
                       onMouseLeave={(e) => { (e.currentTarget).style.background = 'none'; }}
                     >
-                      <span style={{ width: '16px', color: '#003912', flexShrink: 0 }}>
+                      <span style={{ width: '16px', color: 'var(--accent)', flexShrink: 0 }}>
                         {active && <Check size={15} strokeWidth={2.5} />}
                       </span>
-                      <span style={{ fontWeight: 600, minWidth: '32px', color: '#555' }}>{cur.symbol}</span>
+                      <span style={{ fontWeight: 600, minWidth: '32px', color: 'var(--text-secondary)' }}>{cur.symbol}</span>
                       {cur.label}
                     </button>
                   </li>

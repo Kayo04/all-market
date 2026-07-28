@@ -145,7 +145,7 @@ export default function BecomeProPage() {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 24px' }}>
         <Card hover={false} style={{ maxWidth: '420px', width: '100%', padding: '40px', textAlign: 'center' }}>
-          <CheckCircle size={52} color="#003912" style={{ margin: '0 auto 16px' }} />
+          <CheckCircle size={52} color="var(--accent)" style={{ margin: '0 auto 16px' }} />
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 800, marginBottom: '10px' }}>
             {locale === 'pt' ? 'Já és um Profissional!' : "You're already a Professional!"}
           </h1>
@@ -165,7 +165,7 @@ export default function BecomeProPage() {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 24px' }}>
         <Card hover={false} style={{ maxWidth: '420px', width: '100%', padding: '40px', textAlign: 'center' }}>
-          <CheckCircle size={52} color="#003912" style={{ margin: '0 auto 16px' }} />
+          <CheckCircle size={52} color="var(--accent)" style={{ margin: '0 auto 16px' }} />
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 800, marginBottom: '10px' }}>
             {locale === 'pt' ? 'Bem-vindo à equipa!' : 'Welcome to the team!'}
           </h1>
@@ -242,8 +242,8 @@ export default function BecomeProPage() {
       <Card variant="default" hover={false} style={{ width: '100%', maxWidth: '460px', padding: '36px' }}>
         {/* Header */}
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-          <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: 'rgba(0,57,18,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
-            <Briefcase size={24} color="#003912" />
+          <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: 'var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
+            <Briefcase size={24} color="var(--accent)" />
           </div>
           <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 800, marginBottom: '8px', letterSpacing: '-0.02em' }}>
             {locale === 'pt' ? 'Torna-te Profissional' : 'Become a Professional'}
