@@ -27,14 +27,14 @@ const typeIcons: Record<string, typeof Bell> = {
 };
 
 const typeColors: Record<string, string> = {
-  new_proposal: '#1dbf73',
-  proposal_accepted: '#22c55e',
-  proposal_rejected: '#ef4444',
-  new_message: '#8b5cf6',
-  request_closed: '#3b82f6',
-  new_review: '#f59e0b',
-  system: '#6b7280',
-  new_request: '#06b6d4',
+  new_proposal: 'var(--accent)',
+  proposal_accepted: 'var(--success)',
+  proposal_rejected: 'var(--error)',
+  new_message: 'var(--accent-warm)',
+  request_closed: 'var(--text-tertiary)',
+  new_review: 'var(--verified)',
+  system: 'var(--text-secondary)',
+  new_request: 'var(--warning)',
 };
 
 export default function NotificationBell() {

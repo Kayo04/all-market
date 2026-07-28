@@ -28,7 +28,7 @@ export default function CategoryBar() {
         <div className="catbar-inner">
           {/* Trending */}
           <Link href="/requests" className="catbar-link catbar-trending">
-            <Flame size={13} color="#ef4444" strokeWidth={2.5} />
+            <Flame size={13} color="var(--error)" strokeWidth={2.5} />
             {locale === 'pt' ? 'Em Alta' : 'Trending'}
           </Link>
 
