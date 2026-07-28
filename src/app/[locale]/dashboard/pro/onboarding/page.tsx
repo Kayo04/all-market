@@ -327,7 +327,7 @@ export default function ProOnboardingPage() {
         <div style={{
           padding: '10px 14px', marginTop: '20px', borderRadius: 'var(--radius-md)',
           background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-          color: '#dc2626', fontSize: '13px',
+          color: 'var(--error)', fontSize: '13px',
         }}>
           {error}
         </div>

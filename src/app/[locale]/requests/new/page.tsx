@@ -228,7 +228,7 @@ export default function NewRequestPage() {
                     style={{
                       padding: '14px',
                       background: form.category === cat.key ? 'var(--accent-light)' : 'var(--bg-card)',
-                      border: `2px solid ${form.category === cat.key ? 'var(--accent)' : isEmergency ? '#f97316' : 'var(--border)'}`,
+                      border: `2px solid ${form.category === cat.key ? 'var(--accent)' : isEmergency ? 'var(--accent-warm)' : 'var(--border)'}`,
                       borderRadius: 'var(--radius-md)',
                       cursor: 'pointer',
                       textAlign: 'left',
@@ -245,7 +245,7 @@ export default function NewRequestPage() {
                           position: 'absolute',
                           top: '6px',
                           right: '6px',
-                          background: '#f97316',
+                          background: 'var(--accent-warm)',
                           color: '#fff',
                           fontSize: '10px',
                           fontWeight: 700,
@@ -428,7 +428,7 @@ export default function NewRequestPage() {
                     flex: 1,
                     padding: '14px',
                     background: form.urgency === 'Urgent' ? 'rgba(249,115,22,0.1)' : 'var(--bg-card)',
-                    border: `2px solid ${form.urgency === 'Urgent' ? '#f97316' : 'var(--border)'}`,
+                    border: `2px solid ${form.urgency === 'Urgent' ? 'var(--accent-warm)' : 'var(--border)'}`,
                     borderRadius: 'var(--radius-md)',
                     cursor: 'pointer',
                     display: 'flex',
@@ -438,8 +438,8 @@ export default function NewRequestPage() {
                     transition: 'all var(--transition-fast)',
                   }}
                 >
-                  <Zap size={20} color={form.urgency === 'Urgent' ? '#f97316' : 'var(--text-tertiary)'} />
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: form.urgency === 'Urgent' ? '#f97316' : 'var(--text-primary)' }}>
+                  <Zap size={20} color={form.urgency === 'Urgent' ? 'var(--accent-warm)' : 'var(--text-tertiary)'} />
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: form.urgency === 'Urgent' ? 'var(--accent-warm)' : 'var(--text-primary)' }}>
                     {locale === 'pt' ? 'AGORA' : 'RIGHT NOW'}
                   </span>
                   <span style={{ fontSize: '11px', color: 'var(--text-tertiary)' }}>
@@ -499,7 +499,7 @@ export default function NewRequestPage() {
                   border: '1px solid rgba(249,115,22,0.3)',
                   borderRadius: 'var(--radius-md)',
                   fontSize: '13px',
-                  color: '#f97316',
+                  color: 'var(--accent-warm)',
                   marginBottom: '8px',
                   display: 'flex',
                   alignItems: 'center',
@@ -596,7 +596,7 @@ export default function NewRequestPage() {
                 <span>€{form.fixedPrice}</span>
                 <span>{form.location}</span>
                 {form.urgency === 'Urgent' && (
-                  <span style={{ color: '#f97316', fontWeight: 600 }}>
+                  <span style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
                     🔥 {locale === 'pt' ? 'Urgente' : 'Urgent'}
                   </span>
                 )}

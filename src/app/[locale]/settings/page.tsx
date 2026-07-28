@@ -317,7 +317,7 @@ export default function SettingsPage() {
                     style={{
                       padding: '10px 18px', borderRadius: '10px',
                       border: '1px solid rgba(239,68,68,0.4)', background: 'transparent',
-                      color: '#dc2626', fontSize: '13px', fontWeight: 600,
+                      color: 'var(--error)', fontSize: '13px', fontWeight: 600,
                       cursor: 'pointer', fontFamily: 'var(--font-sans)', flexShrink: 0,
                     }}
                   >
@@ -341,7 +341,7 @@ export default function SettingsPage() {
                     <div style={{
                       padding: '10px 14px', marginBottom: '12px', borderRadius: 'var(--radius-md)',
                       background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-                      color: '#dc2626', fontSize: '13px',
+                      color: 'var(--error)', fontSize: '13px',
                     }}>
                       {deleteError}
                     </div>
@@ -379,7 +379,7 @@ export default function SettingsPage() {
                       disabled={deleteConfirmText !== DELETE_KEYWORD || deleting}
                       style={{
                         padding: '10px 18px', borderRadius: '10px', border: 'none',
-                        background: deleteConfirmText === DELETE_KEYWORD ? '#dc2626' : 'var(--border)',
+                        background: deleteConfirmText === DELETE_KEYWORD ? 'var(--error)' : 'var(--border)',
                         color: deleteConfirmText === DELETE_KEYWORD ? '#fff' : 'var(--text-tertiary)',
                         fontSize: '13px', fontWeight: 700,
                         cursor: deleteConfirmText === DELETE_KEYWORD && !deleting ? 'pointer' : 'not-allowed',

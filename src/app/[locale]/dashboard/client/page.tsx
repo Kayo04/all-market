@@ -64,28 +64,28 @@ export default function ClientDashboard() {
           label: t('Open', 'Aberto'),
           variant: 'success' as const,
           icon: CircleDot,
-          color: '#22c55e',
+          color: 'var(--success)',
         };
       case 'accepted':
         return {
           label: t('In Progress', 'Em Progresso'),
           variant: 'warning' as const,
           icon: Clock,
-          color: '#f59e0b',
+          color: 'var(--warning)',
         };
       case 'closed':
         return {
           label: t('Completed', 'Concluído'),
           variant: 'default' as const,
           icon: CheckCircle,
-          color: '#6b7280',
+          color: 'var(--text-tertiary)',
         };
       default:
         return {
           label: status,
           variant: 'default' as const,
           icon: CircleDot,
-          color: '#6b7280',
+          color: 'var(--text-tertiary)',
         };
     }
   };
@@ -142,10 +142,10 @@ export default function ClientDashboard() {
           gap: '10px', marginBottom: '24px',
         }}>
           {[
-            { label: t('Total', 'Total'), value: totalRequests, color: '#3b82f6', icon: FileText },
-            { label: t('Open', 'Abertos'), value: openCount, color: '#22c55e', icon: CircleDot },
-            { label: t('In Progress', 'Em Progresso'), value: activeCount, color: '#f59e0b', icon: Clock },
-            { label: t('Completed', 'Concluídos'), value: completedCount, color: '#6b7280', icon: CheckCircle },
+            { label: t('Total', 'Total'), value: totalRequests, color: 'var(--accent-warm)', icon: FileText },
+            { label: t('Open', 'Abertos'), value: openCount, color: 'var(--success)', icon: CircleDot },
+            { label: t('In Progress', 'Em Progresso'), value: activeCount, color: 'var(--warning)', icon: Clock },
+            { label: t('Completed', 'Concluídos'), value: completedCount, color: 'var(--text-tertiary)', icon: CheckCircle },
           ].map(stat => {
             const Icon = stat.icon;
             return (
@@ -210,8 +210,8 @@ export default function ClientDashboard() {
               >
                 <Card style={{
                   padding: '18px',
-                  borderLeft: req.status === 'accepted' ? '3px solid #f59e0b' :
-                             req.status === 'open' ? '3px solid #22c55e' : undefined,
+                  borderLeft: req.status === 'accepted' ? '3px solid var(--warning)' :
+                             req.status === 'open' ? '3px solid var(--success)' : undefined,
                 }}>
                   <div style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',

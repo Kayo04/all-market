@@ -181,7 +181,7 @@ export default function VerifyPage() {
               <div style={{
                 padding: '10px 14px', marginBottom: '16px', borderRadius: 'var(--radius-md)',
                 background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
-                color: '#dc2626', fontSize: '13px',
+                color: 'var(--error)', fontSize: '13px',
               }}>
                 {error}
               </div>
@@ -221,7 +221,7 @@ export default function VerifyPage() {
                 disabled={!form.businessName || !form.taxId}
                 style={{
                   marginTop: '8px',
-                  background: 'linear-gradient(135deg, #1dbf73, #10b981)',
+                  background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))',
                 }}
               >
                 {locale === 'pt' ? 'Submeter Verificação' : 'Submit Verification'}

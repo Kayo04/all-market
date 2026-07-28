@@ -157,10 +157,10 @@ export default function ProDashboard() {
         marginBottom: '28px',
       }}>
         {[
-          { icon: Send, label: t('Proposals sent', 'Propostas enviadas'), value: stats.totalSent.toString(), color: '#1dbf73' },
-          { icon: CheckCircle, label: t('Accepted', 'Aceites'), value: stats.accepted.toString(), color: '#22c55e' },
-          { icon: TrendingUp, label: t('Acceptance rate', 'Taxa de aceitação'), value: stats.acceptanceRate > 0 ? `${stats.acceptanceRate}%` : '—', color: '#8b5cf6' },
-          { icon: Target, label: t('Active leads', 'Leads ativos'), value: stats.pending.toString(), color: '#f59e0b' },
+          { icon: Send, label: t('Proposals sent', 'Propostas enviadas'), value: stats.totalSent.toString(), color: 'var(--accent-warm)' },
+          { icon: CheckCircle, label: t('Accepted', 'Aceites'), value: stats.accepted.toString(), color: 'var(--success)' },
+          { icon: TrendingUp, label: t('Acceptance rate', 'Taxa de aceitação'), value: stats.acceptanceRate > 0 ? `${stats.acceptanceRate}%` : '—', color: 'var(--accent)' },
+          { icon: Target, label: t('Active leads', 'Leads ativos'), value: stats.pending.toString(), color: 'var(--warning)' },
         ].map(stat => {
           const Icon = stat.icon;
           return (
@@ -201,15 +201,15 @@ export default function ProDashboard() {
           <Card
             style={{
               padding: '18px',
-              background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(168, 85, 247, 0.06))',
-              border: '1px solid rgba(59, 130, 246, 0.2)',
+              background: 'linear-gradient(135deg, var(--accent-warm-light), var(--accent-light))',
+              border: '1px solid var(--border-accent)',
             }}
             hover={false}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
               <div style={{
                 width: '42px', height: '42px', borderRadius: 'var(--radius-md)',
-                background: 'linear-gradient(135deg, #1dbf73, #10b981)',
+                background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
                 <span style={{ fontSize: '18px' }}>✦</span>
@@ -226,7 +226,7 @@ export default function ProDashboard() {
                 </div>
               </div>
               <Link href="/dashboard/pro/verify" style={{ textDecoration: 'none' }}>
-                <Button size="sm" style={{ background: 'linear-gradient(135deg, #1dbf73, #10b981)' }}>
+                <Button size="sm" style={{ background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))' }}>
                   {t('Get Started', 'Começar')}
                 </Button>
               </Link>
@@ -242,7 +242,7 @@ export default function ProDashboard() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
               <div style={{
                 width: '42px', height: '42px', borderRadius: 'var(--radius-md)',
-                background: 'linear-gradient(135deg, var(--accent), #004d16)',
+                background: 'linear-gradient(135deg, var(--accent), var(--accent-hover))',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
               }}>
                 <ExternalLink size={18} color="#fff" />
