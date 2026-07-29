@@ -104,7 +104,10 @@ Locale for your response: ${locale}
 Pending proposals:
 ${proposalLines}`;
 
-        const result = await callGeminiJSON<CompareResult>(SYSTEM_PROMPT, userMessage, { maxOutputTokens: 800 });
+        // maxOutputTokens must cover invisible "thinking" tokens the model spends before
+        // writing any visible text (observed ~900 for this prompt) on top of the actual
+        // JSON output, or the response gets cut off mid-write and fails to parse.
+        const result = await callGeminiJSON<CompareResult>(SYSTEM_PROMPT, userMessage, { maxOutputTokens: 2048 });
 
         if (!result?.recommendedProposalId || !result?.summary) {
             return NextResponse.json(errorPayload(locale), { status: 503 });
