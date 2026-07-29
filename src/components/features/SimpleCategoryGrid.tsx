@@ -39,7 +39,7 @@ const CASES = [
   },
 ];
 
-const ICON_BG = '#003912';
+const ICON_BG = 'var(--accent)';
 
 export default function UseCaseShowcase() {
   const locale = useLocale();

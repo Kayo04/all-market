@@ -148,7 +148,7 @@ export default function RegisterPage() {
               borderRadius: 'var(--radius-md)',
               background: 'rgba(239,68,68,0.1)',
               border: '1px solid rgba(239,68,68,0.3)',
-              color: '#dc2626',
+              color: 'var(--error)',
               fontSize: '13px',
             }}
           >

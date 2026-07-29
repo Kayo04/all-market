@@ -11,7 +11,7 @@ export default function PreFooterCTA() {
     <section>
       <div style={{
         width: '100%',
-        background: 'linear-gradient(135deg, #1b3a24, #003912)',
+        background: 'linear-gradient(135deg, var(--accent-hover), var(--accent))',
         padding: '88px 24px',
         textAlign: 'center',
         display: 'flex',
@@ -41,7 +41,7 @@ export default function PreFooterCTA() {
             alignItems: 'center',
             gap: '8px',
             background: '#fdfbf6',
-            color: '#003912',
+            color: 'var(--accent)',
             padding: '14px 32px',
             borderRadius: 'var(--radius-md)',
             textDecoration: 'none',
@@ -56,7 +56,7 @@ export default function PreFooterCTA() {
           }}
           onMouseLeave={(e) => {
             (e.currentTarget as HTMLElement).style.background = '#fdfbf6';
-            (e.currentTarget as HTMLElement).style.color = '#003912';
+            (e.currentTarget as HTMLElement).style.color = 'var(--accent)';
           }}
         >
           {t('cta')}

@@ -148,7 +148,7 @@ export default function PopularCategories() {
           min-width: ${CARD_WIDTH}px;
           max-width: ${CARD_WIDTH}px;
           border-radius: 14px;
-          background: #003912;
+          background: var(--accent);
           text-decoration: none;
           display: flex;
           flex-direction: column;
