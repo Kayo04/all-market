@@ -252,7 +252,10 @@ async function geminiCategorize(query: string, locale: string): Promise<ParsedQu
                     generationConfig: {
                         responseMimeType: 'application/json',
                         temperature: 0.2,
-                        maxOutputTokens: 800,
+                        // Must cover invisible "thinking" tokens the model spends before writing
+                        // visible text (observed ~900 for a similar prompt) on top of the actual
+                        // JSON output, or the response cuts off mid-write and fails to parse.
+                        maxOutputTokens: 2048,
                     },
                 }),
             }
