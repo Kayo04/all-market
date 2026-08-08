@@ -76,6 +76,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
         heading: '10. Governing law',
         body: [
           'These terms are governed by the laws of Portugal, without prejudice to any mandatory consumer-protection rights you have under the law of the EU member state where you reside.',
+          '(Needer\'s formal company registration — including registered address and tax identification number — is pending and will be added here before public launch.)',
         ],
       },
       {
@@ -151,6 +152,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
         heading: '10. Lei aplicável',
         body: [
           'Estes termos são regidos pela lei portuguesa, sem prejuízo de quaisquer direitos de proteção do consumidor de caráter imperativo que tenhas ao abrigo da lei do Estado-Membro da UE onde resides.',
+          '(O registo formal da empresa Needer — incluindo morada e número de identificação fiscal — está pendente e será adicionado aqui antes do lançamento público.)',
         ],
       },
       {

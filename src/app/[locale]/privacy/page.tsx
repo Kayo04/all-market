@@ -21,6 +21,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
         heading: '1. Who is responsible for your data',
         body: [
           'Needer International Ltd. is the data controller for the personal data processed through this website. For any privacy question or to exercise your rights, contact us at privacy@needer.com.',
+          '(Formal company registration details — registered address and tax identification number — are pending and will be added here before public launch.)',
         ],
       },
       {
@@ -100,6 +101,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
         heading: '1. Quem é responsável pelos teus dados',
         body: [
           'A Needer International Ltd. é a responsável pelo tratamento dos dados pessoais processados através deste site. Para qualquer questão de privacidade ou para exercer os teus direitos, contacta-nos em privacy@needer.com.',
+          '(Os dados formais de registo da empresa — morada e número de identificação fiscal — estão pendentes e serão adicionados aqui antes do lançamento público.)',
         ],
       },
       {
