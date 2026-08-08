@@ -2,9 +2,18 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
+import { rateLimit } from '@/lib/rateLimit';
 
 export async function POST(request: Request) {
     try {
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
+        if (!rateLimit(`register:${ip}`, 5, 15 * 60 * 1000)) {
+            return NextResponse.json(
+                { error: 'Too many accounts created from this address. Please try again later.' },
+                { status: 429 }
+            );
+        }
+
         const body = await request.json();
         const { name, email, password, phone, role, locationLabel, agreedToTerms } = body;
 

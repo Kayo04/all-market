@@ -88,8 +88,8 @@ export default function Footer() {
             {t('colSupport')}
           </h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <span style={{ fontSize: '14px', color: 'var(--text-secondary)', cursor: 'pointer' }}>{t('supportLinks.help')}</span>
-            <span style={{ fontSize: '14px', color: 'var(--text-secondary)', cursor: 'pointer' }}>{t('supportLinks.contact')}</span>
+            <a href="mailto:support@needer.com" style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none' }}>{t('supportLinks.help')}</a>
+            <a href="mailto:support@needer.com" style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none' }}>{t('supportLinks.contact')}</a>
             <Link href="/terms" style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none' }}>{t('supportLinks.terms')}</Link>
             <Link href="/privacy" style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none' }}>{t('supportLinks.privacy')}</Link>
           </div>

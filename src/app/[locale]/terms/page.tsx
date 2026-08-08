@@ -3,7 +3,7 @@
 import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 
-const LAST_UPDATED = '2026-07-18';
+const LAST_UPDATED = '2026-07-30';
 
 interface Section {
   heading: string;

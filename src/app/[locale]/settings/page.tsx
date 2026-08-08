@@ -6,7 +6,7 @@ import { useLocale } from 'next-intl';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
-import { Moon, Sun, Monitor, ArrowLeft, Check, Globe, DollarSign, AlertTriangle } from 'lucide-react';
+import { Moon, Sun, Monitor, ArrowLeft, Check, Globe, DollarSign, AlertTriangle, Download } from 'lucide-react';
 import { useState } from 'react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -287,6 +287,45 @@ export default function SettingsPage() {
 
         {session?.user && (
           <>
+            <Divider />
+
+            {/* ── YOUR DATA ── */}
+            <section>
+              <SectionHeader icon={<Download size={14} />} label={locale === 'pt' ? 'Os Teus Dados' : 'Your Data'} />
+              <div style={{
+                padding: '18px 20px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border)',
+                borderRadius: '14px',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                gap: '16px', flexWrap: 'wrap',
+              }}>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '3px' }}>
+                    {locale === 'pt' ? 'Descarregar os teus dados' : 'Download your data'}
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
+                    {locale === 'pt'
+                      ? 'Exporta a tua conta, pedidos, propostas e mensagens num ficheiro JSON.'
+                      : 'Export your account, requests, proposals, and messages as a JSON file.'}
+                  </div>
+                </div>
+                <a
+                  href={`/api/users/${(session.user as { id?: string }).id}/export`}
+                  download
+                  style={{
+                    padding: '10px 18px', borderRadius: '10px',
+                    border: '1px solid var(--border)', background: 'var(--bg-primary)',
+                    color: 'var(--text-primary)', fontSize: '13px', fontWeight: 600,
+                    cursor: 'pointer', fontFamily: 'var(--font-sans)', flexShrink: 0,
+                    textDecoration: 'none', display: 'inline-block',
+                  }}
+                >
+                  {locale === 'pt' ? 'Descarregar' : 'Download'}
+                </a>
+              </div>
+            </section>
+
             <Divider />
 
             {/* ── DANGER ZONE ── */}

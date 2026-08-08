@@ -5,6 +5,8 @@ import { randomUUID } from 'crypto';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
+import RequestModel from '@/lib/models/Request';
+import Proposal from '@/lib/models/Proposal';
 
 // GET: Public profile
 export async function GET(
@@ -121,6 +123,19 @@ export async function DELETE(
         if (!user) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
+
+        // Don't leave this person's activity live under "Deleted User" — close out
+        // anything that's still open on their behalf. Reuses existing enum values
+        // ('closed' / 'rejected') rather than adding new ones the rest of the app
+        // doesn't know how to render.
+        await RequestModel.updateMany(
+            { userId: id, status: { $in: ['open', 'accepted', 'in_progress'] } },
+            { status: 'closed' }
+        );
+        await Proposal.updateMany(
+            { proId: id, status: 'pending' },
+            { status: 'rejected' }
+        );
 
         return NextResponse.json({ message: 'Account deleted' });
     } catch (error) {

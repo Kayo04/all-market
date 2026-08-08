@@ -3,7 +3,7 @@
 import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 
-const LAST_UPDATED = '2026-07-18';
+const LAST_UPDATED = '2026-07-30';
 
 interface Section {
   heading: string;
@@ -49,6 +49,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
           'Request details you post are visible to all users browsing open requests, since the platform is a reverse marketplace built around public requests.',
           'We do not sell your personal data to third parties, and we do not run advertising or analytics trackers on this site today.',
           'We use MongoDB Atlas to host our database. This is a data processor acting on our instructions, not an independent party with its own use of your data.',
+          'When you post a request or a professional submits a proposal, the relevant text (request title/description, budget, proposal message and price) is sent to Google\'s Gemini AI API to power AI categorization and the "Compare with AI" proposal recommendation feature. Google acts as a data processor for this purpose. Your account credentials and payment details, if any, are never sent to Gemini.',
         ],
       },
       {
@@ -127,6 +128,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
           'Os detalhes dos pedidos que publicas são visíveis a todos os utilizadores que navegam nos pedidos abertos, já que a plataforma é um mercado inverso construído à volta de pedidos públicos.',
           'Não vendemos os teus dados pessoais a terceiros, e não usamos publicidade ou rastreadores de análise neste site atualmente.',
           'Usamos o MongoDB Atlas para alojar a nossa base de dados. Este é um subcontratante que atua segundo as nossas instruções, não uma entidade independente com uso próprio dos teus dados.',
+          'Quando publicas um pedido ou um profissional envia uma proposta, o texto relevante (título/descrição do pedido, orçamento, mensagem e preço da proposta) é enviado à API de IA Gemini da Google para alimentar a categorização automática e a funcionalidade "Comparar com IA". A Google atua como subcontratante para este fim. As tuas credenciais de conta e dados de pagamento, caso existam, nunca são enviados à Gemini.',
         ],
       },
       {

@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
 import { JWT } from 'next-auth/jwt';
+import { rateLimit } from '@/lib/rateLimit';
 
 interface ExtendedUser extends NextAuthUser {
     role: string;
@@ -23,9 +24,17 @@ export const authOptions: AuthOptions = {
                     throw new Error('Email and password are required');
                 }
 
+                // Per-account lockout against credential stuffing/brute force. Keyed on the
+                // email being attempted (not IP — NextAuth v4's authorize() doesn't reliably
+                // expose the caller's real IP across all deployment targets).
+                const email = credentials.email.toLowerCase();
+                if (!rateLimit(`login:${email}`, 10, 15 * 60 * 1000)) {
+                    throw new Error('Too many login attempts. Please try again in a few minutes.');
+                }
+
                 await dbConnect();
 
-                const user = await User.findOne({ email: credentials.email.toLowerCase() });
+                const user = await User.findOne({ email });
                 if (!user || user.isDeleted) {
                     throw new Error('No account found with this email');
                 }

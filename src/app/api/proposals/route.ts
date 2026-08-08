@@ -7,8 +7,19 @@ import RequestModel from '@/lib/models/Request';
 import { createNotification } from '@/lib/notifications';
 
 // GET: Proposals for a specific request
+//
+// The request owner sees every proposal (needed to compare bids). Anyone else
+// (e.g. a pro browsing the request before deciding whether to bid) only sees
+// their own proposal, if any — otherwise this leaks every pro's price and
+// message to any other pro or the public, which breaks the sealed-bid model.
 export async function GET(request: Request) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        const currentUserId = (session.user as { id: string }).id;
+
         await dbConnect();
 
         const { searchParams } = new URL(request.url);
@@ -18,7 +29,15 @@ export async function GET(request: Request) {
             return NextResponse.json({ error: 'requestId is required' }, { status: 400 });
         }
 
-        const proposals = await Proposal.find({ requestId })
+        const reqDoc = await RequestModel.findById(requestId).select('userId').lean();
+        if (!reqDoc) {
+            return NextResponse.json({ error: 'Request not found' }, { status: 404 });
+        }
+        const isOwner = (reqDoc as { userId: { toString(): string } }).userId.toString() === currentUserId;
+
+        const filter = isOwner ? { requestId } : { requestId, proId: currentUserId };
+
+        const proposals = await Proposal.find(filter)
             .sort({ createdAt: -1 })
             .populate('proId', 'name avatar isVerified ratings rating locationLabel')
             .lean();
