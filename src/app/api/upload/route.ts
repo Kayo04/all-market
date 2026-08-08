@@ -1,21 +1,17 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
-import { randomUUID } from 'crypto';
+import { UTApi } from 'uploadthing/server';
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
-const ALLOWED_TYPES: Record<string, string> = {
-    'image/jpeg': 'jpg',
-    'image/png': 'png',
-    'image/webp': 'webp',
-    'image/gif': 'gif',
-};
+const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
-// POST: Upload a single image, stored on local disk under public/uploads/
-// (no cloud storage — e.g. S3/Cloudinary — is configured for this project)
+const utapi = new UTApi();
+
+// POST: Upload a single image to Uploadthing (cloud storage — local disk doesn't
+// survive most deploys). Client contract (FormData 'file' in, { url } out) is
+// unchanged so callers didn't need to change when this moved off local disk.
 export async function POST(request: Request) {
     try {
         const session = await getServerSession(authOptions);
@@ -30,8 +26,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'No file provided' }, { status: 400 });
         }
 
-        const ext = ALLOWED_TYPES[file.type];
-        if (!ext) {
+        if (!ALLOWED_TYPES.has(file.type)) {
             return NextResponse.json({ error: 'Unsupported file type' }, { status: 400 });
         }
 
@@ -39,13 +34,13 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 });
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const filename = `${randomUUID()}.${ext}`;
-        const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'requests');
-        await mkdir(uploadDir, { recursive: true });
-        await writeFile(path.join(uploadDir, filename), buffer);
+        const response = await utapi.uploadFiles(file);
+        if (response.error || !response.data) {
+            console.error('Uploadthing error:', response.error);
+            return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
+        }
 
-        return NextResponse.json({ url: `/uploads/requests/${filename}` }, { status: 201 });
+        return NextResponse.json({ url: response.data.ufsUrl }, { status: 201 });
     } catch (error) {
         console.error('Error uploading file:', error);
         return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });

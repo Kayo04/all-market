@@ -237,20 +237,35 @@ export default function PublicProfilePage() {
 
         <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
           {/* Avatar */}
-          <div style={{
-            width: '88px', height: '88px', borderRadius: '20px', flexShrink: 0,
-            background: user.hasSponsoredSpot
-              ? 'linear-gradient(135deg, #d4af37, #a07e1a)'
-              : 'linear-gradient(135deg, var(--accent), #004d16)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontSize: '36px', fontWeight: 800,
-            fontFamily: 'var(--font-display)',
-            boxShadow: user.hasSponsoredSpot
-              ? '0 8px 32px rgba(212,175,55,0.25)'
-              : '0 8px 32px rgba(0,80,20,0.2)',
-          }}>
-            {initials}
-          </div>
+          {user.avatar ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={user.avatar}
+              alt=""
+              style={{
+                width: '88px', height: '88px', borderRadius: '20px', flexShrink: 0,
+                objectFit: 'cover',
+                boxShadow: user.hasSponsoredSpot
+                  ? '0 8px 32px rgba(212,175,55,0.25)'
+                  : '0 8px 32px rgba(0,80,20,0.2)',
+              }}
+            />
+          ) : (
+            <div style={{
+              width: '88px', height: '88px', borderRadius: '20px', flexShrink: 0,
+              background: user.hasSponsoredSpot
+                ? 'linear-gradient(135deg, #d4af37, #a07e1a)'
+                : 'linear-gradient(135deg, var(--accent), #004d16)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#fff', fontSize: '36px', fontWeight: 800,
+              fontFamily: 'var(--font-display)',
+              boxShadow: user.hasSponsoredSpot
+                ? '0 8px 32px rgba(212,175,55,0.25)'
+                : '0 8px 32px rgba(0,80,20,0.2)',
+            }}>
+              {initials}
+            </div>
+          )}
 
           {/* Info */}
           <div style={{ flex: 1, minWidth: '200px' }}>

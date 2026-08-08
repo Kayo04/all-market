@@ -53,13 +53,14 @@ export async function PUT(
         await dbConnect();
 
         const body = await request.json();
-        const { name, bio, skills, locationLabel } = body;
+        const { name, bio, skills, locationLabel, avatar } = body;
 
         const updateData: Record<string, unknown> = {};
         if (name) updateData.name = name;
         if (bio !== undefined) updateData.bio = bio;
         if (skills) updateData.skills = skills;
         if (locationLabel) updateData.locationLabel = locationLabel;
+        if (avatar !== undefined) updateData.avatar = avatar;
 
         const user = await User.findByIdAndUpdate(id, updateData, { new: true })
             .select('name role isVerified bio skills locationLabel avatar')

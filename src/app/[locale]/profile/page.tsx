@@ -4,7 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useLocale } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useEffect, useState } from 'react';
-import { User, MapPin, Tag, Save, CheckCircle, ExternalLink, Copy } from 'lucide-react';
+import { User, MapPin, Tag, Save, CheckCircle, ExternalLink, Copy, Camera } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -19,11 +19,14 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState('');
   const [form, setForm] = useState({
     name: '',
     bio: '',
     skills: '',
     locationLabel: '',
+    avatar: '',
   });
 
   const userId = (session?.user as { id: string })?.id;
@@ -48,6 +51,7 @@ export default function ProfilePage() {
             bio: u.bio || '',
             skills: (u.skills || []).join(', '),
             locationLabel: u.locationLabel || '',
+            avatar: u.avatar || '',
           });
         }
       } catch (err) {
@@ -72,6 +76,7 @@ export default function ProfilePage() {
           bio: form.bio,
           skills: form.skills.split(',').map((s) => s.trim()).filter(Boolean),
           locationLabel: form.locationLabel,
+          avatar: form.avatar,
         }),
       });
 
@@ -83,6 +88,44 @@ export default function ProfilePage() {
       console.error('Error saving profile:', err);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    setAvatarUploading(true);
+    setAvatarError('');
+    try {
+      const uploadForm = new FormData();
+      uploadForm.append('file', file);
+      const uploadRes = await fetch('/api/upload', { method: 'POST', body: uploadForm });
+      const uploadData = await uploadRes.json().catch(() => ({}));
+
+      if (!uploadRes.ok) {
+        setAvatarError(uploadData.error || (locale === 'pt' ? 'Não foi possível carregar a imagem.' : 'Could not upload the image.'));
+        return;
+      }
+
+      // Persist immediately, same as any other avatar-picker UX — don't make the
+      // upload feel undone until the unrelated "Save" button is also clicked.
+      const saveRes = await fetch(`/api/users/${userId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar: uploadData.url }),
+      });
+      if (saveRes.ok) {
+        setForm((f) => ({ ...f, avatar: uploadData.url }));
+      } else {
+        setAvatarError(locale === 'pt' ? 'Não foi possível guardar a foto.' : 'Could not save the photo.');
+      }
+    } catch (err) {
+      console.error('Error uploading avatar:', err);
+      setAvatarError(locale === 'pt' ? 'Não foi possível carregar a imagem.' : 'Could not upload the image.');
+    } finally {
+      setAvatarUploading(false);
     }
   };
 
@@ -157,27 +200,67 @@ export default function ProfilePage() {
 
       <Card variant="glass" hover={false} style={{ padding: '32px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
-          {/* Avatar placeholder */}
+          {/* Avatar */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
-            <div
+            <label
               style={{
+                position: 'relative',
                 width: '64px',
                 height: '64px',
                 borderRadius: '50%',
-                background: 'var(--accent-light)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--accent)',
-                fontSize: '24px',
-                fontWeight: 800,
+                flexShrink: 0,
+                cursor: avatarUploading ? 'wait' : 'pointer',
+                display: 'block',
               }}
             >
-              {form.name.charAt(0).toUpperCase() || '?'}
-            </div>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleAvatarChange}
+                disabled={avatarUploading}
+                style={{ display: 'none' }}
+              />
+              {form.avatar ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={form.avatar}
+                  alt=""
+                  style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover' }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: '64px', height: '64px', borderRadius: '50%',
+                    background: 'var(--accent-light)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: 'var(--accent)', fontSize: '24px', fontWeight: 800,
+                  }}
+                >
+                  {form.name.charAt(0).toUpperCase() || '?'}
+                </div>
+              )}
+              <div
+                style={{
+                  position: 'absolute', bottom: 0, right: 0,
+                  width: '22px', height: '22px', borderRadius: '50%',
+                  background: 'var(--bg-card)', border: '1px solid var(--border)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <Camera size={11} color="var(--text-secondary)" />
+              </div>
+            </label>
             <div>
               <div style={{ fontWeight: 700, fontSize: '18px' }}>{form.name || '—'}</div>
               <div style={{ fontSize: '13px', color: 'var(--text-tertiary)' }}>{(session?.user as { email?: string })?.email}</div>
+              {avatarUploading && (
+                <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '2px' }}>
+                  {locale === 'pt' ? 'A carregar...' : 'Uploading...'}
+                </div>
+              )}
+              {avatarError && (
+                <div style={{ fontSize: '12px', color: 'var(--error)', marginTop: '2px' }}>{avatarError}</div>
+              )}
             </div>
           </div>
 
