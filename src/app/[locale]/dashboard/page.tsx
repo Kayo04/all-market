@@ -17,7 +17,9 @@ export default function DashboardPage() {
     }
 
     const role = (session.user as { role: string }).role;
-    if (role === 'pro') {
+    if (role === 'admin') {
+      router.replace('/admin');
+    } else if (role === 'pro') {
       router.replace('/dashboard/pro');
     } else {
       router.replace('/dashboard/client');

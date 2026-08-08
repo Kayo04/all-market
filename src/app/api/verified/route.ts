@@ -3,7 +3,6 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
-import { createNotification } from '@/lib/notifications';
 
 // GET: Check verification status
 export async function GET() {
@@ -50,10 +49,9 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Business name and tax ID are required' }, { status: 400 });
         }
 
-        // Auto-approve on submit (no admin review flow exists yet)
         await User.findByIdAndUpdate(user.id, {
-            verificationStatus: 'approved',
-            isVerified: true,
+            verificationStatus: 'pending',
+            isVerified: false,
             verificationData: {
                 businessName,
                 taxId,
@@ -62,16 +60,8 @@ export async function POST(request: Request) {
             },
         });
 
-        // Notification
-        await createNotification(
-            user.id,
-            'system',
-            'Your verification was approved! The trust badge is now live on your profile.',
-            undefined
-        );
-
         return NextResponse.json(
-            { message: 'Verification approved', status: 'approved' },
+            { message: 'Verification submitted for review', status: 'pending' },
             { status: 201 }
         );
     } catch (error) {

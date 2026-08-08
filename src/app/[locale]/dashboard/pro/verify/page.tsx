@@ -64,8 +64,6 @@ export default function VerifyPage() {
       if (res.ok) {
         setSubmitted(true);
         setVerificationStatus('pending');
-        // Server already approved it; keep the "Under Review" moment for a beat before revealing.
-        setTimeout(() => setVerificationStatus('approved'), 3000 + Math.random() * 2000);
       } else {
         const data = await res.json().catch(() => ({}));
         setError(data.error || (locale === 'pt' ? 'Não foi possível submeter a verificação. Tenta novamente.' : 'Could not submit verification. Please try again.'));
@@ -152,8 +150,25 @@ export default function VerifyPage() {
         </Card>
       )}
 
+      {/* Rejected — can resubmit below */}
+      {verificationStatus === 'rejected' && !submitted && (
+        <div style={{
+          padding: '16px 20px', marginBottom: '20px', borderRadius: 'var(--radius-md)',
+          background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+        }}>
+          <p style={{ color: 'var(--error)', fontSize: '14px', fontWeight: 600, marginBottom: '4px' }}>
+            {locale === 'pt' ? 'Verificação não aprovada' : 'Verification not approved'}
+          </p>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
+            {locale === 'pt'
+              ? 'Revê os teus dados abaixo e submete novamente.'
+              : 'Review your details below and resubmit.'}
+          </p>
+        </div>
+      )}
+
       {/* Form */}
-      {verificationStatus === 'none' && !submitted && (
+      {(verificationStatus === 'none' || verificationStatus === 'rejected') && !submitted && (
         <>
           {/* Benefits */}
           <div
