@@ -6,8 +6,8 @@ import { useLocale } from 'next-intl';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter, usePathname } from '@/i18n/navigation';
 import { Link } from '@/i18n/navigation';
-import { Moon, Sun, Monitor, ArrowLeft, Check, Globe, DollarSign, AlertTriangle, Download } from 'lucide-react';
-import { useState } from 'react';
+import { Moon, Sun, Monitor, ArrowLeft, Check, Globe, DollarSign, AlertTriangle, Download, Bell, Lock } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // /settings — Appearance + Language + Currency
@@ -49,6 +49,69 @@ const LANGUAGE_OPTIONS: { value: 'pt' | 'en'; label: string; flag: string }[] = 
   { value: 'en', label: 'English', flag: '🇬🇧' },
 ];
 
+type PrefKey = 'proposals' | 'messages' | 'newRequests' | 'reviews';
+
+const NOTIFICATION_OPTIONS: {
+  key: PrefKey;
+  labelEn: string; labelPt: string;
+  descEn: string; descPt: string;
+}[] = [
+  {
+    key: 'proposals',
+    labelEn: 'Proposals', labelPt: 'Propostas',
+    descEn: 'New proposals on your requests, and when yours is accepted or declined.',
+    descPt: 'Novas propostas nos teus pedidos, e quando a tua é aceite ou recusada.',
+  },
+  {
+    key: 'messages',
+    labelEn: 'Messages', labelPt: 'Mensagens',
+    descEn: 'When someone sends you a message.',
+    descPt: 'Quando alguém te envia uma mensagem.',
+  },
+  {
+    key: 'newRequests',
+    labelEn: 'New requests', labelPt: 'Novos pedidos',
+    descEn: 'New requests posted in your professional category.',
+    descPt: 'Novos pedidos publicados na tua categoria profissional.',
+  },
+  {
+    key: 'reviews',
+    labelEn: 'Reviews', labelPt: 'Avaliações',
+    descEn: 'When a client leaves you a review.',
+    descPt: 'Quando um cliente te deixa uma avaliação.',
+  },
+];
+
+function Toggle({ on, onClick, disabled }: { on: boolean; onClick: () => void; disabled?: boolean }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      role="switch"
+      aria-checked={on}
+      style={{
+        width: '40px', height: '23px', borderRadius: '99px', flexShrink: 0,
+        border: '1px solid ' + (on ? 'var(--accent)' : 'var(--border)'),
+        background: on ? 'var(--accent)' : 'var(--bg-primary)',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.5 : 1,
+        padding: 0, position: 'relative',
+        transition: 'background var(--transition-fast), border-color var(--transition-fast)',
+      }}
+    >
+      <span
+        style={{
+          position: 'absolute', top: '2px', left: on ? '19px' : '2px',
+          width: '17px', height: '17px', borderRadius: '50%',
+          background: on ? '#fff' : 'var(--text-tertiary)',
+          transition: 'left var(--transition-fast)',
+        }}
+      />
+    </button>
+  );
+}
+
 function SectionHeader({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
@@ -76,15 +139,102 @@ export default function SettingsPage() {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
 
+  const [prefs, setPrefs] = useState<Record<PrefKey, boolean> | null>(null);
+  const [prefSaving, setPrefSaving] = useState<PrefKey | null>(null);
+  const [prefError, setPrefError] = useState('');
+
+  const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
+  const [pwSaving, setPwSaving] = useState(false);
+  const [pwError, setPwError] = useState('');
+  const [pwSuccess, setPwSuccess] = useState(false);
+
+  const userId = (session?.user as { id?: string } | undefined)?.id;
+
   const flash = (key: string) => {
     setSaved(key);
     setTimeout(() => setSaved(null), 1800);
   };
 
+  const loadPrefs = useCallback(async () => {
+    if (!userId) return;
+    try {
+      const res = await fetch(`/api/users/${userId}/notifications`);
+      if (res.ok) {
+        const data = await res.json();
+        setPrefs(data.notificationPrefs);
+      }
+    } catch (err) {
+      console.error('Error loading notification preferences:', err);
+    }
+  }, [userId]);
+
+  useEffect(() => { loadPrefs(); }, [loadPrefs]);
+
+  const togglePref = async (key: PrefKey) => {
+    if (!prefs || !userId) return;
+    const next = !prefs[key];
+    setPrefs({ ...prefs, [key]: next });   // optimistic
+    setPrefSaving(key);
+    setPrefError('');
+    try {
+      const res = await fetch(`/api/users/${userId}/notifications`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ [key]: next }),
+      });
+      if (!res.ok) {
+        setPrefs((p) => (p ? { ...p, [key]: !next } : p));   // roll back
+        setPrefError(locale === 'pt' ? 'Não foi possível guardar.' : 'Could not save.');
+      }
+    } catch {
+      setPrefs((p) => (p ? { ...p, [key]: !next } : p));
+      setPrefError(locale === 'pt' ? 'Não foi possível guardar.' : 'Could not save.');
+    } finally {
+      setPrefSaving(null);
+    }
+  };
+
+  const handlePasswordChange = async () => {
+    if (!userId) return;
+    setPwError('');
+    setPwSuccess(false);
+
+    if (pwForm.next !== pwForm.confirm) {
+      setPwError(locale === 'pt' ? 'As passwords novas não coincidem.' : 'New passwords do not match.');
+      return;
+    }
+    if (pwForm.next.length < 6) {
+      setPwError(locale === 'pt'
+        ? 'A password deve ter pelo menos 6 caracteres.'
+        : 'Password must be at least 6 characters.');
+      return;
+    }
+
+    setPwSaving(true);
+    try {
+      const res = await fetch(`/api/users/${userId}/password`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.next }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setPwForm({ current: '', next: '', confirm: '' });
+        setPwSuccess(true);
+        setTimeout(() => setPwSuccess(false), 4000);
+      } else {
+        setPwError(data.error || (locale === 'pt' ? 'Algo correu mal.' : 'Something went wrong.'));
+      }
+    } catch {
+      setPwError(locale === 'pt' ? 'Algo correu mal.' : 'Something went wrong.');
+    } finally {
+      setPwSaving(false);
+    }
+  };
+
   const DELETE_KEYWORD = locale === 'pt' ? 'APAGAR' : 'DELETE';
 
   const handleDeleteAccount = async () => {
-    const userId = (session?.user as { id?: string } | undefined)?.id;
     if (!userId) return;
     setDeleting(true);
     setDeleteError('');
@@ -289,6 +439,150 @@ export default function SettingsPage() {
           <>
             <Divider />
 
+            {/* ── NOTIFICATIONS ── */}
+            <section>
+              <SectionHeader icon={<Bell size={14} />} label={locale === 'pt' ? 'Notificações' : 'Notifications'} />
+
+              {prefError && (
+                <div style={{
+                  padding: '10px 14px', marginBottom: '12px', borderRadius: '10px',
+                  background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+                  color: 'var(--error)', fontSize: '13px',
+                }}>
+                  {prefError}
+                </div>
+              )}
+
+              <div style={{
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border)',
+                borderRadius: '14px',
+                overflow: 'hidden',
+              }}>
+                {NOTIFICATION_OPTIONS.map((opt, i) => (
+                  <div
+                    key={opt.key}
+                    style={{
+                      padding: '16px 20px',
+                      borderTop: i === 0 ? 'none' : '1px solid var(--border)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      gap: '16px',
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '2px' }}>
+                        {locale === 'pt' ? opt.labelPt : opt.labelEn}
+                      </div>
+                      <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', lineHeight: 1.5 }}>
+                        {locale === 'pt' ? opt.descPt : opt.descEn}
+                      </div>
+                    </div>
+                    <Toggle
+                      on={prefs ? prefs[opt.key] : true}
+                      disabled={!prefs || prefSaving === opt.key}
+                      onClick={() => togglePref(opt.key)}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', marginTop: '10px', lineHeight: 1.5 }}>
+                {locale === 'pt'
+                  ? 'Avisos sobre a tua conta (por exemplo, o resultado da verificação) são sempre enviados.'
+                  : 'Notices about your account (for example, your verification outcome) are always sent.'}
+              </p>
+            </section>
+
+            <Divider />
+
+            {/* ── SECURITY ── */}
+            <section>
+              <SectionHeader icon={<Lock size={14} />} label={locale === 'pt' ? 'Segurança' : 'Security'} />
+
+              <div style={{
+                padding: '18px 20px',
+                background: 'var(--bg-secondary)',
+                border: '1px solid var(--border)',
+                borderRadius: '14px',
+              }}>
+                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '3px' }}>
+                  {locale === 'pt' ? 'Alterar password' : 'Change password'}
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-tertiary)', lineHeight: 1.5, marginBottom: '14px' }}>
+                  {locale === 'pt'
+                    ? 'Precisas da password atual para definir uma nova.'
+                    : 'You need your current password to set a new one.'}
+                </div>
+
+                {pwError && (
+                  <div style={{
+                    padding: '10px 14px', marginBottom: '12px', borderRadius: '10px',
+                    background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)',
+                    color: 'var(--error)', fontSize: '13px',
+                  }}>
+                    {pwError}
+                  </div>
+                )}
+
+                {pwSuccess && (
+                  <div style={{
+                    padding: '10px 14px', marginBottom: '12px', borderRadius: '10px',
+                    background: 'var(--accent-light)', border: '1px solid var(--accent)',
+                    color: 'var(--accent)', fontSize: '13px', fontWeight: 600,
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                  }}>
+                    <Check size={14} />
+                    {locale === 'pt' ? 'Password alterada.' : 'Password changed.'}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {([
+                    { key: 'current' as const, ph: locale === 'pt' ? 'Password atual' : 'Current password' },
+                    { key: 'next' as const, ph: locale === 'pt' ? 'Nova password' : 'New password' },
+                    { key: 'confirm' as const, ph: locale === 'pt' ? 'Confirmar nova password' : 'Confirm new password' },
+                  ]).map((f) => (
+                    <input
+                      key={f.key}
+                      type="password"
+                      value={pwForm[f.key]}
+                      onChange={(e) => setPwForm({ ...pwForm, [f.key]: e.target.value })}
+                      placeholder={f.ph}
+                      autoComplete={f.key === 'current' ? 'current-password' : 'new-password'}
+                      style={{
+                        width: '100%', padding: '10px 14px', fontSize: '14px',
+                        fontFamily: 'var(--font-sans)',
+                        background: 'var(--bg-input)', color: 'var(--text-primary)',
+                        border: '1px solid var(--border)', borderRadius: '10px', outline: 'none',
+                      }}
+                    />
+                  ))}
+
+                  <button
+                    onClick={handlePasswordChange}
+                    disabled={pwSaving || !pwForm.current || !pwForm.next || !pwForm.confirm}
+                    style={{
+                      alignSelf: 'flex-start', marginTop: '4px',
+                      padding: '10px 18px', borderRadius: '10px', border: 'none',
+                      background: (!pwForm.current || !pwForm.next || !pwForm.confirm)
+                        ? 'var(--border)' : 'var(--accent)',
+                      color: (!pwForm.current || !pwForm.next || !pwForm.confirm)
+                        ? 'var(--text-tertiary)' : '#fff',
+                      fontSize: '13px', fontWeight: 600, fontFamily: 'var(--font-sans)',
+                      cursor: (pwSaving || !pwForm.current || !pwForm.next || !pwForm.confirm)
+                        ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {pwSaving
+                      ? (locale === 'pt' ? 'A guardar...' : 'Saving...')
+                      : (locale === 'pt' ? 'Alterar password' : 'Change password')}
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <Divider />
+
             {/* ── YOUR DATA ── */}
             <section>
               <SectionHeader icon={<Download size={14} />} label={locale === 'pt' ? 'Os Teus Dados' : 'Your Data'} />
@@ -438,11 +732,6 @@ export default function SettingsPage() {
 
         {/* Coming soon footer */}
         <Divider />
-        <p style={{ fontSize: '12px', color: 'var(--text-tertiary)', opacity: 0.5, marginTop: '24px' }}>
-          {locale === 'pt'
-            ? 'Mais definições (notificações, privacidade) em breve.'
-            : 'More settings (notifications, privacy) coming soon.'}
-        </p>
 
       </div>
     </div>

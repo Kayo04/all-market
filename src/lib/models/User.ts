@@ -10,6 +10,15 @@ const UserSchema = new Schema(
         termsAcceptedAt: { type: Date },
         // Set by DELETE /api/users/[id] — see that route for what "deleted" means here
         isDeleted: { type: Boolean, default: false },
+        // Per-category opt-outs, enforced in createNotification() (src/lib/notifications.ts).
+        // 'system' notifications (verification outcome, account state) are deliberately not
+        // toggleable — a user shouldn't be able to silence being told their account changed.
+        notificationPrefs: {
+            proposals: { type: Boolean, default: true },
+            messages: { type: Boolean, default: true },
+            newRequests: { type: Boolean, default: true },
+            reviews: { type: Boolean, default: true },
+        },
         isVerified: { type: Boolean, default: false },
         location: {
             type: { type: String, enum: ['Point'], default: 'Point' },
