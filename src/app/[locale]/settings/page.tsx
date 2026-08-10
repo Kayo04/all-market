@@ -51,10 +51,14 @@ const LANGUAGE_OPTIONS: { value: 'pt' | 'en'; label: string; flag: string }[] = 
 
 type PrefKey = 'proposals' | 'messages' | 'newRequests' | 'reviews';
 
+// proOnly marks categories only ever sent to professionals — `new_request` goes to
+// pros whose category matches (ai-match), and `new_review` to the pro being reviewed.
+// Showing those toggles to a client would be a dead control.
 const NOTIFICATION_OPTIONS: {
   key: PrefKey;
   labelEn: string; labelPt: string;
   descEn: string; descPt: string;
+  proOnly?: boolean;
 }[] = [
   {
     key: 'proposals',
@@ -73,12 +77,14 @@ const NOTIFICATION_OPTIONS: {
     labelEn: 'New requests', labelPt: 'Novos pedidos',
     descEn: 'New requests posted in your professional category.',
     descPt: 'Novos pedidos publicados na tua categoria profissional.',
+    proOnly: true,
   },
   {
     key: 'reviews',
     labelEn: 'Reviews', labelPt: 'Avaliações',
     descEn: 'When a client leaves you a review.',
     descPt: 'Quando um cliente te deixa uma avaliação.',
+    proOnly: true,
   },
 ];
 
@@ -149,6 +155,8 @@ export default function SettingsPage() {
   const [pwSuccess, setPwSuccess] = useState(false);
 
   const userId = (session?.user as { id?: string } | undefined)?.id;
+  const isPro = (session?.user as { role?: string } | undefined)?.role === 'pro';
+  const visibleNotificationOptions = NOTIFICATION_OPTIONS.filter((o) => isPro || !o.proOnly);
 
   const flash = (key: string) => {
     setSaved(key);
@@ -459,7 +467,7 @@ export default function SettingsPage() {
                 borderRadius: '14px',
                 overflow: 'hidden',
               }}>
-                {NOTIFICATION_OPTIONS.map((opt, i) => (
+                {visibleNotificationOptions.map((opt, i) => (
                   <div
                     key={opt.key}
                     style={{
