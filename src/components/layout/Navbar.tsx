@@ -198,18 +198,17 @@ export default function Navbar() {
               <NotificationBell />
               <Link
                 href="/messages"
+                className="nav-hover"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   width: '32px',
                   height: '32px',
-                  background: 'transparent',
                   border: 'none',
                   borderRadius: 'var(--radius-md)',
                   textDecoration: 'none',
                   color: 'var(--text-tertiary)',
-                  transition: 'color var(--transition-fast)',
                 }}
                 title={locale === 'pt' ? 'Mensagens' : 'Messages'}
               >
@@ -234,12 +233,13 @@ export default function Navbar() {
               {isPro && userId && (
                 <Link
                   href={`/users/${userId}`}
+                  className="nav-hover"
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     width: '32px', height: '32px',
-                    background: 'transparent', border: 'none',
+                    border: 'none',
                     borderRadius: 'var(--radius-md)', textDecoration: 'none',
-                    color: 'var(--text-tertiary)', transition: 'color var(--transition-fast)',
+                    color: 'var(--text-tertiary)',
                   }}
                   title={locale === 'pt' ? 'O meu perfil público' : 'My public profile'}
                 >
@@ -248,12 +248,13 @@ export default function Navbar() {
               )}
               <Link
                 href="/settings"
+                className="nav-hover"
                 style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   width: '32px', height: '32px',
-                  background: 'transparent', border: 'none',
+                  border: 'none',
                   borderRadius: 'var(--radius-md)', textDecoration: 'none',
-                  color: 'var(--text-tertiary)', transition: 'color var(--transition-fast)',
+                  color: 'var(--text-tertiary)',
                 }}
                 title={locale === 'pt' ? 'Definições' : 'Settings'}
               >
@@ -261,16 +262,15 @@ export default function Navbar() {
               </Link>
               <button
                 onClick={() => signOut({ callbackUrl: '/' })}
+                className="nav-hover"
                 style={{
                   padding: '6px 12px',
                   fontSize: '13px',
                   fontWeight: 500,
                   color: 'var(--text-tertiary)',
-                  background: 'transparent',
                   border: 'none',
                   borderRadius: 'var(--radius-md)',
                   cursor: 'pointer',
-                  transition: 'color var(--transition-fast)',
                 }}
               >
                 {t('logout')}
@@ -281,6 +281,7 @@ export default function Navbar() {
               {/* Become a Professional */}
               <Link
                 href="/pro"
+                className="nav-hover"
                 style={{
                   padding: '6px 10px',
                   fontSize: '13px',
@@ -288,6 +289,7 @@ export default function Navbar() {
                   color: 'var(--text-secondary)',
                   textDecoration: 'none',
                   whiteSpace: 'nowrap',
+                  borderRadius: 'var(--radius-md)',
                 }}
               >
                 {locale === 'pt' ? 'Torne-se um Profissional' : 'Become a Professional'}
@@ -295,13 +297,14 @@ export default function Navbar() {
 
               <Link
                 href="/auth/login"
+                className="nav-hover"
                 style={{
                   padding: '6px 12px',
                   fontSize: '13px',
                   fontWeight: 500,
                   color: 'var(--text-secondary)',
                   textDecoration: 'none',
-                  transition: 'color var(--transition-fast)',
+                  borderRadius: 'var(--radius-md)',
                 }}
               >
                 {t('login')}
@@ -497,6 +500,19 @@ export default function Navbar() {
       )}
 
       <style>{`
+        /* Soft green wash that fades in behind plain navbar items on hover.
+           Applied via a class rather than onMouseEnter/Leave handlers so the
+           fade-out animates too — inline style swaps jump instantly. Elements
+           using this must NOT set an inline background, since inline styles
+           beat this rule and the hover would never show. */
+        .nav-hover {
+          background-color: transparent;
+          transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .nav-hover:hover {
+          background-color: var(--nav-hover-bg);
+        }
+
         @media (max-width: 768px) {
           .desktop-nav { display: none !important; }
           .desktop-search { display: none !important; }

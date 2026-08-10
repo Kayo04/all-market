@@ -36,6 +36,9 @@
   --accent-hover: #268049;
   --accent-light: rgba(47, 158, 92, 0.12);
   --accent-glow: rgba(47, 158, 92, 0.18);
+  /* Hover wash behind plain navbar items — deliberately stronger than
+     --accent-light, which is too faint to read as an interactive state. */
+  --nav-hover-bg: rgba(47, 158, 92, 0.18);
 
   --accent-warm: #e08a4f;
   --accent-warm-hover: #cc7640;
@@ -75,6 +78,9 @@
   --accent-hover: #002b0d;
   --accent-light: rgba(0, 57, 18, 0.06);
   --accent-glow: rgba(0, 57, 18, 0.08);
+  /* Hover wash behind plain navbar items — a brighter, less inky green than
+     --accent so it reads as a soft highlight rather than a dark smudge. */
+  --nav-hover-bg: rgba(47, 158, 92, 0.16);
 
   --accent-warm: #c1622d;
   --accent-warm-hover: #a34f22;
