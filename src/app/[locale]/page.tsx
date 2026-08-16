@@ -1,4 +1,5 @@
 import HeroSection from '@/components/features/HeroSection';
+import LiveNeedsFeed from '@/components/features/LiveNeedsFeed';
 import SimpleCategoryGrid from '@/components/features/SimpleCategoryGrid';
 import PopularCategories from '@/components/features/PopularCategories';
 import NeederPro from '@/components/features/NeederPro';
@@ -10,6 +11,7 @@ export default function HomePage() {
   return (
     <>
       <HeroSection />
+      <LiveNeedsFeed />
       <PopularCategories />
       <NeederPro />
       <SimpleCategoryGrid />

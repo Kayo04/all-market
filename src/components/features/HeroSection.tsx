@@ -28,8 +28,10 @@ const SUGGESTIONS = {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HeroSection — reverse marketplace entry point (services AND products)
-// Submitting routes to /concierge?q=… for AI matching — the AI detects
-// whether the query is a service need or a product want.
+// The search bar searches what PEOPLE NEED, not who's offering. It routes to
+// /requests?q=… (the needs feed). Posting your own need is a separate, deliberate
+// action ("Criar pedido" in the navbar → /concierge), so that browsing the
+// marketplace never turns into browsing a directory of professionals.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function HeroSection() {
@@ -45,12 +47,12 @@ export default function HeroSection() {
         }
     }, []);
 
-    // Submitting routes to /concierge with the query so the AI can find sellers.
+    // Searches the needs feed — what people are asking for — not professionals.
     const handleSubmit = useCallback(
         (overrideQuery?: string) => {
             const q = (overrideQuery ?? query).trim();
             if (!q) return;
-            router.push(`/concierge?q=${encodeURIComponent(q)}`);
+            router.push(`/requests?q=${encodeURIComponent(q)}`);
         },
         [query, router]
     );
@@ -185,8 +187,8 @@ export default function HeroSection() {
                         }}
                     >
                         {locale === 'pt'
-                            ? 'Descreve o que precisas — um serviço ou um produto. Profissionais e vendedores que podem ajudar enviam-te a melhor oferta.'
-                            : 'Describe what you need — a service or a product. Pros and sellers who can help send you their best offer.'}
+                            ? 'Vê o que as pessoas estão a pedir agora — serviços e produtos. Precisas de algo? Cria o teu pedido e deixa as ofertas virem ter contigo.'
+                            : 'See what people are asking for right now — services and products. Need something yourself? Post a request and let the offers come to you.'}
                     </p>
 
                     {/* Input box */}
@@ -213,8 +215,8 @@ export default function HeroSection() {
                             onKeyDown={handleKeyDown}
                             placeholder={
                                 locale === 'pt'
-                                    ? "Ex: 'Eletricista urgente', 'BMW Série 1 abaixo de €10k', 'Explicador de Matemática'..."
-                                    : "E.g. 'Emergency electrician', 'BMW Series 1 under €10k', 'Math tutor'..."
+                                    ? "Procurar pedidos: 'eletricista', 'mudanças', 'PS5'..."
+                                    : "Search requests: 'electrician', 'house move', 'PS5'..."
                             }
                             rows={2}
                             style={{

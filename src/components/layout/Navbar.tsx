@@ -156,7 +156,9 @@ export default function Navbar() {
           className="desktop-nav"
         >
 
-          {/* ✦ Find a Pro CTA → /concierge */}
+          {/* ✦ Post-a-request CTA → /concierge (AI-assisted request creation).
+              Labelled "create a request", not "find a pro": clients post needs and
+              pros come to them. Browsing professionals is not a flow this product has. */}
           <Link
             id="find-pro-btn"
             href="/concierge"
@@ -189,7 +191,7 @@ export default function Navbar() {
             }}
           >
             <span>✦</span>
-            <span>{locale === 'pt' ? 'Contratar Profissional' : 'Find a Pro'}</span>
+            <span>{locale === 'pt' ? 'Criar pedido' : 'Post a request'}</span>
           </Link>
 
           {/* Auth Area */}
@@ -412,7 +414,7 @@ export default function Navbar() {
             </button>
           </form>
 
-          {/* ✦ Find a Pro CTA — mirrors the desktop pill, was missing on mobile */}
+          {/* ✦ Post-a-request CTA — mirrors the desktop pill */}
           <Link
             href="/concierge"
             onClick={() => setIsMenuOpen(false)}
@@ -433,7 +435,7 @@ export default function Navbar() {
             }}
           >
             <span>✦</span>
-            <span>{locale === 'pt' ? 'Contratar Profissional' : 'Find a Pro'}</span>
+            <span>{locale === 'pt' ? 'Criar pedido' : 'Post a request'}</span>
           </Link>
 
           <Link

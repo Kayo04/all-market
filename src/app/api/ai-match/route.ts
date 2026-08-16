@@ -49,7 +49,12 @@ Rules:
 - when type is "product", category MUST be "equipment" (never a service category) — subcategory is "automotive" for vehicles, "gaming" for consoles/games, "smartphones" for phones, "laptops" for computers, or "product" for anything else
 - budget: extract the euro amount as a plain number (handle "k" as ×1000); null if not mentioned
 - city: detect Portuguese city names (Porto, Lisboa, Braga, Coimbra, Faro, Aveiro, Setúbal, Guimarães); default to "Porto"
-- responseMessage: empathetic, confirms understanding, mentions the city and urgency if relevant`;
+- responseMessage: empathetic, confirms understanding, mentions the city and urgency if relevant
+- responseMessage MUST describe the request being POSTED so professionals can send offers.
+  Needer does not search for or show professionals — they come to the client.
+  Never say you are "searching", "finding", "selecting" or "looking for" professionals,
+  and never claim to have found any. Say the request is being published and that
+  interested professionals will send their proposals.`;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Keyword-based mock categorizer
@@ -217,12 +222,14 @@ function mockCategorize(query: string, locale: string): ParsedQuery {
             ? locale === 'pt' ? prof.pt : prof.en
             : locale === 'pt' ? 'profissionais' : 'professionals';
         const urgencyStr = urgency === 'Urgent'
-            ? locale === 'pt' ? 'disponíveis agora mesmo' : 'available right now'
+            ? locale === 'pt' ? 'com prioridade urgente' : 'flagged as urgent'
             : locale === 'pt' ? `em ${city}` : `in ${city}`;
 
+        // Describes publishing, not searching — this product never shows the client
+        // a list of professionals to pick from. Keep it consistent with SYSTEM_PROMPT.
         responseMessage = locale === 'pt'
-            ? `✅ Encontrei os melhores ${profStr} ${urgencyStr} para ti. O primeiro a aceitar fica com o trabalho.`
-            : `✅ I found the top ${profStr} ${urgencyStr} for you. The first to accept gets the job.`;
+            ? `✅ Publiquei o teu pedido ${urgencyStr}. Os ${profStr} da tua zona vão ver isto e enviar-te propostas.`
+            : `✅ I've posted your request ${urgencyStr}. ${profStr.charAt(0).toUpperCase()}${profStr.slice(1)} in your area will see it and send you proposals.`;
     }
 
     return { category, subcategory, type: isProduct ? 'product' : 'service', urgency, budget, tags, city, responseMessage };
@@ -446,49 +453,13 @@ export async function POST(request: Request) {
 
         await dbConnect();
 
-        // ── 2. Find matching Pros (services only) ──────────────────────────
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let pros: any[] = [];
-
-        if (parsed.type === 'service') {
-            const catFilter = parsed.subcategory && parsed.subcategory !== 'general'
-                ? { proCategory: parsed.subcategory }
-                : {};
-
-            // Slot 1 — Sponsored AI Match (Quality Gate): hasSponsoredSpot=true AND rating≥4.5
-            const sponsored = await UserModel.findOne({
-                role: 'pro',
-                hasSponsoredSpot: true,
-                rating: { $gte: 4.5 },
-                ...catFilter,
-            })
-                .select('name rating proCategory isVerified hasSponsoredSpot avatar locationLabel')
-                .lean();
-
-            // Slots 2–3 — Organic: best-rated in category (excluding sponsored)
-            const organicFilter = {
-                role: 'pro',
-                ...(sponsored ? { _id: { $ne: (sponsored as { _id: unknown })._id } } : {}),
-                ...catFilter,
-            };
-            const organic = await UserModel.find(organicFilter)
-                .select('name rating proCategory isVerified hasSponsoredSpot avatar locationLabel')
-                .sort({ rating: -1 })
-                .limit(sponsored ? 2 : 3)
-                .lean();
-
-            pros = [
-                ...(sponsored ? [{ ...sponsored, isSponsored: true }] : []),
-                ...organic.map(p => ({ ...p, isSponsored: false })),
-            ];
-
-            // ── Fallback: DB has no pros yet → serve mock roster ──────────
-            if (pros.length === 0) {
-                pros = MOCK_PROS[parsed.subcategory] ?? MOCK_PROS_GENERIC;
-            }
-        }
-
-        // ── 3. Persist request to DB (only if user is logged in) ──────────
+        // ── 2. Persist request to DB (only if user is logged in) ──────────
+        // NOTE: this route deliberately does NOT search for or return professionals.
+        // Needer is a reverse marketplace: the client posts a need and pros come to
+        // them. Showing the client a ranked list of pros to browse inverted that and
+        // made the product a directory. The AI's job here is to turn a messy sentence
+        // into a well-categorized, well-tagged post so pros can FIND it in the feed.
+        // Don't reintroduce pro matching here.
         let requestId: string | undefined;
         const session = await getServerSession(authOptions);
 
@@ -515,25 +486,32 @@ export async function POST(request: Request) {
                 const persistedRequestId = doc._id.toString();
                 requestId = persistedRequestId;
 
-                // Auto-inject mock proposals for demo completeness
-                if (pros.length > 0 && pros[0]._id?.toString().startsWith('mock-')) {
-                    injectMockProposals(persistedRequestId, pros as MockPro[], locale, parsed.budget ?? 0);
-                }
-
-                // Notify real pros whose proCategory matches this request (independent of the
-                // display-limited `pros` slots, which may be capped/mock — notify everyone who qualifies)
+                // This is the whole reverse-marketplace mechanic: the request is now
+                // live in the public feed, and every pro in the category gets pinged
+                // to go bid on it.
                 if (parsed.type === 'service') {
                     const matchingPros = await UserModel.find({ role: 'pro', proCategory: parsed.subcategory })
                         .select('_id')
                         .lean();
 
-                    const notifyContent = locale === 'pt'
-                        ? `Novo pedido na tua categoria: "${query.slice(0, 80)}"`
-                        : `New request in your category: "${query.slice(0, 80)}"`;
+                    if (matchingPros.length > 0) {
+                        const notifyContent = locale === 'pt'
+                            ? `Novo pedido na tua categoria: "${query.slice(0, 80)}"`
+                            : `New request in your category: "${query.slice(0, 80)}"`;
 
-                    await Promise.all(
-                        matchingPros.map(p => createNotification(p._id.toString(), 'new_request', notifyContent, persistedRequestId))
-                    );
+                        await Promise.all(
+                            matchingPros.map(p => createNotification(p._id.toString(), 'new_request', notifyContent, persistedRequestId))
+                        );
+                    } else {
+                        // No real pros in this category yet, so nobody would ever bid and
+                        // the request would sit dead forever — which makes the whole product
+                        // look broken in development. Fall back to the mock roster so the
+                        // post → proposals → compare → accept loop stays walkable.
+                        // Previously this was keyed off the (now removed) display list of
+                        // matched pros; it's keyed off real-pro absence directly instead.
+                        const mockPros = MOCK_PROS[parsed.subcategory] ?? MOCK_PROS_GENERIC;
+                        injectMockProposals(persistedRequestId, mockPros, locale, parsed.budget ?? 0);
+                    }
                 }
             } catch (err) {
                 // Don't crash the AI response if request persistence fails
@@ -551,7 +529,6 @@ export async function POST(request: Request) {
             budget: parsed.budget,
             tags: parsed.tags,
             city: parsed.city,
-            pros,
             requestId,
             isProduct: parsed.type === 'product',
             usingLiveAI, // debug flag — can remove in production

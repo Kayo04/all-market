@@ -192,7 +192,7 @@ export default function ClientDashboard() {
               cursor: 'pointer', fontFamily: 'var(--font-sans)',
             }}>
               <Sparkles size={14} />
-              {t('Find a Professional', 'Encontrar um Profissional')}
+              {t('Post a request', 'Criar pedido')}
             </button>
           </Link>
         </Card>

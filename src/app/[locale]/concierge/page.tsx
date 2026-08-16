@@ -3,29 +3,23 @@
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useLocale } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
-import { Link, useRouter } from '@/i18n/navigation';
-import { ArrowLeft, Star, CheckCircle, Zap, Send, Shield, Award, ExternalLink } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
+import { ArrowLeft, CheckCircle, Zap, Send, ExternalLink } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
-interface Pro {
-  _id: string;
-  name: string;
-  rating: number;
-  proCategory: string;
-  isVerified: boolean;
-  hasSponsoredSpot: boolean;
-  isSponsored: boolean;
-  locationLabel: string;
-}
-
 interface ResultBlockData {
   query: string;
   message: string;
-  pros: Pro[];
   urgency: string;
+  category?: string;
+  tags?: string[];
+  city?: string;
   requestId?: string;
+  /** The request call itself failed. Distinct from "no requestId because the
+   *  visitor isn't signed in" — those need different messages. */
+  failed?: boolean;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -54,8 +48,8 @@ const SUGGESTIONS = {
 function ScanningState({ locale }: { locale: string }) {
   const [step, setStep] = useState(0);
   const steps = locale === 'pt'
-    ? ['A verificar profissionais disponíveis…', 'A analisar avaliações e certificações…', 'A selecionar os melhores para si…']
-    : ['Scanning available professionals…', 'Analysing ratings and certifications…', 'Selecting the best matches for you…'];
+    ? ['A perceber o teu pedido…', 'A escolher a categoria certa…', 'A publicar para os profissionais…']
+    : ['Understanding your request…', 'Picking the right category…', 'Publishing it for professionals…'];
 
   useEffect(() => {
     const t = setInterval(() => setStep(s => (s + 1) % steps.length), 1600);
@@ -91,159 +85,17 @@ function ScanningState({ locale }: { locale: string }) {
         </span>
       </div>
 
-      {/* Skeleton pro cards */}
-      {[0, 1, 2].map(i => (
-        <div key={i} style={{
-          height: '80px', borderRadius: '14px',
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.07)',
-          marginBottom: '10px',
-          animation: `shimmer 1.6s ease-in-out ${i * 0.15}s infinite`,
-        }} />
-      ))}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Trust badge helper
-// ─────────────────────────────────────────────────────────────────────────────
-function TrustBadge({ isSponsored, locale }: { isSponsored: boolean; locale: string }) {
-  if (isSponsored) {
-    return (
-      <div style={{
-        display: 'inline-flex', alignItems: 'center', gap: '5px',
-        padding: '3px 9px', borderRadius: '6px',
-        background: 'rgba(255,255,255,0.07)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        fontSize: '10px', fontWeight: 700, letterSpacing: '0.05em',
-        color: 'rgba(255,255,255,0.70)', textTransform: 'uppercase',
-      }}>
-        <Shield size={9} />
-        {locale === 'pt' ? 'Parceiro Premium' : 'Premium Partner'}
+      {/* Skeleton tag chips — mirrors the "what I understood" block that lands here */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px' }}>
+        {[74, 96, 60, 112].map((w, i) => (
+          <div key={i} style={{
+            height: '26px', width: `${w}px`, borderRadius: 'var(--radius-full)',
+            background: 'rgba(255,255,255,0.04)',
+            border: '1px solid rgba(255,255,255,0.07)',
+            animation: `shimmer 1.6s ease-in-out ${i * 0.15}s infinite`,
+          }} />
+        ))}
       </div>
-    );
-  }
-  return null;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Pro card
-// ─────────────────────────────────────────────────────────────────────────────
-function ProCard({ pro, index, locale, requestId, query }: { pro: Pro; index: number; locale: string; requestId?: string; query: string }) {
-  const [hovered, setHovered] = useState(false);
-  const router = useRouter();
-
-  return (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display: 'flex', alignItems: 'center', gap: '16px',
-        padding: '18px 20px',
-        background: hovered ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.025)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: '14px',
-        transition: 'background 0.2s ease, border-color 0.2s ease',
-        cursor: 'pointer',
-        animation: `riseIn 0.35s ease ${index * 0.08}s both`,
-        borderColor: hovered ? 'rgba(255,255,255,0.14)' : 'rgba(255,255,255,0.08)',
-      }}
-    >
-      {/* Rank number */}
-      <span style={{
-        fontSize: '11px', fontWeight: 700,
-        color: index === 0 ? 'rgba(255,255,255,0.55)' : 'rgba(255,255,255,0.22)',
-        width: '18px', flexShrink: 0, textAlign: 'center',
-        fontVariantNumeric: 'tabular-nums',
-      }}>
-        {index + 1}
-      </span>
-
-      {/* Avatar */}
-      <div style={{
-        width: '44px', height: '44px', borderRadius: '12px', flexShrink: 0,
-        background: index === 0
-          ? 'linear-gradient(135deg, #1a1a1a, #2d2d2d)'
-          : 'rgba(255,255,255,0.06)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '16px', fontWeight: 800, color: 'rgba(255,255,255,0.75)',
-        border: index === 0 ? '1px solid rgba(255,255,255,0.15)' : 'none',
-      }}>
-        {pro.name.charAt(0)}
-      </div>
-
-      {/* Info */}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '5px', flexWrap: 'wrap' }}>
-          <Link
-            href={`/users/${pro._id}`}
-            style={{
-              fontSize: '14px', fontWeight: 600, color: '#ffffff',
-              whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
-              textDecoration: 'none', borderBottom: '1px solid transparent',
-              transition: 'border-color 0.15s ease',
-            }}
-            onMouseEnter={e => (e.currentTarget as HTMLElement).style.borderBottomColor = 'rgba(255,255,255,0.4)'}
-            onMouseLeave={e => (e.currentTarget as HTMLElement).style.borderBottomColor = 'transparent'}
-            onClick={e => e.stopPropagation()}
-          >
-            {pro.name}
-          </Link>
-          {pro.isVerified && (
-            <span style={{
-              display: 'inline-flex', alignItems: 'center', gap: '3px',
-              fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.45)',
-              letterSpacing: '0.04em',
-            }}>
-              <CheckCircle size={10} /> {locale === 'pt' ? 'Verificado' : 'Verified'}
-            </span>
-          )}
-          <TrustBadge isSponsored={pro.isSponsored} locale={locale} />
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Star size={11} fill="#ffffff" color="#ffffff" style={{ opacity: 0.7 }} />
-            <span style={{ fontSize: '12px', fontWeight: 600, color: 'rgba(255,255,255,0.65)' }}>
-              {pro.rating.toFixed(1)}
-            </span>
-          </div>
-          <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.28)' }}>·</span>
-          <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.38)' }}>{pro.locationLabel}</span>
-          {index === 0 && (
-            <>
-              <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.28)' }}>·</span>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
-                <Award size={10} color="rgba(255,255,255,0.45)" />
-                <span style={{ fontSize: '11px', color: 'rgba(255,255,255,0.45)', fontWeight: 600 }}>
-                  {locale === 'pt' ? 'Top Rated' : 'Top Rated'}
-                </span>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* CTA */}
-      <button 
-        onClick={() => {
-          if (requestId) {
-            router.push(`/requests/${requestId}`);
-          } else {
-            router.push(`/auth/login?redirect=/concierge&q=${encodeURIComponent(query)}`);
-          }
-        }}
-        style={{
-        padding: '9px 18px', flexShrink: 0,
-        background: hovered ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.07)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        borderRadius: '9px', color: '#fff',
-        fontSize: '12px', fontWeight: 600, cursor: 'pointer',
-        transition: 'all 0.15s ease', whiteSpace: 'nowrap',
-        fontFamily: 'var(--font-sans)',
-      }}>
-        {locale === 'pt' ? 'Contactar' : 'Contact'}
-      </button>
     </div>
   );
 }
@@ -294,22 +146,36 @@ function ResultBlock({ block, locale, index }: { block: ResultBlockData; locale:
         {block.message}
       </p>
 
-      {/* Divider */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px',
-      }}>
-        <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          {locale === 'pt' ? `${block.pros.length} Profissionais encontrados` : `${block.pros.length} Professionals found`}
-        </span>
-        <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' }} />
-      </div>
+      {/* What the AI understood — these are the fields pros will search the feed by,
+          so showing them is a chance for the client to spot a miscategorisation. */}
+      {(block.category || (block.tags && block.tags.length > 0)) && (
+        <>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px',
+          }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              {locale === 'pt' ? 'O que percebi' : 'What I understood'}
+            </span>
+            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' }} />
+          </div>
 
-      {/* Pro cards */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-        {block.pros.map((pro, i) => (
-          <ProCard key={pro._id} pro={pro} index={i} locale={locale} requestId={block.requestId} query={block.query} />
-        ))}
-      </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px', marginBottom: '4px' }}>
+            {[block.category, block.city, ...(block.tags ?? [])]
+              .filter((t): t is string => Boolean(t))
+              .map((tag, i) => (
+                <span key={`${tag}-${i}`} style={{
+                  padding: '5px 11px', borderRadius: 'var(--radius-full)',
+                  background: 'rgba(255,255,255,0.05)',
+                  border: '1px solid rgba(255,255,255,0.09)',
+                  fontSize: '11px', fontWeight: 600,
+                  color: 'rgba(255,255,255,0.55)',
+                }}>
+                  {tag}
+                </span>
+              ))}
+          </div>
+        </>
+      )}
 
       {/* Confirmation / View Request */}
       {block.requestId && (
@@ -355,6 +221,43 @@ function ResultBlock({ block, locale, index }: { block: ResultBlockData; locale:
           >
             <ExternalLink size={12} />
             {locale === 'pt' ? 'Ver pedido e propostas →' : 'View request & proposals →'}
+          </Link>
+        </div>
+      )}
+
+      {/* Signed out: the AI understood the need but nothing was saved, because
+          persistence requires a userId. Say so — silently dropping the request
+          leaves the visitor thinking they posted something that doesn't exist. */}
+      {!block.requestId && !block.failed && (
+        <div style={{
+          marginTop: '20px', padding: '18px 20px',
+          background: 'rgba(255,255,255,0.04)',
+          border: '1px solid rgba(255,255,255,0.10)',
+          borderRadius: '12px',
+          animation: 'riseIn 0.35s ease 0.3s both',
+        }}>
+          <p style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.85)', marginBottom: '6px' }}>
+            {locale === 'pt' ? 'Falta só entrares na conta' : 'One step left — sign in'}
+          </p>
+          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', marginBottom: '14px', lineHeight: 1.6 }}>
+            {locale === 'pt'
+              ? 'Para publicares este pedido e receberes propostas, precisas de ter sessão iniciada. O teu pedido ainda não foi guardado.'
+              : 'To post this request and start receiving proposals you need to be signed in. Your request has not been saved yet.'}
+          </p>
+          <Link
+            href={`/auth/signin?callbackUrl=${encodeURIComponent(`/${locale}/concierge?q=${encodeURIComponent(block.query)}`)}`}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              padding: '8px 16px',
+              background: 'rgba(255,255,255,0.10)',
+              border: '1px solid rgba(255,255,255,0.16)',
+              borderRadius: '8px',
+              fontSize: '12px', fontWeight: 600,
+              color: 'rgba(255,255,255,0.85)',
+              textDecoration: 'none',
+            }}
+          >
+            {locale === 'pt' ? 'Entrar e publicar →' : 'Sign in & post →'}
           </Link>
         </div>
       )}
@@ -409,18 +312,20 @@ function ConciergePage() {
       setResults(prev => [...prev, {
         query: q,
         message: data.message,
-        pros: data.pros ?? [],
         urgency: data.urgency,
+        category: data.subcategory ?? data.category,
+        tags: data.tags ?? [],
+        city: data.city,
         requestId: data.requestId,
       }]);
     } catch {
       setResults(prev => [...prev, {
         query: q,
         message: locale === 'pt'
-          ? 'Não foi possível completar a pesquisa. Tenta novamente.'
-          : 'Could not complete the search. Please try again.',
-        pros: [],
+          ? 'Não foi possível publicar o pedido. Tenta novamente.'
+          : 'Could not post your request. Please try again.',
         urgency: 'Normal',
+        failed: true,
       }]);
     } finally {
       setLoading(false);

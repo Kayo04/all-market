@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What is this
 
-Needer is an AI-powered concierge marketplace (reverse marketplace): a user describes a need in natural language, the AI categorizes it and matches professionals, and pros pitch to the buyer (buyer has the power, not the searcher). See `NEEDER_PROJECT_BIBLE.md` for the full product/architecture spec — read it before making non-trivial changes, it is the source of truth for this project.
+Needer is an AI-powered reverse marketplace: a user describes a need in natural language, the AI categorizes and tags it, the request is published to a public feed, and professionals come to the client with proposals. See `NEEDER_PROJECT_BIBLE.md` for the full product/architecture spec — read it before making non-trivial changes, it is the source of truth for this project.
+
+**The product never shows a client a list of professionals to browse.** The thing on display is *demand* (open requests), not supply. The homepage feed and the search bar both search requests; pros scan them for work to bid on. An earlier version returned ranked pro cards from `ai-match` and was removed on purpose (2026-08-16) — it made the product a directory, which is the exact dynamic this marketplace exists to invert. Do not reintroduce pro search, pro ranking, or a pro directory.
 
 ## Commands
 
@@ -27,8 +29,9 @@ There is no test suite configured in this repo.
 - `src/proxy.ts` is the routing middleware (Next.js 16 renamed the `middleware.ts` convention to `proxy.ts`) — it wraps `next-intl`'s middleware and matches all paths except API/static routes.
 - MongoDB via Mongoose. Models are in `src/lib/models/` (`User`, `Request`, `Proposal`, `Notification`, `Message`, `ProposalDraft`). Connection is a cached singleton in `src/lib/db.ts`.
 - Auth is NextAuth Credentials + JWT (30-day sessions). Session carries `id`, `name`, `email`, `role`, `isVerified`. Changing a user's `role` in the DB requires them to log out/in since it's baked into the JWT.
-- The core product logic is the AI match engine at `src/app/api/ai-match/route.ts`: categorizes the query, finds/ranks pros (sponsored slot first, then organic by rating), falls back to a hardcoded mock pro roster per category if no real pros exist, and persists the request. Without `GEMINI_API_KEY` it uses a keyword-based mock categorizer (`mockCategorize()`) instead of calling Gemini — this is the normal/expected dev mode. Gemini (not OpenAI) was chosen because its free tier needs no billing/payment method.
-- Mock proposal injection: when mock pros are used, the system upserts them as real `User` documents (emails like `*@mock.needer.com`) 3–10s after a match, so `Proposal` documents can reference valid ObjectIds. Don't assume mock pro IDs (e.g. `'mock-plumb-1'`) are valid ObjectIds anywhere else — they only become real after upsert.
+- The core product logic is at `src/app/api/ai-match/route.ts`, which despite the name no longer matches pros: it categorizes the query, persists the request, and notifies every pro whose `proCategory` matches so they come and bid. Without `GEMINI_API_KEY` it uses a keyword-based mock categorizer (`mockCategorize()`) instead of calling Gemini — this is the normal/expected dev mode. Gemini (not OpenAI) was chosen because its free tier needs no billing/payment method.
+- Mock proposal injection: when a request's category has **no real pros at all**, the system fabricates proposals from the `MOCK_PROS` roster, upserting those pros as real `User` documents (emails like `*@mock.needer.com`) 3–10s later, so `Proposal` documents can reference valid ObjectIds. Without this the post → proposals → compare → accept loop is unwalkable on a fresh DB. Don't assume mock pro IDs (e.g. `'mock-plumb-1'`) are valid ObjectIds anywhere else — they only become real after upsert.
+- The public needs feed is `GET /api/requests` (no session required for open requests) — it backs both `/[locale]/requests` and the homepage `LiveNeedsFeed`. Free-text search is the `q` param and runs in MongoDB; don't move it back into the client, which can only ever filter the current page of results.
 - Categories (12, each with 2–4 subcategories, EN/PT labels) are defined centrally in `src/lib/categories.ts` — this is the single place category taxonomy changes.
 - Next.js 16: `params` in route handlers is a Promise — must `await params` before destructuring.
 

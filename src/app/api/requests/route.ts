@@ -18,6 +18,7 @@ export async function GET(request: Request) {
         const lng = searchParams.get('lng');
         const lat = searchParams.get('lat');
         const radius = searchParams.get('radius'); // in km
+        const q = searchParams.get('q')?.trim();
         const page = parseInt(searchParams.get('page') || '1');
         const limit = parseInt(searchParams.get('limit') || '20');
         const skip = (page - 1) * limit;
@@ -37,6 +38,23 @@ export async function GET(request: Request) {
 
         if (category) {
             query.category = category;
+        }
+
+        // Free-text search across the fields a browsing pro would actually scan.
+        // This has to run in the DB, not client-side: the page only holds one
+        // `limit`-sized slice, so filtering in the browser silently searches the
+        // most recent 20 requests and hides everything older.
+        // Input is escaped — an unescaped user string is a valid regex, so
+        // something like "(((" throws and a ".*.*.*" pattern is a cheap DoS.
+        if (q) {
+            const safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const rx = new RegExp(safe, 'i');
+            query.$or = [
+                { title: rx },
+                { description: rx },
+                { aiTags: rx },
+                { locationLabel: rx },
+            ];
         }
 
         // Geospatial query: find requests near a point

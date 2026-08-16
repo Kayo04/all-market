@@ -77,11 +77,15 @@ export default function BrowseRequestsPage() {
   const [searchTerm, setSearchTerm] = useState(urlQuery);
   const prevCountRef = useRef(0);
 
-  const fetchRequests = useCallback(async (category?: string) => {
+  const fetchRequests = useCallback(async (category?: string, q?: string) => {
     setLoading(true);
     try {
       const params = new URLSearchParams({ status: 'open', limit: '50' });
       if (category) params.set('category', category);
+      // Search runs in the DB, not here: this page only ever holds one 50-item
+      // slice, so filtering locally would quietly search the 50 newest requests
+      // and hide every older match.
+      if (q) params.set('q', q);
       const res = await fetch(`/api/requests?${params}`);
       if (res.ok) {
         const data = await res.json();
@@ -100,11 +104,21 @@ export default function BrowseRequestsPage() {
   }, []);
 
   useEffect(() => {
-    fetchRequests(selectedCategory || undefined);
+    // Debounced: searchTerm changes on every keystroke and each change now hits
+    // the database, so firing per character would be a request storm.
+    const debounce = setTimeout(() => {
+      fetchRequests(selectedCategory || undefined, searchTerm || undefined);
+    }, 300);
     // Poll every 30s so new urgent jobs appear live
-    const interval = setInterval(() => fetchRequests(selectedCategory || undefined), 30000);
-    return () => clearInterval(interval);
-  }, [selectedCategory, fetchRequests]);
+    const interval = setInterval(
+      () => fetchRequests(selectedCategory || undefined, searchTerm || undefined),
+      30000
+    );
+    return () => {
+      clearTimeout(debounce);
+      clearInterval(interval);
+    };
+  }, [selectedCategory, searchTerm, fetchRequests]);
 
   const getCategoryLabel = (key: string) => {
     const cat = categories.find((c) => c.key === key);
@@ -122,14 +136,9 @@ export default function BrowseRequestsPage() {
     return `${Math.floor(hours / 24)}d`;
   };
 
-  // Filter client-side — both services and products show here
-  const filtered = requests.filter((r) => {
-    if (!searchTerm) return true;
-    return (
-      r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      r.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  });
+  // Search and category filtering both happen server-side now (see fetchRequests),
+  // so what arrives is already the result set.
+  const filtered = requests;
 
   // Urgent first, then by date
   const sorted = [...filtered].sort((a, b) => {
