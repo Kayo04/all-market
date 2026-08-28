@@ -10,11 +10,13 @@ Needer is an **AI-powered Concierge Marketplace** (Reverse Marketplace). It is N
 
 **How it works:**
 1. The user types a raw need in natural language: *"My bathroom lamp sparked, need an electrician"*
-2. The **Needer AI** instantly categorizes the request, determines urgency, and finds matching professionals
+2. The **Needer AI** instantly categorizes the request, determines urgency, and **publishes it to the public feed**
 3. Professionals receive the request and **pitch to the buyer** (reverse marketplace — buyer has the power)
 4. The buyer reviews proposals, accepts one, the job happens, and then they leave a review
 
-**Key differentiator:** Users never search, browse, or fill forms. They just describe what they need and the AI handles everything.
+**Key differentiator:** The buyer never searches, browses, or filters a list of professionals. They describe what they need; the AI files it; the pros come to them.
+
+**What is on display is demand, not supply.** The homepage feed and the search bar both search *open requests* — what other people need right now. Professionals scan that feed for work to bid on. An earlier version of `ai-match` returned ranked pro cards; it was removed on purpose on 2026-08-16 because it made Needer a directory, which is the exact dynamic this marketplace exists to invert. Do not reintroduce pro search, pro ranking, or a pro directory.
 
 ---
 
@@ -85,7 +87,7 @@ e:\Needer.com\all-market\
 │   │   │   ├── pro/             ← Pro landing page
 │   │   │   └── profile/         ← User's own profile
 │   │   └── api/
-│   │       ├── ai-match/        ← ⭐ POST: AI categorization + pro matching
+│   │       ├── ai-match/        ← ⭐ POST: AI categorization + publish + notify pros
 │   │       ├── auth/
 │   │       │   ├── [...nextauth]/ ← NextAuth config (JWT, credentials)
 │   │       │   └── register/    ← POST: User registration
@@ -189,22 +191,23 @@ content, readStatus, relatedId
 
 ---
 
-## 6. The AI Match Engine (`/api/ai-match`)
+## 6. The Intake Engine (`/api/ai-match`)
 
-This is the **core of the product**. It has two modes:
+This is the **core of the product**. Despite the legacy route name it does not match professionals to a buyer — it turns a sentence into a filed, categorized, publicly visible request and then tells the relevant pros to come bid. It has two modes:
 
 ### Mode 1: Mock (default — no GEMINI_API_KEY)
 A keyword-based router (`mockCategorize()`) that pattern-matches the user query to categories. Works for demo/dev without any API key.
 
 ### Mode 2: Live AI (when GEMINI_API_KEY is set)
-Calls Gemini (`gemini-2.0-flash`) with a structured system prompt. Falls back to mock on any error. Gemini was chosen over OpenAI because its free tier requires no billing/payment method.
+Calls Gemini (`gemini-flash-latest`) with a structured system prompt. Falls back to mock on any error. Gemini was chosen over OpenAI because its free tier requires no billing/payment method.
 
-### The matching flow:
+### The intake flow:
 1. **Categorize** the query → `{ category, subcategory, urgency, budget, city, tags }`
-2. **Find pros** in DB: Slot 1 = Sponsored (hasSponsoredSpot + rating ≥ 4.5), Slots 2-3 = Organic (best rated)
-3. **Fallback** if no real pros exist → serve mock roster (hardcoded demo pros per category)
-4. **Persist request** to DB if user is logged in
-5. **Inject mock proposals** (3-10s delay) if using mock pros → creates real User docs + Proposal docs in DB
+2. **Persist request** to DB if the user is logged in (signed-out visitors get a sign-in CTA that preserves their query)
+3. **Notify every pro** whose `proCategory` matches, so they come to the request and pitch
+4. **Inject mock proposals** (3-10s delay) *only when the category has no real pros at all* — otherwise the post → proposals → compare → accept loop is unwalkable on a fresh DB
+
+Step 2 of the old flow — picking pro cards to show the buyer (Slot 1 sponsored, Slots 2-3 organic) — was **deleted on 2026-08-16**. `responseMessage` must describe the request being *posted*; the system prompt forbids "searching"/"finding"/"selecting" professionals, because saying so would promise a directory the product deliberately doesn't have.
 
 ### Mock Pro Roster Categories:
 electricians, plumbers, painters, locksmiths, house-cleaning, office-cleaning, websites, mechanic, personal-trainers + a generic fallback
@@ -215,7 +218,7 @@ electricians, plumbers, painters, locksmiths, house-cleaning, office-cleaning, w
 
 | Revenue Stream | How it works |
 |----------------|-------------|
-| **Sponsored AI Match** | Pro pays to always appear as Slot #1 in AI results. Quality gate: must have rating ≥ 4.5 |
+| **Sponsored AI Match** | Pro pays for priority placement. Quality gate: must have rating ≥ 4.5. **⚠️ Homeless since 2026-08-16** — its only rendering surface was the deleted pro-card list; `hasSponsoredSpot` is still read by the code but is currently displayed nowhere. Needs a new surface (e.g. ranking inside a request's proposal list) before billing ships. |
 | **Sniper Bidding** | Product sellers pay for 1-hour early access to new requests before they go public |
 | **Commission** | Future: % cut on accepted proposals |
 
@@ -257,15 +260,15 @@ Each has 2-4 subcategories with EN/PT labels. Defined in `src/lib/categories.ts`
 ## 10. What Has Been Built (Complete ✅)
 
 ### Phase 1: The Cliff Fix
-Fixed the dead-end after AI matching. The user now flows seamlessly from search to job confirmation.
+Fixed the dead-end after intake. The user now flows seamlessly from posting a request to job confirmation.
 
 | Feature | Files | What it does |
 |---------|-------|-------------|
 | **AI Concierge** | `concierge/page.tsx` | Chat-like interface, type need → get pro cards |
 | **Pro Profile** | `users/[id]/page.tsx` | Premium trust page: bio, stats, reviews, skills, CTA |
-| **Confirmation** | `concierge/page.tsx` | Green "Request posted!" banner after match |
+| **Confirmation** | `concierge/page.tsx` | Green "Request posted!" banner after the request is filed |
 | **Proposals Inbox** | `requests/[id]/page.tsx` | See incoming proposals, accept/reject, 15s auto-polling |
-| **Mock Injection** | `api/ai-match/route.ts` | Auto-creates fake proposals 3-10s after match for demo |
+| **Mock Injection** | `api/ai-match/route.ts` | Auto-creates fake proposals 3-10s after the request is filed for demo |
 | **Request API** | `api/requests/[id]/route.ts` | GET single request, PATCH mark complete |
 | **Proposal API** | `api/proposals/[id]/route.ts` | PUT accept/reject with notifications |
 
@@ -281,7 +284,7 @@ Added the post-acceptance lifecycle.
 
 ### The Complete User Loop (Verified End-to-End):
 ```
-Search "I need a plumber" → AI matches 3 pros → Green confirmation
+Post "I need a plumber" → AI categorizes and publishes it → Green confirmation
 → "View request & proposals" → Proposals arrive (3-10s)
 → Accept one → "Professional Assigned!" + "Mark as Complete" button
 → Click complete → "Job Complete!" + Review form
@@ -321,7 +324,7 @@ Made professionals real participants instead of mock data.
 
 ### Phase 4: Real AI (NEXT)
 - Add `GEMINI_API_KEY` to `.env`
-- The code already has the full Gemini integration (`geminiCategorize()` function, using the free-tier `gemini-2.0-flash` model — no billing required)
+- The code already has the full Gemini integration (`geminiCategorize()` function, using the free-tier `gemini-flash-latest` model — no billing required)
 - Just needs the key — everything else is wired
 
 ### Phase 5: Payment & Billing
@@ -380,7 +383,7 @@ http://localhost:3000
 ## 16. Summary
 
 **Needer is an AI-first marketplace where buyers describe what they need and professionals compete to serve them.** Both sides of the marketplace are now functional:
-- **Client side** (Phase 1+2): search → match → proposals → accept → complete → review ✅
+- **Client side** (Phase 1+2): post → publish → proposals → accept → complete → review ✅
 - **Pro side** (Phase 3): register as pro → onboarding wizard → dashboard with real stats → submit proposals on open requests ✅
 
 The next steps are Phase 4 (real Gemini integration), Phase 5 (Stripe payments), and Phase 6 (production polish).
