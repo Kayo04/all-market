@@ -61,7 +61,7 @@ export default function LiveNeedsFeed() {
     };
 
     // An empty feed on a marketing page looks broken, so render nothing at all
-    // rather than an empty "what people need today" heading with a void beneath it.
+    // rather than an empty "Pedidos recentes" heading with a void beneath it.
     if (!loading && items.length === 0) return null;
 
     return (
@@ -104,7 +104,7 @@ export default function LiveNeedsFeed() {
                             letterSpacing: '-0.02em',
                             color: 'var(--text-primary)',
                         }}>
-                            {locale === 'pt' ? 'O que as pessoas precisam hoje' : 'What people need today'}
+                            {locale === 'pt' ? 'Pedidos recentes' : 'Recent requests'}
                         </h2>
                     </div>
 

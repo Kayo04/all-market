@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocale } from 'next-intl';
-import { useRouter } from '@/i18n/navigation';
+import { useRouter, Link } from '@/i18n/navigation';
 import { Search } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -172,8 +172,8 @@ export default function HeroSection() {
                         }}
                     >
                         {locale === 'pt'
-                            ? <>O que <em style={{ color: '#7fd1a0', fontStyle: 'italic', fontWeight: 500 }}>precisas</em> hoje?</>
-                            : <>What do you <em style={{ color: '#7fd1a0', fontStyle: 'italic', fontWeight: 500 }}>need</em> today?</>}
+                            ? <>O que as pessoas <em style={{ color: '#7fd1a0', fontStyle: 'italic', fontWeight: 500 }}>precisam</em> hoje?</>
+                            : <>What do people <em style={{ color: '#7fd1a0', fontStyle: 'italic', fontWeight: 500 }}>need</em> today?</>}
                     </h1>
 
                     {/* Subtitle */}
@@ -313,6 +313,19 @@ export default function HeroSection() {
                                 {s}
                             </button>
                         ))}
+                    </div>
+
+                    {/* Secondary path. The search above browses what OTHER people
+                        need; this is how you post your own. Without it the posting
+                        half of the marketplace only exists in the navbar. */}
+                    <div style={{ fontSize: '14px', color: 'rgba(255,255,255,0.5)' }}>
+                        {locale === 'pt' ? 'Precisas de alguma coisa? ' : 'Need something yourself? '}
+                        <Link
+                            href="/concierge"
+                            style={{ color: '#7fd1a0', fontWeight: 600, textDecoration: 'none' }}
+                        >
+                            {locale === 'pt' ? 'Criar pedido →' : 'Post a request →'}
+                        </Link>
                     </div>
                 </div>
             </div>
