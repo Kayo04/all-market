@@ -27,6 +27,23 @@ const SUGGESTIONS = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Background reel — the hero cycles through every clip instead of looping one.
+// Order is fixed so the sequence is predictable; add or remove files here only.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const HERO_VIDEOS = [
+    '/2239241-hd_1920_1080_24fps.mp4',
+    '/3768941-hd_1920_1080_25fps.mp4',
+    '/4941457-hd_1920_1080_25fps.mp4',
+    '/4974884-hd_1920_1080_25fps.mp4',
+    '/5234724-hd_1920_1080_25fps.mp4',
+    '/6764455-hd_1920_1080_30fps.mp4',
+    '/7989732-hd_1920_1080_25fps.mp4',
+];
+
+const FADE_MS = 1000;
+
+// ─────────────────────────────────────────────────────────────────────────────
 // HeroSection — reverse marketplace entry point (services AND products)
 // The search bar searches what PEOPLE NEED, not who's offering. It routes to
 // /requests?q=… (the needs feed). Posting your own need is a separate, deliberate
@@ -39,12 +56,37 @@ export default function HeroSection() {
     const router = useRouter();
     const [query, setQuery] = useState('');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
-    const videoRef = useRef<HTMLVideoElement>(null);
+
+    // Two stacked <video> slots: one on screen, one silently preloading the next
+    // clip. When the visible one ends we crossfade to its neighbour, then load the
+    // clip after that into the slot which just faded out — so the reel advances
+    // through the whole playlist without ever cutting to a blank frame.
+    const videoA = useRef<HTMLVideoElement>(null);
+    const videoB = useRef<HTMLVideoElement>(null);
+    const [srcs, setSrcs] = useState<[string, string]>([HERO_VIDEOS[0], HERO_VIDEOS[1]]);
+    const [active, setActive] = useState<0 | 1>(0);
+    const queued = useRef(1); // playlist index currently held by the hidden slot
 
     useEffect(() => {
-        if (videoRef.current) {
-            videoRef.current.play().catch(() => {});
-        }
+        const visible = active === 0 ? videoA : videoB;
+        visible.current?.play().catch(() => {});
+    }, [active]);
+
+    const advance = useCallback(() => {
+        setActive(previous => {
+            queued.current = (queued.current + 1) % HERO_VIDEOS.length;
+            const upcoming = HERO_VIDEOS[queued.current];
+            // Wait out the crossfade before swapping the outgoing slot's source,
+            // otherwise the clip fading away blinks to black halfway through.
+            window.setTimeout(() => {
+                setSrcs(current => {
+                    const next: [string, string] = [...current];
+                    next[previous] = upcoming;
+                    return next;
+                });
+            }, FADE_MS + 100);
+            return (1 - previous) as 0 | 1;
+        });
     }, []);
 
     // Searches the needs feed — what people are asking for — not professionals.
@@ -81,22 +123,29 @@ export default function HeroSection() {
                 overflow: 'hidden',
             }}
         >
-            {/* ── Video background ────────────────────────────────────── */}
-            <video
-                ref={videoRef}
-                muted
-                playsInline
-                loop
-                src="/2239241-hd_1920_1080_24fps.mp4"
-                style={{
-                    position: 'absolute',
-                    inset: 0,
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    zIndex: 0,
-                }}
-            />
+            {/* ── Video background — crossfading reel ──────────────────── */}
+            {([0, 1] as const).map(slot => (
+                <video
+                    key={slot}
+                    ref={slot === 0 ? videoA : videoB}
+                    muted
+                    playsInline
+                    preload="auto"
+                    src={srcs[slot]}
+                    onEnded={advance}
+                    onError={advance}
+                    style={{
+                        position: 'absolute',
+                        inset: 0,
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        opacity: active === slot ? 1 : 0,
+                        transition: `opacity ${FADE_MS}ms ease-in-out`,
+                        zIndex: 0,
+                    }}
+                />
+            ))}
 
             {/* ── Gradient overlay ─────────────────────────────────────── */}
             <div
