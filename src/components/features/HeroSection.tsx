@@ -176,7 +176,6 @@ export default function HeroSection() {
                         style={{
                             display: 'inline-flex',
                             alignItems: 'center',
-                            gap: '8px',
                             padding: '5px 14px',
                             background: 'rgba(255,255,255,0.06)',
                             border: '1px solid rgba(255,255,255,0.13)',
@@ -185,16 +184,6 @@ export default function HeroSection() {
                             marginBottom: '28px',
                         }}
                     >
-                        <span
-                            style={{
-                                display: 'inline-block',
-                                width: '7px',
-                                height: '7px',
-                                borderRadius: '50%',
-                                background: '#e08a4f',
-                                animation: 'pulseDot 2s ease-in-out infinite',
-                            }}
-                        />
                         <span
                             style={{
                                 fontSize: '12px',
@@ -379,12 +368,7 @@ export default function HeroSection() {
                 </div>
             </div>
 
-            {/* ── Keyframe for brand pill dot ───────────────────────────── */}
             <style>{`
-                @keyframes pulseDot {
-                    0%, 100% { opacity: 1; transform: scale(1); }
-                    50% { opacity: 0.4; transform: scale(0.75); }
-                }
                 section textarea::placeholder { color: rgba(255,255,255,0.28) !important; }
             `}</style>
         </section>
