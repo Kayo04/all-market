@@ -41,7 +41,6 @@ Needer is an **AI-powered Concierge Marketplace** (Reverse Marketplace). It is N
 MONGODB_URI=mongodb+srv://...@cluster0.5b2kgy4.mongodb.net/allmarket
 NEXTAUTH_SECRET=<secret>
 NEXTAUTH_URL=http://localhost:3000
-GEMINI_API_KEY=<optional — enables real AI categorization, free tier, no billing required>
 ```
 
 ---
@@ -193,13 +192,7 @@ content, readStatus, relatedId
 
 ## 6. The Intake Engine (`/api/ai-match`)
 
-This is the **core of the product**. Despite the legacy route name it does not match professionals to a buyer — it turns a sentence into a filed, categorized, publicly visible request and then tells the relevant pros to come bid. It has two modes:
-
-### Mode 1: Mock (default — no GEMINI_API_KEY)
-A keyword-based router (`mockCategorize()`) that pattern-matches the user query to categories. Works for demo/dev without any API key.
-
-### Mode 2: Live AI (when GEMINI_API_KEY is set)
-Calls Gemini (`gemini-flash-latest`) with a structured system prompt. Falls back to mock on any error. Gemini was chosen over OpenAI because its free tier requires no billing/payment method.
+This is the **core of the product**. Despite the legacy route name it does not match professionals to a buyer — it turns a sentence into a filed, categorized, publicly visible request and then tells the relevant pros to come bid. Categorization is a keyword-based router (`categorize()`) that pattern-matches the user query to categories. No LLM runs in this path — a Gemini integration was removed on 2026-09-13 at the owner's request.
 
 ### The intake flow:
 1. **Categorize** the query → `{ category, subcategory, urgency, budget, city, tags }`
@@ -322,10 +315,10 @@ Made professionals real participants instead of mock data.
 
 ### Phase 3: The Pro Side ✅ COMPLETE
 
-### Phase 4: Real AI (NEXT)
-- Add `GEMINI_API_KEY` to `.env`
-- The code already has the full Gemini integration (`geminiCategorize()` function, using the free-tier `gemini-flash-latest` model — no billing required)
-- Just needs the key — everything else is wired
+### Phase 4: Real AI — DROPPED (2026-09-13)
+The Gemini integration was built, ran live, and was then removed at the owner's
+request along with the AI proposal comparison. Categorization stays keyword-based.
+Don't reintroduce an LLM here without asking.
 
 ### Phase 5: Payment & Billing
 - Stripe integration for proposal payments
@@ -358,7 +351,7 @@ Made professionals real participants instead of mock data.
 2. **Next.js 16 params** — `params` in route handlers is a Promise and must be `await`ed: `const { id } = await params`
 3. **Mock ObjectIds** — mock pro IDs like `'mock-plumb-1'` are strings, not valid ObjectIds. The injection system now upserts them as real users first
 4. **Session role** — the `role` field is in the JWT token. If you change a user's role in the DB, they need to log out and back in
-5. **No Gemini key** — without `GEMINI_API_KEY` in `.env`, the AI match uses the keyword-based mock categorizer. This is fine for development
+5. **No LLM in the intake path** — categorization is keyword-based by design since 2026-09-13. `GEMINI_API_KEY` is no longer read anywhere.
 
 ---
 
@@ -386,7 +379,7 @@ http://localhost:3000
 - **Client side** (Phase 1+2): post → publish → proposals → accept → complete → review ✅
 - **Pro side** (Phase 3): register as pro → onboarding wizard → dashboard with real stats → submit proposals on open requests ✅
 
-The next steps are Phase 4 (real Gemini integration), Phase 5 (Stripe payments), and Phase 6 (production polish).
+The next steps are Phase 5 (Stripe payments) and Phase 6 (production polish). Phase 4 (real AI) was dropped.
 
 ### Test Accounts
 - **Client:** `testflow@needer.com` / `Test1234!`

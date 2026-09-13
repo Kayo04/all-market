@@ -23,42 +23,8 @@ interface ParsedQuery {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// AI system prompt
-// When GEMINI_API_KEY is present, this drives real Gemini calls.
-// The entire switch is in categorize() — no other code change needed.
-// ─────────────────────────────────────────────────────────────────────────────
-
-const SYSTEM_PROMPT = `You are Needer AI, a marketplace categorization engine. 
-Given a natural language request in any language, extract structured data and write a friendly response.
-
-Return ONLY a valid JSON object with this exact shape:
-{
-  "category": "home-repairs|tech-digital|tutoring|events|wellness|business|design|writing|cleaning|automotive|beauty|equipment",
-  "subcategory": "electricians|plumbers|painters|locksmiths|furniture-assembly|websites|social-media|computer-repair|math|english|music|exam-prep|photographers|djs|catering|venue-rental|personal-trainers|massage|dog-walking|accounting|legal|logo|illustration|copywriting|translation|house-cleaning|office-cleaning|mechanic|car-wash|hairdresser|makeup|automotive|gaming|smartphones|laptops|product",
-  "type": "service|product",
-  "urgency": "Normal|High|Urgent",
-  "budget": <number_in_euros_or_null>,
-  "tags": ["relevant", "keyword", "tags"],
-  "city": "<detected_city_or_Porto>",
-  "responseMessage": "<warm 1-2 sentence reply in the SAME language as the query>"
-}
-
-Rules:
-- urgency: "Urgent" = emergency/now/sparks/flood/broken; "High" = today/soon/this week; "Normal" = default
-- type: "product" when user wants to BUY a physical object; "service" when they need someone to DO something
-- when type is "product", category MUST be "equipment" (never a service category) — subcategory is "automotive" for vehicles, "gaming" for consoles/games, "smartphones" for phones, "laptops" for computers, or "product" for anything else
-- budget: extract the euro amount as a plain number (handle "k" as ×1000); null if not mentioned
-- city: detect Portuguese city names (Porto, Lisboa, Braga, Coimbra, Faro, Aveiro, Setúbal, Guimarães); default to "Porto"
-- responseMessage: empathetic, confirms understanding, mentions the city and urgency if relevant
-- responseMessage MUST describe the request being POSTED so professionals can send offers.
-  Needer does not search for or show professionals — they come to the client.
-  Never say you are "searching", "finding", "selecting" or "looking for" professionals,
-  and never claim to have found any. Say the request is being published and that
-  interested professionals will send their proposals.`;
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Keyword-based mock categorizer
-// Used when GEMINI_API_KEY is not set. Covers the 95% case for a PT marketplace.
+// Keyword-based categorizer
+// The only categorizer. Covers the 95% case for a PT marketplace.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const PROF_LABELS: Record<string, { en: string; pt: string }> = {
@@ -84,7 +50,7 @@ const PROF_LABELS: Record<string, { en: string; pt: string }> = {
     hairdresser: { en: 'hairdressers', pt: 'cabeleireiros' },
 };
 
-function mockCategorize(query: string, locale: string): ParsedQuery {
+function categorize(query: string, locale: string): ParsedQuery {
     const q = query.toLowerCase();
 
     // ── Type: product vs service ───────────────────────────────────────────
@@ -120,9 +86,14 @@ function mockCategorize(query: string, locale: string): ParsedQuery {
             : 'Normal';
 
     // ── Budget ─────────────────────────────────────────────────────────────
-    const budgetMatch = q.match(
-        /(?:under|below|max|up\s*to|até|abaixo\s*de|menos\s*de|máximo\s*de|€|eur)\s*(\d+(?:[.,]\d+)?)\s*(k|mil)?/i
-    );
+    // Two shapes, tried in order: a cue before the number ("até 150", "€150",
+    // "orçamento 150") and a currency after it ("150 euros"). The trailing form
+    // is how people actually write it in PT, and the LLM used to catch it.
+    const budgetMatch =
+        q.match(
+            /(?:under|below|max|up\s*to|budget|até|abaixo\s*de|menos\s*de|máximo\s*de|or[çc]amento(?:\s*de)?|€|eur)\s*:?\s*(\d+(?:[.,]\d+)?)\s*(k|mil)?/i
+        ) ??
+        q.match(/(\d+(?:[.,]\d+)?)\s*(k|mil)?\s*(?:€|eur(?:os?)?)/i);
     let budget: number | null = null;
     if (budgetMatch) {
         budget = parseFloat(budgetMatch[1].replace(',', '.'));
@@ -226,76 +197,13 @@ function mockCategorize(query: string, locale: string): ParsedQuery {
             : locale === 'pt' ? `em ${city}` : `in ${city}`;
 
         // Describes publishing, not searching — this product never shows the client
-        // a list of professionals to pick from. Keep it consistent with SYSTEM_PROMPT.
+        // a list of professionals to pick from.
         responseMessage = locale === 'pt'
             ? `✅ Publiquei o teu pedido ${urgencyStr}. Os ${profStr} da tua zona vão ver isto e enviar-te propostas.`
             : `✅ I've posted your request ${urgencyStr}. ${profStr.charAt(0).toUpperCase()}${profStr.slice(1)} in your area will see it and send you proposals.`;
     }
 
     return { category, subcategory, type: isProduct ? 'product' : 'service', urgency, budget, tags, city, responseMessage };
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Gemini categorizer
-// Auto-activates when GEMINI_API_KEY is present in .env — zero code changes needed.
-// Uses Gemini's free tier (no billing/payment method required), unlike OpenAI.
-// ─────────────────────────────────────────────────────────────────────────────
-
-const GEMINI_MODEL = 'gemini-flash-latest';
-
-async function geminiCategorize(query: string, locale: string): Promise<ParsedQuery | null> {
-    try {
-        const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-goog-api-key': process.env.GEMINI_API_KEY!,
-                },
-                body: JSON.stringify({
-                    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-                    contents: [{ parts: [{ text: `User query (locale: ${locale}): "${query}"` }] }],
-                    generationConfig: {
-                        responseMimeType: 'application/json',
-                        temperature: 0.2,
-                        // Must cover invisible "thinking" tokens the model spends before writing
-                        // visible text (observed ~900 for a similar prompt) on top of the actual
-                        // JSON output, or the response cuts off mid-write and fails to parse.
-                        maxOutputTokens: 2048,
-                    },
-                }),
-            }
-        );
-
-        if (!res.ok) {
-            console.warn('[ai-match] Gemini returned', res.status, '— falling back to mock');
-            return null;
-        }
-
-        const data = await res.json();
-        const raw = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!raw) return null;
-
-        return JSON.parse(raw) as ParsedQuery;
-    } catch (err) {
-        console.warn('[ai-match] Gemini error — falling back to mock:', err);
-        return null;
-    }
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Central categorize() — the single switch point
-// ─────────────────────────────────────────────────────────────────────────────
-
-async function categorize(query: string, locale: string): Promise<{ parsed: ParsedQuery; usingLiveAI: boolean }> {
-    // If GEMINI_API_KEY is set, try the live model first; gracefully fall back to mock on any error
-    if (process.env.GEMINI_API_KEY) {
-        const result = await geminiCategorize(query, locale);
-        if (result) return { parsed: result, usingLiveAI: true };
-    }
-    // No key, or Gemini call failed → mock
-    return { parsed: mockCategorize(query, locale), usingLiveAI: false };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -449,7 +357,7 @@ export async function POST(request: Request) {
         }
 
         // ── 1. Categorize ──────────────────────────────────────────────────
-        const { parsed, usingLiveAI } = await categorize(query, locale);
+        const parsed = categorize(query, locale);
 
         await dbConnect();
 
@@ -531,7 +439,6 @@ export async function POST(request: Request) {
             city: parsed.city,
             requestId,
             isProduct: parsed.type === 'product',
-            usingLiveAI, // debug flag — can remove in production
         });
     } catch (error) {
         console.error('[ai-match] Unhandled error:', error);
