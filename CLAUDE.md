@@ -21,7 +21,11 @@ There is no test suite configured in this repo.
 
 ## Environment
 
-`.env` requires `MONGODB_URI`, `NEXTAUTH_SECRET` and `NEXTAUTH_URL`. MongoDB is Atlas-hosted — the local machine's IP must be whitelisted or connections fail with `ENOTFOUND`.
+`.env` requires `MONGODB_URI`, `NEXTAUTH_SECRET`, `NEXTAUTH_URL` and `UPLOADTHING_TOKEN` (see `.env.example`). MongoDB is Atlas-hosted — the local machine's IP must be whitelisted or connections fail with `ENOTFOUND`.
+
+**The GitHub repo is public.** Never commit secrets, real test-account passwords, or connection-string hosts — not in code and not in docs. `.env*` (except `.env.example`), `PROGRESS.md`, `.claude/settings.local.json` and `_tmp_*` scripts are gitignored.
+
+On the owner's machine port 3000 is used by another app; run `npx next dev -p 3100` with `NEXTAUTH_URL=http://localhost:3100`. If `MODULE_NOT_FOUND` errors appear inside `node_modules/next` or `typescript`, the install is corrupted: `npm ci` and delete `.next`.
 
 ## Architecture
 

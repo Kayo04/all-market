@@ -38,10 +38,12 @@ Needer is an **AI-powered Concierge Marketplace** (Reverse Marketplace). It is N
 
 **Environment variables** (`.env`):
 ```
-MONGODB_URI=mongodb+srv://...@cluster0.5b2kgy4.mongodb.net/allmarket
+MONGODB_URI=<Atlas connection string>
 NEXTAUTH_SECRET=<secret>
 NEXTAUTH_URL=http://localhost:3000
+UPLOADTHING_TOKEN=<uploadthing v7 token>
 ```
+See `.env.example` for the full, commented list. Never commit real values — this repo is public.
 
 ---
 
@@ -366,10 +368,9 @@ npm run dev
 
 # Open in browser
 http://localhost:3000
-
-# Test accounts (created during testing):
-# Email: testflow@needer.com / Password: Test1234!
 ```
+
+Test-account credentials are kept out of this file on purpose — the repo is public.
 
 ---
 
@@ -380,7 +381,3 @@ http://localhost:3000
 - **Pro side** (Phase 3): register as pro → onboarding wizard → dashboard with real stats → submit proposals on open requests ✅
 
 The next steps are Phase 5 (Stripe payments) and Phase 6 (production polish). Phase 4 (real AI) was dropped.
-
-### Test Accounts
-- **Client:** `testflow@needer.com` / `Test1234!`
-- **Pro:** `carlos.pro@test.com` / `Test1234!`

@@ -43,6 +43,10 @@ yarn-error.log*
 # session continuity notes (local only, not for github)
 /PROGRESS.md
 
+# local Claude Code permissions and one-off maintenance scripts (may touch the live DB)
+.claude/settings.local.json
+/_tmp_*
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
