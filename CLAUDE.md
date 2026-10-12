@@ -11,7 +11,7 @@ Needer is an AI-powered reverse marketplace: a user describes a need in natural 
 ## Commands
 
 ```bash
-npm run dev      # start dev server (http://localhost:3000)
+npm run dev      # start dev server (http://localhost:3100)
 npm run build    # production build
 npm run start    # run production build
 npm run lint     # eslint
@@ -25,7 +25,7 @@ There is no test suite configured in this repo.
 
 **The GitHub repo is public.** Never commit secrets, real test-account passwords, or connection-string hosts — not in code and not in docs. `.env*` (except `.env.example`), `PROGRESS.md`, `.claude/settings.local.json` and `_tmp_*` scripts are gitignored.
 
-On the owner's machine port 3000 is used by another app; run `npx next dev -p 3100` with `NEXTAUTH_URL=http://localhost:3100`. If `MODULE_NOT_FOUND` errors appear inside `node_modules/next` or `typescript`, the install is corrupted: `npm ci` and delete `.next`.
+On the owner's machine port 3000 is used by another app, so `npm run dev`/`start` are pinned to 3100 and `NEXTAUTH_URL` must be `http://localhost:3100`. If `MODULE_NOT_FOUND` errors appear inside `node_modules/next` or `typescript`, the install is corrupted: `npm ci` and delete `.next`.
 
 ## Architecture
 
@@ -33,17 +33,22 @@ On the owner's machine port 3000 is used by another app; run `npx next dev -p 31
 - `src/proxy.ts` is the routing middleware (Next.js 16 renamed the `middleware.ts` convention to `proxy.ts`) — it wraps `next-intl`'s middleware and matches all paths except API/static routes.
 - MongoDB via Mongoose. Models are in `src/lib/models/` (`User`, `Request`, `Proposal`, `Notification`, `Message`, `ProposalDraft`). Connection is a cached singleton in `src/lib/db.ts`.
 - Auth is NextAuth Credentials + JWT (30-day sessions). Session carries `id`, `name`, `email`, `role`, `isVerified`. Changing a user's `role` in the DB requires them to log out/in since it's baked into the JWT.
-- The core product logic is at `src/app/api/ai-match/route.ts`, which despite the name no longer matches pros: it categorizes the query, persists the request, and notifies every pro whose `proCategory` matches so they come and bid. Categorization is a keyword-based router (`categorize()`) — there is no LLM in this path. A Gemini integration was removed on 2026-09-13 at the owner's request; do not reintroduce an LLM here without asking.
-- Mock proposal injection: when a request's category has **no real pros at all**, the system fabricates proposals from the `MOCK_PROS` roster, upserting those pros as real `User` documents (emails like `*@mock.needer.com`) 3–10s later, so `Proposal` documents can reference valid ObjectIds. Without this the post → proposals → compare → accept loop is unwalkable on a fresh DB. Don't assume mock pro IDs (e.g. `'mock-plumb-1'`) are valid ObjectIds anywhere else — they only become real after upsert.
+- **Request creation has exactly one write path: `POST /api/requests`** (form at `/[locale]/requests/new`). The concierge (`/[locale]/concierge`) never saves: it runs `categorize()` from `src/lib/categorize.ts` in the browser (keyword rules, no LLM — Gemini was removed 2026-09-13; ask the owner before reintroducing one) and redirects to `/requests/new?q=&category=&subcategory=&district=&budget=&urgency=` so the client confirms everything. `categorize()` returns real keys or `''` — never a guessed default. `/api/ai-match` and its mock-proposal injection were deleted on 2026-10-12; leftover `*@mock.needer.com` users/proposals in the DB are scheduled for cleanup.
+- `notifyMatchingPros()` (`src/lib/notifications.ts`) pings every pro whose `proCategory` equals the request's subcategory or category — called from `POST /api/requests`.
+- Location = **district** (`src/lib/districts.ts`: 18 districts + Açores + Madeira). `Request.district` is the key; `Request.location` holds the district capital's coordinates (not the client's address); `locationLabel` is an optional free-text town. Requests created before 2026-10 have no `district`.
+- Reviews (`POST /api/users/[id]/review`) require `requestId` of a **closed** request owned by the reviewer whose `acceptedByProId` is that pro; one review per job (`ratings.requestId`).
 - The public needs feed is `GET /api/requests` (no session required for open requests) — it backs both `/[locale]/requests` and the homepage `LiveNeedsFeed`. Free-text search is the `q` param and runs in MongoDB; don't move it back into the client, which can only ever filter the current page of results.
-- Categories (12, each with 2–4 subcategories, EN/PT labels) are defined centrally in `src/lib/categories.ts` — this is the single place category taxonomy changes.
+- Categories (12, each with 2–5 subcategories, EN/PT labels) are defined centrally in `src/lib/categories.ts` — this is the single place category taxonomy changes. Use `isValidSubcategory()` / `isValidProCategory()` to validate keys.
 - Next.js 16: `params` in route handlers is a Promise — must `await params` before destructuring.
 
 ## Conventions
 
+- **API input validation:** every write route parses its body with a zod schema via `parseBody(request, schema)` from `src/lib/validation.ts` (bad JSON/invalid fields → 400, unknown keys stripped). Dynamic `[id]` routes check `isObjectId(id)` first (→ 404). Reuse the shared pieces there (`text(max, min)`, `euros`, `objectId`, `password` (8–72), `email`, `phone`, `uploadedImageUrl`/`avatarUrl` — only Uploadthing URLs, `isValidNif`). Don't hand-roll `await request.json()` + truthiness checks.
+- Login errors are deliberately identical for unknown email and wrong password (no account enumeration).
+
 - i18n: all user-facing text must have both EN and PT variants. Older/core components use `next-intl` message keys (`messages/en.json`, `messages/pt.json`); most newer feature code instead inlines `locale === 'pt' ? 'PT text' : 'EN text'` — match whichever pattern the file you're editing already uses.
 - Styling is mixed: most of the app uses Tailwind CSS, but the concierge flow and request-detail pages use React inline styles for a dark, premium look — follow the existing pattern within a given file rather than converting wholesale.
-- Monetization fields (`hasSponsoredSpot`, `isPremiumSniper`, `publicReleaseDate`) exist in the DB schema and are read by the match engine, but there is no billing/payment integration yet — don't assume a Stripe layer exists.
+- Monetization fields (`hasSponsoredSpot`, `isPremiumSniper`, `publicReleaseDate`) exist in the DB schema and are read by the match engine, but there is no billing/payment integration yet — don't assume a payment layer exists (planned: IfthenPay first, see PROGRESS.md).
 
 ## Continuidade de sessão
 - No ARRANQUE: lê `PROGRESS.md` por inteiro antes de qualquer ação e resume-me em 2 linhas onde ficámos.

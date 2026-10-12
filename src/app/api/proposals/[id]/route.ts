@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { isObjectId, parseBody } from '@/lib/validation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
@@ -6,6 +8,8 @@ import Proposal from '@/lib/models/Proposal';
 import RequestModel from '@/lib/models/Request';
 import User from '@/lib/models/User';
 import { createNotification } from '@/lib/notifications';
+
+const proposalActionSchema = z.object({ action: z.enum(['accept', 'reject']) });
 
 // PUT /api/proposals/[id] — accept or reject a proposal
 export async function PUT(
@@ -19,12 +23,12 @@ export async function PUT(
         }
 
         const { id } = await params;
-        const body = await request.json();
-        const { action } = body; // 'accept' | 'reject'
-
-        if (!['accept', 'reject'].includes(action)) {
-            return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
+        if (!isObjectId(id)) {
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
         }
+        const { data, error } = await parseBody(request, proposalActionSchema);
+        if (error) return error;
+        const { action } = data;
 
         await dbConnect();
 

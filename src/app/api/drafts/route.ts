@@ -3,6 +3,17 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import ProposalDraft from '@/lib/models/ProposalDraft';
+import { z } from 'zod';
+import { euros, isObjectId, objectId, parseBody, text } from '@/lib/validation';
+
+const draftFields = {
+    title: text(120),
+    message: text(2000),
+    defaultPrice: euros.optional(),
+    category: text(60, 0).optional(),
+};
+const createDraftSchema = z.object(draftFields);
+const updateDraftSchema = z.object({ id: objectId, ...draftFields });
 
 // GET: All drafts for the current pro
 export async function GET() {
@@ -43,14 +54,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Only professionals can create drafts' }, { status: 403 });
         }
 
+        const { data, error } = await parseBody(request, createDraftSchema);
+        if (error) return error;
+        const { title, message, defaultPrice, category } = data;
+
         await dbConnect();
-
-        const body = await request.json();
-        const { title, message, defaultPrice, category } = body;
-
-        if (!title || !message) {
-            return NextResponse.json({ error: 'Title and message are required' }, { status: 400 });
-        }
 
         const draft = await ProposalDraft.create({
             proId: user.id,
@@ -77,14 +85,11 @@ export async function PUT(request: Request) {
 
         const user = session.user as { id: string; role: string };
 
+        const { data, error } = await parseBody(request, updateDraftSchema);
+        if (error) return error;
+        const { id, title, message, defaultPrice, category } = data;
+
         await dbConnect();
-
-        const body = await request.json();
-        const { id, title, message, defaultPrice, category } = body;
-
-        if (!id) {
-            return NextResponse.json({ error: 'Draft ID is required' }, { status: 400 });
-        }
 
         const draft = await ProposalDraft.findOneAndUpdate(
             { _id: id, proId: user.id },
@@ -118,7 +123,7 @@ export async function DELETE(request: Request) {
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
 
-        if (!id) {
+        if (!isObjectId(id)) {
             return NextResponse.json({ error: 'Draft ID is required' }, { status: 400 });
         }
 

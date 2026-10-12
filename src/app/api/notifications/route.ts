@@ -3,6 +3,13 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import Notification from '@/lib/models/Notification';
+import { z } from 'zod';
+import { objectId, parseBody } from '@/lib/validation';
+
+const markReadSchema = z.object({
+    ids: z.array(objectId).max(200).optional(),
+    markAll: z.boolean().optional(),
+});
 
 // GET: Fetch user's notifications
 export async function GET(request: Request) {
@@ -51,17 +58,18 @@ export async function PATCH(request: Request) {
 
         const userId = (session.user as { id: string }).id;
 
-        await dbConnect();
+        const { data, error } = await parseBody(request, markReadSchema);
+        if (error) return error;
+        const { ids, markAll } = data;
 
-        const body = await request.json();
-        const { ids, markAll } = body;
+        await dbConnect();
 
         if (markAll) {
             await Notification.updateMany(
                 { userId, readStatus: false },
                 { readStatus: true }
             );
-        } else if (ids && Array.isArray(ids)) {
+        } else if (ids && ids.length > 0) {
             await Notification.updateMany(
                 { _id: { $in: ids }, userId },
                 { readStatus: true }

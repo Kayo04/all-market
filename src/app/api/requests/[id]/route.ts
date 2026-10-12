@@ -1,9 +1,13 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { isObjectId, parseBody } from '@/lib/validation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import RequestModel from '@/lib/models/Request';
 import { createNotification } from '@/lib/notifications';
+
+const requestActionSchema = z.object({ action: z.literal('complete') });
 
 // GET /api/requests/[id] — fetch a single request by ID
 export async function GET(
@@ -13,6 +17,9 @@ export async function GET(
     try {
         await dbConnect();
         const { id } = await params;
+        if (!isObjectId(id)) {
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
 
         const doc = await RequestModel.findById(id)
             .populate('userId', 'name avatar')
@@ -42,8 +49,12 @@ export async function PATCH(
         }
 
         const { id } = await params;
-        const body = await request.json();
-        const { action } = body; // 'complete'
+        if (!isObjectId(id)) {
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
+        const { data, error } = await parseBody(request, requestActionSchema);
+        if (error) return error;
+        const { action } = data;
 
         await dbConnect();
 
@@ -64,7 +75,7 @@ export async function PATCH(
                 return NextResponse.json({ error: 'Can only complete accepted jobs' }, { status: 400 });
             }
 
-            await RequestModel.findByIdAndUpdate(id, { status: 'closed' });
+            await RequestModel.updateOne({ _id: id, status: 'accepted' }, { status: 'closed' });
 
             // Notify the assigned pro
             if (reqData.acceptedByProId) {

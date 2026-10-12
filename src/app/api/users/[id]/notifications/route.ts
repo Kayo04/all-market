@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isObjectId } from '@/lib/validation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
@@ -25,6 +26,9 @@ export async function GET(
         }
 
         const { id } = await params;
+        if (!isObjectId(id)) {
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
         if ((session.user as { id: string }).id !== id) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
@@ -57,6 +61,9 @@ export async function PUT(
         }
 
         const { id } = await params;
+        if (!isObjectId(id)) {
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
         if ((session.user as { id: string }).id !== id) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }

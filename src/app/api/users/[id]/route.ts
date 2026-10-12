@@ -1,4 +1,14 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { avatarUrl, isObjectId, parseBody, skills, text } from '@/lib/validation';
+
+const updateUserSchema = z.object({
+    name: text(80, 2).optional(),
+    bio: text(1000, 0).optional(),
+    skills: skills.optional(),
+    locationLabel: text(80, 0).optional(),
+    avatar: avatarUrl.optional(),
+});
 import { getServerSession } from 'next-auth';
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
@@ -16,6 +26,9 @@ export async function GET(
     try {
         await dbConnect();
         const { id } = await params;
+        if (!isObjectId(id)) {
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
 
         const user = await User.findById(id)
             .select('name role isVerified bio skills location locationLabel avatar ratings rating proCategory hasSponsoredSpot createdAt')
@@ -44,6 +57,9 @@ export async function PUT(
         }
 
         const { id } = await params;
+        if (!isObjectId(id)) {
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
         const currentUser = session.user as { id: string };
 
         if (currentUser.id !== id) {
@@ -52,15 +68,8 @@ export async function PUT(
 
         await dbConnect();
 
-        const body = await request.json();
-        const { name, bio, skills, locationLabel, avatar } = body;
-
-        const updateData: Record<string, unknown> = {};
-        if (name) updateData.name = name;
-        if (bio !== undefined) updateData.bio = bio;
-        if (skills) updateData.skills = skills;
-        if (locationLabel) updateData.locationLabel = locationLabel;
-        if (avatar !== undefined) updateData.avatar = avatar;
+        const { data: updateData, error } = await parseBody(request, updateUserSchema);
+        if (error) return error;
 
         const user = await User.findByIdAndUpdate(id, updateData, { new: true })
             .select('name role isVerified bio skills locationLabel avatar')
@@ -92,6 +101,9 @@ export async function DELETE(
         }
 
         const { id } = await params;
+        if (!isObjectId(id)) {
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
         const currentUser = session.user as { id: string };
 
         if (currentUser.id !== id) {

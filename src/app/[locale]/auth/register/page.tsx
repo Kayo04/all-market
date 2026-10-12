@@ -31,8 +31,8 @@ export default function RegisterPage() {
       setError(locale === 'pt' ? 'As passwords não coincidem' : 'Passwords do not match');
       return;
     }
-    if (password.length < 6) {
-      setError(locale === 'pt' ? 'A password deve ter pelo menos 6 caracteres' : 'Password must be at least 6 characters');
+    if (password.length < 8) {
+      setError(locale === 'pt' ? 'A password deve ter pelo menos 8 caracteres' : 'Password must be at least 8 characters');
       return;
     }
     if (!agreed) {
@@ -194,7 +194,7 @@ export default function RegisterPage() {
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder={locale === 'pt' ? 'Mín. 6 caracteres' : 'Min. 6 characters'}
+              placeholder={locale === 'pt' ? 'Mín. 8 caracteres' : 'Min. 8 characters'}
               icon={<Lock size={16} />}
               required
             />

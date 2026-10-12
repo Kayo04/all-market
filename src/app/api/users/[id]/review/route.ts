@@ -1,11 +1,25 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { isObjectId, objectId, parseBody, text } from '@/lib/validation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
+import RequestModel from '@/lib/models/Request';
 import { createNotification } from '@/lib/notifications';
 
-// POST /api/users/[id]/review — submit a review for a professional
+const reviewSchema = z.object({
+    requestId: objectId,
+    score: z.number().int('Score must be a whole number').min(1).max(5),
+    comment: text(1000, 0).optional(),
+});
+
+// POST /api/users/[id]/review — the client reviews the pro who did a job for them.
+//
+// A review must be tied to a real, finished job: the reviewer owns the request,
+// the request is closed, and this pro is the one whose proposal was accepted.
+// Ratings decide trust (and, later, whether a pro keeps the verified badge), so
+// "any signed-in user can rate any pro" — how this used to work — is not acceptable.
 export async function POST(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
@@ -17,63 +31,68 @@ export async function POST(
         }
 
         const { id: proId } = await params;
+        if (!isObjectId(proId)) {
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
         const currentUser = session.user as { id: string; name?: string };
 
-        // Can't review yourself
         if (currentUser.id === proId) {
             return NextResponse.json({ error: 'Cannot review yourself' }, { status: 400 });
         }
 
-        const body = await request.json();
-        const { score, comment } = body;
-
-        if (!score || score < 1 || score > 5) {
-            return NextResponse.json({ error: 'Score must be between 1 and 5' }, { status: 400 });
-        }
+        const { data, error } = await parseBody(request, reviewSchema);
+        if (error) return error;
+        const { requestId, score } = data;
+        const comment = data.comment ?? '';
 
         await dbConnect();
 
-        const pro = await User.findById(proId);
-        if (!pro) {
-            return NextResponse.json({ error: 'Professional not found' }, { status: 404 });
+        const job = await RequestModel.findById(requestId)
+            .select('userId status acceptedByProId')
+            .lean<{ userId: { toString(): string }; status: string; acceptedByProId?: { toString(): string } | null }>();
+
+        if (
+            !job ||
+            job.userId.toString() !== currentUser.id ||
+            job.status !== 'closed' ||
+            job.acceptedByProId?.toString() !== proId
+        ) {
+            return NextResponse.json(
+                { error: 'You can only review a professional after they completed a job for you' },
+                { status: 403 }
+            );
         }
 
-        // Check if this user already reviewed this pro
-        const alreadyReviewed = pro.ratings?.some(
-            (r: { userId?: { toString(): string } }) => r.userId?.toString() === currentUser.id
+        // One review per job — the filter makes the check-and-push atomic, so a
+        // double submit can't add two ratings.
+        const pushed = await User.updateOne(
+            { _id: proId, 'ratings.requestId': { $ne: requestId } },
+            { $push: { ratings: { userId: currentUser.id, requestId, score, comment, createdAt: new Date() } } }
         );
-        if (alreadyReviewed) {
-            return NextResponse.json({ error: 'You already reviewed this professional' }, { status: 409 });
+        if (pushed.matchedCount === 0) {
+            return NextResponse.json({ error: 'You already reviewed this job' }, { status: 409 });
         }
-
-        // Add the review
-        pro.ratings.push({
-            userId: currentUser.id,
-            score: Math.round(score),
-            comment: comment?.trim() || '',
-            createdAt: new Date(),
-        });
 
         // Recalculate aggregate rating
-        const totalScores = pro.ratings.reduce(
-            (sum: number, r: { score: number }) => sum + r.score, 0
-        );
-        pro.rating = Math.round((totalScores / pro.ratings.length) * 10) / 10;
-
-        await pro.save();
+        const pro = await User.findById(proId).select('ratings').lean<{ ratings: { score: number }[] }>();
+        const ratings = pro?.ratings ?? [];
+        const newRating = ratings.length
+            ? Math.round((ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length) * 10) / 10
+            : 0;
+        await User.updateOne({ _id: proId }, { rating: newRating });
 
         // Notify the professional
         await createNotification(
             proId,
             'new_review',
-            `${currentUser.name || 'A client'} left a ${score}-star review: "${(comment || '').slice(0, 60)}${(comment || '').length > 60 ? '...' : ''}"`,
+            `${currentUser.name || 'A client'} left a ${score}-star review: "${comment.slice(0, 60)}${comment.length > 60 ? '...' : ''}"`,
             proId
         );
 
         return NextResponse.json({
             success: true,
             message: 'Review submitted',
-            newRating: pro.rating,
+            newRating,
         });
     } catch (error) {
         console.error('Error submitting review:', error);

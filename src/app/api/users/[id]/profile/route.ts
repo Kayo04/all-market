@@ -1,4 +1,20 @@
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { avatarUrl, isObjectId, parseBody, phone, skills, text } from '@/lib/validation';
+import { isValidProCategory } from '@/lib/categories';
+
+// Whitelist of self-editable fields. zod strips everything else, so this can't be
+// used to set role (beyond the one allowed upgrade), isVerified, rating, etc.
+const profileSchema = z.object({
+    bio: text(1000, 0).optional(),
+    skills: skills.optional(),
+    proCategory: z.union([z.literal(''), z.string().refine(isValidProCategory, 'Unknown category')]).optional(),
+    locationLabel: text(80, 0).optional(),
+    phone: phone.optional(),
+    avatar: avatarUrl.optional(),
+    // Self-service role change is only ever an upgrade to 'pro' (see /pro page).
+    role: z.literal('pro').optional(),
+});
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
@@ -16,6 +32,9 @@ export async function PATCH(
         }
 
         const { id } = await params;
+        if (!isObjectId(id)) {
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
         const currentUserId = (session.user as { id: string }).id;
 
         // Users can only update their own profile
@@ -23,25 +42,8 @@ export async function PATCH(
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
-        const body = await request.json();
-        const allowedFields = [
-            'bio', 'skills', 'proCategory', 'locationLabel', 'phone', 'avatar',
-        ];
-
-        // Only pick allowed fields from the body
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const update: Record<string, any> = {};
-        for (const field of allowedFields) {
-            if (body[field] !== undefined) {
-                update[field] = body[field];
-            }
-        }
-
-        // Self-service role change is only ever an upgrade to 'pro' (see /pro page) —
-        // never allow this endpoint to be used to set any other role value.
-        if (body.role === 'pro') {
-            update.role = 'pro';
-        }
+        const { data: update, error } = await parseBody(request, profileSchema);
+        if (error) return error;
 
         if (Object.keys(update).length === 0) {
             return NextResponse.json({ error: 'No valid fields to update' }, { status: 400 });

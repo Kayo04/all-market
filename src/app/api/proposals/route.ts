@@ -4,7 +4,15 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import Proposal from '@/lib/models/Proposal';
 import RequestModel from '@/lib/models/Request';
+import { z } from 'zod';
 import { createNotification } from '@/lib/notifications';
+import { euros, objectId, parseBody, text } from '@/lib/validation';
+
+const createProposalSchema = z.object({
+    requestId: objectId,
+    message: text(2000, 5),
+    price: euros,
+});
 
 // GET: Proposals for a specific request
 //
@@ -65,13 +73,26 @@ export async function POST(request: Request) {
             );
         }
 
+        const { data, error } = await parseBody(request, createProposalSchema);
+        if (error) return error;
+        const { requestId, message, price } = data;
+
         await dbConnect();
 
-        const body = await request.json();
-        const { requestId, message, price } = body;
-
-        if (!requestId || !message || price === undefined) {
-            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+        // Only open requests posted by someone else can be bid on.
+        const req = await RequestModel.findById(requestId).select('userId status').lean<{
+            userId: { toString(): string };
+            status: string;
+        }>();
+        if (!req) {
+            return NextResponse.json({ error: 'Request not found' }, { status: 404 });
+        }
+        if (req.status !== 'open') {
+            return NextResponse.json({ error: 'This request is no longer accepting proposals' }, { status: 409 });
+        }
+        const reqOwner = req.userId.toString();
+        if (reqOwner === user.id) {
+            return NextResponse.json({ error: 'You cannot send a proposal to your own request' }, { status: 403 });
         }
 
         // Check if pro already submitted a proposal for this request
@@ -91,16 +112,12 @@ export async function POST(request: Request) {
         });
 
         // Notify the request owner about the new proposal
-        const req = await RequestModel.findById(requestId).lean();
-        if (req) {
-            const reqOwner = (req as { userId: { toString: () => string } }).userId.toString();
-            await createNotification(
-                reqOwner,
-                'new_proposal',
-                `${user.name || 'A professional'} sent a proposal for €${price}`,
-                requestId
-            );
-        }
+        await createNotification(
+            reqOwner,
+            'new_proposal',
+            `${user.name || 'A professional'} sent a proposal for €${price}`,
+            requestId
+        );
 
         return NextResponse.json(
             { message: 'Proposal submitted', proposal },

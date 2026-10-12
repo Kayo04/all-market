@@ -55,3 +55,34 @@ export async function createNotification(
         console.error('Failed to create notification:', error);
     }
 }
+
+// The reverse-marketplace mechanic: when a request goes live, every pro working
+// in its subcategory (or who registered the whole category) is pinged to come bid.
+// Runs for every request regardless of how it was created — it used to live only
+// in the concierge path, so requests posted through the form reached nobody.
+export async function notifyMatchingPros(request: {
+    _id: { toString(): string };
+    userId: { toString(): string };
+    title: string;
+    category: string;
+    subcategory: string;
+}) {
+    try {
+        await dbConnect();
+        const pros = await User.find({
+            role: 'pro',
+            isDeleted: { $ne: true },
+            proCategory: { $in: [request.subcategory, request.category] },
+            _id: { $ne: request.userId },
+        })
+            .select('_id')
+            .lean();
+
+        const content = `New request in your category: "${request.title.slice(0, 80)}"`;
+        await Promise.all(
+            pros.map((p) => createNotification(String(p._id), 'new_request', content, request._id.toString()))
+        );
+    } catch (error) {
+        console.error('Failed to notify matching pros:', error);
+    }
+}

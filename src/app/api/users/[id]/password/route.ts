@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isObjectId, PASSWORD_MIN } from '@/lib/validation';
 import { getServerSession } from 'next-auth';
 import bcrypt from 'bcryptjs';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
@@ -6,7 +7,7 @@ import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
 import { rateLimit } from '@/lib/rateLimit';
 
-const MIN_LENGTH = 6; // matches the rule enforced at registration
+const MIN_LENGTH = PASSWORD_MIN; // same rule as registration (src/lib/validation.ts)
 
 // PUT: Change own password (requires the current one)
 export async function PUT(
@@ -20,6 +21,9 @@ export async function PUT(
         }
 
         const { id } = await params;
+        if (!isObjectId(id)) {
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
         if ((session.user as { id: string }).id !== id) {
             return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
@@ -43,9 +47,9 @@ export async function PUT(
             );
         }
 
-        if (typeof newPassword !== 'string' || newPassword.length < MIN_LENGTH) {
+        if (typeof newPassword !== 'string' || typeof currentPassword !== 'string' || newPassword.length < MIN_LENGTH || newPassword.length > 72) {
             return NextResponse.json(
-                { error: `New password must be at least ${MIN_LENGTH} characters` },
+                { error: `New password must be between ${MIN_LENGTH} and 72 characters` },
                 { status: 400 }
             );
         }

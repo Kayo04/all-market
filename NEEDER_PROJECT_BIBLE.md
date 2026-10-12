@@ -73,7 +73,7 @@ e:\Needer.com\all-market\
 │   │   │   ├── auth/
 │   │   │   │   ├── login/       ← Login page
 │   │   │   │   └── register/    ← Registration page
-│   │   │   ├── concierge/       ← ⭐ AI Concierge page (main feature)
+│   │   │   ├── concierge/       ← Free-text shortcut that pre-fills requests/new
 │   │   │   ├── dashboard/
 │   │   │   │   ├── page.tsx     ← Router (redirects to /client or /pro)
 │   │   │   │   ├── client/      ← Client dashboard (My Jobs)
@@ -88,7 +88,6 @@ e:\Needer.com\all-market\
 │   │   │   ├── pro/             ← Pro landing page
 │   │   │   └── profile/         ← User's own profile
 │   │   └── api/
-│   │       ├── ai-match/        ← ⭐ POST: AI categorization + publish + notify pros
 │   │       ├── auth/
 │   │       │   ├── [...nextauth]/ ← NextAuth config (JWT, credentials)
 │   │       │   └── register/    ← POST: User registration
@@ -192,20 +191,17 @@ content, readStatus, relatedId
 
 ---
 
-## 6. The Intake Engine (`/api/ai-match`)
+## 6. Request intake (rewritten 2026-10-12)
 
-This is the **core of the product**. Despite the legacy route name it does not match professionals to a buyer — it turns a sentence into a filed, categorized, publicly visible request and then tells the relevant pros to come bid. Categorization is a keyword-based router (`categorize()`) that pattern-matches the user query to categories. No LLM runs in this path — a Gemini integration was removed on 2026-09-13 at the owner's request.
+There is **one** way a request is saved: `POST /api/requests`, fed by the form at `/[locale]/requests/new` (category → details + photos + urgency → price + district → confirm).
 
-### The intake flow:
-1. **Categorize** the query → `{ category, subcategory, urgency, budget, city, tags }`
-2. **Persist request** to DB if the user is logged in (signed-out visitors get a sign-in CTA that preserves their query)
-3. **Notify every pro** whose `proCategory` matches, so they come to the request and pitch
-4. **Inject mock proposals** (3-10s delay) *only when the category has no real pros at all* — otherwise the post → proposals → compare → accept loop is unwalkable on a fresh DB
+The concierge (`/[locale]/concierge`) is a shortcut into that form, not a second publisher: the client types a sentence, `categorize()` (`src/lib/categorize.ts`, keyword rules, runs in the browser, no LLM) extracts category, subcategory, district, urgency and budget, and the form opens pre-filled for the client to check and complete. Anything not recognised is left blank for the client to choose — never defaulted (the old engine filed unknown cities as "Porto" and unknown trades under a non-existent `general` subcategory).
 
-Step 2 of the old flow — picking pro cards to show the buyer (Slot 1 sponsored, Slots 2-3 organic) — was **deleted on 2026-08-16**. `responseMessage` must describe the request being *posted*; the system prompt forbids "searching"/"finding"/"selecting" professionals, because saying so would promise a directory the product deliberately doesn't have.
+On creation, `notifyMatchingPros()` notifies every pro whose `proCategory` matches the subcategory or category.
 
-### Mock Pro Roster Categories:
-electricians, plumbers, painters, locksmiths, house-cleaning, office-cleaning, websites, mechanic, personal-trainers + a generic fallback
+The old `/api/ai-match` route, which saved requests directly and **fabricated proposals from fake "mock" pros** when a category had no real pros, was deleted: fake proposals shown to real users are not acceptable in a live product.
+
+Location is the **district** (`src/lib/districts.ts`), plus an optional free-text town. No street addresses are collected.
 
 ---
 
@@ -235,7 +231,7 @@ These fields exist in the DB (`hasSponsoredSpot`, `isPremiumSniper`, `publicRele
 
 | Key | EN | PT | Type |
 |-----|----|----|------|
-| home-repairs | Home Repairs | Reparações Domésticas | service |
+| home-repairs | Home Repairs (incl. Locksmiths/Serralheiros) | Reparações Domésticas | service |
 | tech-digital | Tech & Digital | Tecnologia e Digital | service |
 | tutoring | Tutoring & Languages | Explicações e Línguas | service |
 | events | Events & Parties | Eventos e Festas | service |
@@ -259,11 +255,11 @@ Fixed the dead-end after intake. The user now flows seamlessly from posting a re
 
 | Feature | Files | What it does |
 |---------|-------|-------------|
-| **AI Concierge** | `concierge/page.tsx` | Chat-like interface, type need → get pro cards |
+| **Concierge** | `concierge/page.tsx` | Type a need → opens the request form pre-filled (since 2026-10-12) |
 | **Pro Profile** | `users/[id]/page.tsx` | Premium trust page: bio, stats, reviews, skills, CTA |
-| **Confirmation** | `concierge/page.tsx` | Green "Request posted!" banner after the request is filed |
+| **Confirmation** | `requests/new/page.tsx` | Request is published from the form's confirm step |
 | **Proposals Inbox** | `requests/[id]/page.tsx` | See incoming proposals, accept/reject, 15s auto-polling |
-| **Mock Injection** | `api/ai-match/route.ts` | Auto-creates fake proposals 3-10s after the request is filed for demo |
+| ~~Mock Injection~~ | removed 2026-10-12 | Used to fabricate proposals from fake pros — deleted before launch |
 | **Request API** | `api/requests/[id]/route.ts` | GET single request, PATCH mark complete |
 | **Proposal API** | `api/proposals/[id]/route.ts` | PUT accept/reject with notifications |
 
@@ -341,8 +337,7 @@ Don't reintroduce an LLM here without asking.
 
 1. **Dark theme by default** — the concierge page uses a dark, premium aesthetic
 2. **Inline styles** — most components use React inline styles (not Tailwind classes), especially the concierge and request detail pages
-3. **Mock-first development** — every feature works with mock data before needing real DB content
-4. **Mock pros auto-upsert** — when mock proposals are injected, the mock pros are created as real User documents in MongoDB (with `@mock.needer.com` emails) so ObjectId references work
+3. **No fake activity** — the mock-proposal system was removed on 2026-10-12; an empty request shows an honest empty state, never fabricated proposals
 5. **Locale via ternary** — most components use `locale === 'pt' ? 'PT text' : 'EN text'` instead of translation keys for new features
 
 ---
@@ -351,7 +346,7 @@ Don't reintroduce an LLM here without asking.
 
 1. **MongoDB Atlas IP whitelist** — your local IP must be whitelisted in MongoDB Atlas or connections fail with `ENOTFOUND`
 2. **Next.js 16 params** — `params` in route handlers is a Promise and must be `await`ed: `const { id } = await params`
-3. **Mock ObjectIds** — mock pro IDs like `'mock-plumb-1'` are strings, not valid ObjectIds. The injection system now upserts them as real users first
+3. **Leftover mock data** — `*@mock.needer.com` users and their proposals still exist in the dev DB and are scheduled for cleanup
 4. **Session role** — the `role` field is in the JWT token. If you change a user's role in the DB, they need to log out and back in
 5. **No LLM in the intake path** — categorization is keyword-based by design since 2026-09-13. `GEMINI_API_KEY` is no longer read anywhere.
 

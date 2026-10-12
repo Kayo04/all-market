@@ -1,4 +1,5 @@
 import mongoose, { Schema, models } from 'mongoose';
+import { DISTRICT_KEYS } from '@/lib/districts';
 
 const RequestSchema = new Schema(
     {
@@ -18,8 +19,12 @@ const RequestSchema = new Schema(
             type: { type: String, enum: ['Point'], default: 'Point' },
             coordinates: { type: [Number], required: true },
         },
+        // `location` is the district capital (see src/lib/districts.ts), not the client's address.
+        // Not `required` only because requests created before 2026-10 have no district.
+        district: { type: String, enum: DISTRICT_KEYS },
+        // Free-text locality the client typed (optional); falls back to the district label.
         locationLabel: { type: String, default: '' },
-        // Public URLs under /uploads/requests/ — see src/app/api/upload/route.ts
+        // Uploadthing URLs — see src/app/api/upload/route.ts
         images: [{ type: String }],
         status: {
             type: String,
@@ -60,6 +65,7 @@ const RequestSchema = new Schema(
 
 RequestSchema.index({ location: '2dsphere' });
 RequestSchema.index({ category: 1, status: 1 });
+RequestSchema.index({ district: 1, status: 1 });
 RequestSchema.index({ userId: 1 });
 RequestSchema.index({ isFeatured: -1, createdAt: -1 });
 RequestSchema.index({ urgency: 1, createdAt: -1 });

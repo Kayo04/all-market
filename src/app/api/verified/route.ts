@@ -3,6 +3,18 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
+import { z } from 'zod';
+import { isValidNif, parseBody, text } from '@/lib/validation';
+
+const verificationSchema = z.object({
+    businessName: text(120, 2),
+    taxId: z
+        .string()
+        .trim()
+        .refine(isValidNif, 'Invalid Portuguese NIF')
+        .transform((v) => v.replace(/^PT/i, '').replace(/\s/g, '')),
+    website: z.union([z.literal(''), z.url({ protocol: /^https?$/, error: 'Invalid website URL' }).max(200)]).optional(),
+});
 
 // GET: Check verification status
 export async function GET() {
@@ -40,14 +52,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Only professionals can request verification' }, { status: 403 });
         }
 
+        const { data, error } = await parseBody(request, verificationSchema);
+        if (error) return error;
+        const { businessName, taxId, website } = data;
+
         await dbConnect();
-
-        const body = await request.json();
-        const { businessName, taxId, website } = body;
-
-        if (!businessName || !taxId) {
-            return NextResponse.json({ error: 'Business name and tax ID are required' }, { status: 400 });
-        }
 
         await User.findByIdAndUpdate(user.id, {
             verificationStatus: 'pending',

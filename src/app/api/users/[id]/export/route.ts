@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { isObjectId } from '@/lib/validation';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
@@ -20,6 +21,9 @@ export async function GET(
         }
 
         const { id } = await params;
+        if (!isObjectId(id)) {
+            return NextResponse.json({ error: 'Not found' }, { status: 404 });
+        }
         const currentUser = session.user as { id: string };
 
         if (currentUser.id !== id) {

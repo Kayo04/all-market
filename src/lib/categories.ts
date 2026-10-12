@@ -11,6 +11,7 @@ export const categories: Category[] = [
             { key: 'electricians', labelEN: 'Electricians', labelPT: 'Eletricistas' },
             { key: 'plumbers', labelEN: 'Plumbers', labelPT: 'Canalizadores' },
             { key: 'painters', labelEN: 'Painters', labelPT: 'Pintores' },
+            { key: 'locksmiths', labelEN: 'Locksmiths', labelPT: 'Serralheiros' },
             { key: 'furniture-assembly', labelEN: 'Furniture Assembly', labelPT: 'Montagem de Móveis' },
         ],
     },
@@ -154,4 +155,13 @@ export function isEquipmentCategory(categoryKey: string): boolean {
 
 export function getCategoryType(categoryKey: string): 'service' | 'product' {
     return categories.find((c) => c.key === categoryKey)?.type ?? 'service';
+}
+
+export function isValidSubcategory(categoryKey: string, subcategoryKey: string): boolean {
+    return !!getCategoryByKey(categoryKey)?.subcategories.some((s) => s.key === subcategoryKey);
+}
+
+// Pros store either a subcategory key (onboarding default) or a category key in `proCategory`.
+export function isValidProCategory(key: string): boolean {
+    return categories.some((c) => c.key === key || c.subcategories.some((s) => s.key === key));
 }

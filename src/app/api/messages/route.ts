@@ -7,6 +7,14 @@ import Message from '@/lib/models/Message';
 import RequestModel from '@/lib/models/Request';
 import Proposal from '@/lib/models/Proposal';
 import { createNotification } from '@/lib/notifications';
+import { z } from 'zod';
+import { objectId, parseBody, text } from '@/lib/validation';
+
+const sendMessageSchema = z.object({
+    receiverId: objectId,
+    requestId: objectId,
+    content: text(2000),
+});
 
 // GET: Fetch messages
 // ?requestId=X — conversation thread for a request
@@ -108,14 +116,11 @@ export async function POST(request: Request) {
         }
 
         const user = session.user as { id: string; name?: string };
+        const { data, error } = await parseBody(request, sendMessageSchema);
+        if (error) return error;
+        const { receiverId, requestId, content } = data;
+
         await dbConnect();
-
-        const body = await request.json();
-        const { receiverId, requestId, content } = body;
-
-        if (!receiverId || !requestId || !content) {
-            return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-        }
 
         // Only the request owner and pros who proposed on this request may message each other here.
         const reqDoc = await RequestModel.findById(requestId).select('userId').lean();
@@ -138,7 +143,7 @@ export async function POST(request: Request) {
             senderId: user.id,
             receiverId,
             requestId,
-            content: content.trim(),
+            content,
         });
 
         // Notify receiver

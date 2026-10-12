@@ -406,7 +406,7 @@ export default function RequestDetailPage() {
       const res = await fetch(`/api/users/${acceptedPro.proId._id}/review`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ score: reviewScore, comment: reviewComment }),
+        body: JSON.stringify({ requestId: id, score: reviewScore, comment: reviewComment }),
       });
       if (res.ok) {
         setReviewSubmitted(true);

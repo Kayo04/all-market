@@ -85,8 +85,8 @@ export default function BecomeProPage() {
       setError(locale === 'pt' ? 'As passwords não coincidem' : 'Passwords do not match');
       return;
     }
-    if (password.length < 6) {
-      setError(locale === 'pt' ? 'A password deve ter pelo menos 6 caracteres' : 'Password must be at least 6 characters');
+    if (password.length < 8) {
+      setError(locale === 'pt' ? 'A password deve ter pelo menos 8 caracteres' : 'Password must be at least 8 characters');
       return;
     }
     if (!proCategory) {
@@ -278,7 +278,7 @@ export default function BecomeProPage() {
             <Input label={locale === 'pt' ? 'Telemóvel (opcional)' : 'Phone (optional)'} type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+351 900 000 000" icon={<Phone size={16} />} />
 
             <div style={{ position: 'relative' }}>
-              <Input label="Password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder={locale === 'pt' ? 'Mín. 6 caracteres' : 'Min. 6 characters'} icon={<Lock size={16} />} required />
+              <Input label="Password" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder={locale === 'pt' ? 'Mín. 8 caracteres' : 'Min. 8 characters'} icon={<Lock size={16} />} required />
               <button type="button" onClick={() => setShowPassword(!showPassword)} style={{ position: 'absolute', right: '12px', bottom: '10px', background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', padding: '4px' }}>
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>

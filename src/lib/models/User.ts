@@ -33,6 +33,9 @@ const UserSchema = new Schema(
         ratings: [
             {
                 userId: { type: Schema.Types.ObjectId, ref: 'User' },
+                // The closed job this review is about — one review per job (see api/users/[id]/review).
+                // Absent on reviews written before 2026-10, when reviews weren't tied to jobs.
+                requestId: { type: Schema.Types.ObjectId, ref: 'Request' },
                 score: { type: Number, min: 1, max: 5 },
                 comment: { type: String },
                 createdAt: { type: Date, default: Date.now },

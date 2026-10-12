@@ -3,24 +3,9 @@
 import { useState, useRef, useEffect, useCallback, Suspense } from 'react';
 import { useLocale } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
-import { Link } from '@/i18n/navigation';
-import { ArrowLeft, CheckCircle, Zap, Send, ExternalLink } from 'lucide-react';
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────────────────────
-interface ResultBlockData {
-  query: string;
-  message: string;
-  urgency: string;
-  category?: string;
-  tags?: string[];
-  city?: string;
-  requestId?: string;
-  /** The request call itself failed. Distinct from "no requestId because the
-   *  visitor isn't signed in" — those need different messages. */
-  failed?: boolean;
-}
+import { Link, useRouter } from '@/i18n/navigation';
+import { ArrowLeft, Send } from 'lucide-react';
+import { categorize } from '@/lib/categorize';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Suggestion chips — service-oriented
@@ -43,247 +28,21 @@ const SUGGESTIONS = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Skeleton loader — a single pulsing status line
-// ─────────────────────────────────────────────────────────────────────────────
-function ScanningState({ locale }: { locale: string }) {
-  const [step, setStep] = useState(0);
-  const steps = locale === 'pt'
-    ? ['A perceber o teu pedido…', 'A escolher a categoria certa…', 'A publicar para os profissionais…']
-    : ['Understanding your request…', 'Picking the right category…', 'Publishing it for professionals…'];
-
-  useEffect(() => {
-    const t = setInterval(() => setStep(s => (s + 1) % steps.length), 1600);
-    return () => clearInterval(t);
-  }, [steps.length]);
-
-  return (
-    <div style={{ padding: '32px 0 8px' }}>
-      {/* Skeleton request header */}
-      <div style={{
-        height: '32px', width: '55%', borderRadius: '8px',
-        background: 'rgba(255,255,255,0.06)',
-        animation: 'shimmer 1.6s ease-in-out infinite',
-        marginBottom: '28px',
-      }} />
-
-      {/* Status line */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: '10px',
-        marginBottom: '28px',
-      }}>
-        <div style={{
-          width: '6px', height: '6px', borderRadius: '50%',
-          background: '#a3a3a3',
-          animation: 'pulseDot 1.6s ease-in-out infinite',
-          flexShrink: 0,
-        }} />
-        <span style={{
-          fontSize: '14px', color: 'rgba(255,255,255,0.40)',
-          fontStyle: 'italic', transition: 'opacity 0.4s ease',
-        }}>
-          {steps[step]}
-        </span>
-      </div>
-
-      {/* Skeleton tag chips — mirrors the "what I understood" block that lands here */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px' }}>
-        {[74, 96, 60, 112].map((w, i) => (
-          <div key={i} style={{
-            height: '26px', width: `${w}px`, borderRadius: 'var(--radius-full)',
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.07)',
-            animation: `shimmer 1.6s ease-in-out ${i * 0.15}s infinite`,
-          }} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Result block — query becomes an H2, pros slide in below
-// ─────────────────────────────────────────────────────────────────────────────
-function ResultBlock({ block, locale, index }: { block: ResultBlockData; locale: string; index: number }) {
-  return (
-    <div style={{
-      paddingBottom: '48px',
-      borderBottom: index > 0 ? '1px solid rgba(255,255,255,0.06)' : 'none',
-      marginBottom: index > 0 ? '48px' : 0,
-    }}>
-      {/* Urgency flag */}
-      {block.urgency === 'Urgent' && (
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: '5px',
-          padding: '4px 10px', borderRadius: '6px',
-          background: 'rgba(255,255,255,0.06)',
-          border: '1px solid rgba(255,255,255,0.10)',
-          marginBottom: '14px',
-          fontSize: '10px', fontWeight: 700, letterSpacing: '0.07em',
-          color: 'rgba(255,255,255,0.50)', textTransform: 'uppercase',
-        }}>
-          <Zap size={9} />
-          {locale === 'pt' ? 'Pedido urgente' : 'Urgent request'}
-        </div>
-      )}
-
-      {/* Request headline */}
-      <h2 style={{
-        fontFamily: 'var(--font-display)',
-        fontSize: 'clamp(20px, 3.5vw, 28px)',
-        fontWeight: 700, color: '#ffffff',
-        lineHeight: 1.2, letterSpacing: '-0.02em',
-        marginBottom: '10px',
-        animation: 'riseIn 0.3s ease both',
-      }}>
-        {block.query}
-      </h2>
-
-      {/* Subtext from matching engine */}
-      <p style={{
-        fontSize: '14px', color: 'rgba(255,255,255,0.38)',
-        marginBottom: '24px', lineHeight: 1.6,
-      }}>
-        {block.message}
-      </p>
-
-      {/* What the AI understood — these are the fields pros will search the feed by,
-          so showing them is a chance for the client to spot a miscategorisation. */}
-      {(block.category || (block.tags && block.tags.length > 0)) && (
-        <>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px',
-          }}>
-            <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-              {locale === 'pt' ? 'O que percebi' : 'What I understood'}
-            </span>
-            <div style={{ flex: 1, height: '1px', background: 'rgba(255,255,255,0.06)' }} />
-          </div>
-
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px', marginBottom: '4px' }}>
-            {[block.category, block.city, ...(block.tags ?? [])]
-              .filter((t): t is string => Boolean(t))
-              .map((tag, i) => (
-                <span key={`${tag}-${i}`} style={{
-                  padding: '5px 11px', borderRadius: 'var(--radius-full)',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.09)',
-                  fontSize: '11px', fontWeight: 600,
-                  color: 'rgba(255,255,255,0.55)',
-                }}>
-                  {tag}
-                </span>
-              ))}
-          </div>
-        </>
-      )}
-
-      {/* Confirmation / View Request */}
-      {block.requestId && (
-        <div style={{
-          marginTop: '20px', padding: '18px 20px',
-          background: 'rgba(34,197,94,0.06)',
-          border: '1px solid rgba(34,197,94,0.18)',
-          borderRadius: '12px',
-          animation: 'riseIn 0.35s ease 0.3s both',
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-            <CheckCircle size={15} color="#22c55e" />
-            <span style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.85)' }}>
-              {locale === 'pt' ? 'Pedido publicado! Os profissionais estão a ser notificados.' : 'Request posted! Professionals are being notified.'}
-            </span>
-          </div>
-          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', marginBottom: '14px', lineHeight: 1.6 }}>
-            {locale === 'pt'
-              ? 'Em média, a primeira proposta chega em ~8 minutos. Serás notificado quando responderam.'
-              : 'On average, the first proposal arrives in ~8 minutes. You will be notified when they respond.'}
-          </p>
-          <Link
-            href={`/requests/${block.requestId}`}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '6px',
-              padding: '8px 16px',
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.14)',
-              borderRadius: '8px',
-              fontSize: '12px', fontWeight: 600,
-              color: 'rgba(255,255,255,0.8)',
-              textDecoration: 'none',
-              transition: 'all 0.15s ease',
-            }}
-            onMouseEnter={e => {
-              (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.14)';
-              (e.currentTarget as HTMLElement).style.color = '#ffffff';
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.08)';
-              (e.currentTarget as HTMLElement).style.color = 'rgba(255,255,255,0.8)';
-            }}
-          >
-            <ExternalLink size={12} />
-            {locale === 'pt' ? 'Ver pedido e propostas →' : 'View request & proposals →'}
-          </Link>
-        </div>
-      )}
-
-      {/* Signed out: the AI understood the need but nothing was saved, because
-          persistence requires a userId. Say so — silently dropping the request
-          leaves the visitor thinking they posted something that doesn't exist. */}
-      {!block.requestId && !block.failed && (
-        <div style={{
-          marginTop: '20px', padding: '18px 20px',
-          background: 'rgba(255,255,255,0.04)',
-          border: '1px solid rgba(255,255,255,0.10)',
-          borderRadius: '12px',
-          animation: 'riseIn 0.35s ease 0.3s both',
-        }}>
-          <p style={{ fontSize: '13px', fontWeight: 700, color: 'rgba(255,255,255,0.85)', marginBottom: '6px' }}>
-            {locale === 'pt' ? 'Falta só entrares na conta' : 'One step left — sign in'}
-          </p>
-          <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', marginBottom: '14px', lineHeight: 1.6 }}>
-            {locale === 'pt'
-              ? 'Para publicares este pedido e receberes propostas, precisas de ter sessão iniciada. O teu pedido ainda não foi guardado.'
-              : 'To post this request and start receiving proposals you need to be signed in. Your request has not been saved yet.'}
-          </p>
-          <Link
-            href={`/auth/signin?callbackUrl=${encodeURIComponent(`/${locale}/concierge?q=${encodeURIComponent(block.query)}`)}`}
-            style={{
-              display: 'inline-flex', alignItems: 'center', gap: '6px',
-              padding: '8px 16px',
-              background: 'rgba(255,255,255,0.10)',
-              border: '1px solid rgba(255,255,255,0.16)',
-              borderRadius: '8px',
-              fontSize: '12px', fontWeight: 600,
-              color: 'rgba(255,255,255,0.85)',
-              textDecoration: 'none',
-            }}
-          >
-            {locale === 'pt' ? 'Entrar e publicar →' : 'Sign in & post →'}
-          </Link>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Inner page
 // ─────────────────────────────────────────────────────────────────────────────
+// The concierge never saves anything. It reads the sentence (src/lib/categorize.ts)
+// and hands off to /requests/new pre-filled, where the client confirms category,
+// price, district and photos. One validated write path: POST /api/requests.
 function ConciergePage() {
   const locale = useLocale() as 'pt' | 'en';
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<ResultBlockData[]>([]);
   const [loading, setLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
   const hasRun = useRef(false);
 
   const suggestions = SUGGESTIONS[locale] ?? SUGGESTIONS.en;
-  const isEmpty = results.length === 0 && !loading;
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [results, loading]);
 
   useEffect(() => {
     const q = searchParams.get('q');
@@ -294,43 +53,20 @@ function ConciergePage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  const submitQuery = useCallback(async (overrideQuery?: string) => {
-    const q = (overrideQuery ?? query).trim();
+  const submitQuery = useCallback((overrideQuery?: string) => {
+    const q = (overrideQuery ?? query).trim().slice(0, 2000);
     if (!q || loading) return;
 
-    setQuery('');
-    if (textareaRef.current) textareaRef.current.style.height = 'auto';
     setLoading(true);
-
-    try {
-      const res = await fetch('/api/ai-match', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: q, locale }),
-      });
-      const data = await res.json();
-      setResults(prev => [...prev, {
-        query: q,
-        message: data.message,
-        urgency: data.urgency,
-        category: data.subcategory ?? data.category,
-        tags: data.tags ?? [],
-        city: data.city,
-        requestId: data.requestId,
-      }]);
-    } catch {
-      setResults(prev => [...prev, {
-        query: q,
-        message: locale === 'pt'
-          ? 'Não foi possível publicar o pedido. Tenta novamente.'
-          : 'Could not post your request. Please try again.',
-        urgency: 'Normal',
-        failed: true,
-      }]);
-    } finally {
-      setLoading(false);
-    }
-  }, [query, locale, loading]);
+    const need = categorize(q);
+    const params = new URLSearchParams({ q });
+    if (need.category) params.set('category', need.category);
+    if (need.subcategory) params.set('subcategory', need.subcategory);
+    if (need.district) params.set('district', need.district);
+    if (need.budget) params.set('budget', String(need.budget));
+    params.set('urgency', need.urgency);
+    router.push(`/requests/new?${params.toString()}`);
+  }, [query, loading, router]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -380,7 +116,7 @@ function ConciergePage() {
         }}>
           needer
           <span style={{ fontWeight: 400, color: 'rgba(255,255,255,0.30)', marginLeft: '6px', fontSize: '13px' }}>
-            / {locale === 'pt' ? 'encontrar profissional' : 'find professional'}
+            / {locale === 'pt' ? 'criar pedido' : 'post a request'}
           </span>
         </span>
 
@@ -392,8 +128,7 @@ function ConciergePage() {
         flex: 1, overflowY: 'auto',
         scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.07) transparent',
       }}>
-        {isEmpty ? (
-          /* ── Empty / onboarding state ── */
+        {/* ── Onboarding state ── */}
           <div style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center',
             justifyContent: 'center', minHeight: '100%',
@@ -413,8 +148,8 @@ function ConciergePage() {
               lineHeight: 1.7, maxWidth: '440px', marginBottom: '40px',
             }}>
               {locale === 'pt'
-                ? 'Descreva o seu problema. Encontramos os melhores profissionais disponíveis para si — rapidamente.'
-                : 'Describe your problem. We find the best available professionals for you — fast.'}
+                ? 'Descreva o que precisa. Preparamos o seu pedido e os profissionais da sua zona enviam-lhe propostas.'
+                : 'Describe what you need. We prepare your request and professionals in your area send you proposals.'}
             </p>
 
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center', maxWidth: '560px' }}>
@@ -447,19 +182,6 @@ function ConciergePage() {
               ))}
             </div>
           </div>
-        ) : (
-          /* ── Results feed ── */
-          <div style={{ maxWidth: '680px', margin: '0 auto', padding: '48px 24px 16px' }}>
-            {results.map((block, i) => (
-              <ResultBlock key={i} block={block} locale={locale} index={i} />
-            ))}
-
-            {/* Loading state */}
-            {loading && <ScanningState locale={locale} />}
-
-            <div ref={bottomRef} />
-          </div>
-        )}
       </div>
 
       {/* ── Input bar ── */}
@@ -490,6 +212,7 @@ function ConciergePage() {
                   : "E.g. 'My bathroom lamp sparked, I need an electrician in Lisbon' or 'Looking for a React developer for a 2-week sprint'…"
               }
               disabled={loading}
+              maxLength={2000}
               rows={2}
               style={{
                 width: '100%', padding: '16px 56px 16px 18px',
@@ -526,25 +249,13 @@ function ConciergePage() {
             letterSpacing: '0.01em',
           }}>
             {locale === 'pt'
-              ? 'Enter para pesquisar · Shift+Enter para nova linha'
-              : 'Enter to search · Shift+Enter for new line'}
+              ? 'Enter para continuar · Shift+Enter para nova linha'
+              : 'Enter to continue · Shift+Enter for new line'}
           </p>
         </div>
       </div>
 
       <style>{`
-        @keyframes riseIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes shimmer {
-          0%, 100% { opacity: 0.4; }
-          50%       { opacity: 0.7; }
-        }
-        @keyframes pulseDot {
-          0%, 100% { opacity: 0.3; transform: scale(0.8); }
-          50%       { opacity: 1;   transform: scale(1); }
-        }
         textarea::placeholder { color: rgba(255,255,255,0.20) !important; }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }

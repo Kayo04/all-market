@@ -9,7 +9,8 @@ import { ArrowLeft, ArrowRight, MapPin, Euro, Send, Zap, Clock, ShieldCheck, Ima
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
-import { categories } from '@/lib/categories';
+import { categories, isValidSubcategory } from '@/lib/categories';
+import { districts, getDistrict } from '@/lib/districts';
 
 // Preserves in-progress form data across the login redirect (see handleSubmit) —
 // sessionStorage so it never survives past the tab/session.
@@ -23,9 +24,16 @@ export default function NewRequestPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const initialCategory = categories.find((c) => c.key === searchParams.get('category'))?.key || '';
+  // Pre-fill: the concierge (src/lib/categorize.ts) and the category grid link here
+  // with query params. Anything unrecognised is dropped so the client picks it.
+  const param = (k: string) => searchParams.get(k) || '';
+  const initialCategory = categories.find((c) => c.key === param('category'))?.key || '';
+  const initialSubcategory = isValidSubcategory(initialCategory, param('subcategory')) ? param('subcategory') : '';
+  const initialText = param('q').slice(0, 2000);
+  const initialBudget = Number(param('budget')) > 0 ? String(Math.round(Number(param('budget')))) : '';
 
-  const [step, setStep] = useState(1);
+  // Coming from the concierge with a recognised category, jump straight to the details.
+  const [step, setStep] = useState(initialText && initialSubcategory ? 2 : 1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [imageUploading, setImageUploading] = useState(false);
@@ -33,13 +41,14 @@ export default function NewRequestPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
-    title: '',
-    description: '',
+    title: initialText.slice(0, 120),
+    description: initialText,
     category: initialCategory,
-    subcategory: '',
-    fixedPrice: '',
-    location: locale === 'pt' ? 'Porto, Portugal' : 'Porto, Portugal',
-    urgency: 'Normal' as 'Urgent' | 'Normal',
+    subcategory: initialSubcategory,
+    fixedPrice: initialBudget,
+    district: getDistrict(param('district'))?.key || '',
+    locality: '',
+    urgency: (param('urgency') === 'Urgent' ? 'Urgent' : 'Normal') as 'Urgent' | 'Normal',
     intentConfirmed: false,
     images: [] as string[],
   });
@@ -125,11 +134,10 @@ export default function NewRequestPage() {
           category: form.category,
           subcategory: form.subcategory,
           budget: parseFloat(form.fixedPrice),
-          fixedPrice: parseFloat(form.fixedPrice),
           urgency: form.urgency,
           intentConfirmed: form.intentConfirmed,
-          location: { type: 'Point', coordinates: [0, 0] },
-          locationLabel: form.location,
+          district: form.district,
+          locationLabel: form.locality,
           images: form.images,
         }),
       });
@@ -320,6 +328,7 @@ export default function NewRequestPage() {
             <Input
               label={t('title')}
               value={form.title}
+              maxLength={120}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder={locale === 'pt' ? 'Ex: Preciso de canalizador urgente' : 'E.g.: Need a plumber urgently'}
             />
@@ -330,6 +339,7 @@ export default function NewRequestPage() {
               </label>
               <textarea
                 value={form.description}
+                maxLength={2000}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 placeholder={locale === 'pt' ? 'Descreve o problema com detalhe...' : 'Describe the problem in detail...'}
                 rows={5}
@@ -346,6 +356,11 @@ export default function NewRequestPage() {
                   resize: 'vertical',
                 }}
               />
+              {form.description !== '' && form.description.trim().length < 10 && (
+                <span style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
+                  {locale === 'pt' ? 'Escreve pelo menos 10 caracteres.' : 'Write at least 10 characters.'}
+                </span>
+              )}
             </div>
 
             {/* Photos */}
@@ -478,7 +493,7 @@ export default function NewRequestPage() {
               <Button variant="ghost" onClick={() => setStep(1)} icon={<ArrowLeft size={16} />}>
                 {tc('back')}
               </Button>
-              <Button onClick={() => setStep(3)} disabled={!form.title || !form.description} icon={<ArrowRight size={16} />}>
+              <Button onClick={() => setStep(3)} disabled={form.title.trim().length < 3 || form.description.trim().length < 10} icon={<ArrowRight size={16} />}>
                 {tc('next')}
               </Button>
             </div>
@@ -529,11 +544,39 @@ export default function NewRequestPage() {
               </p>
             )}
 
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <label htmlFor="district" style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-secondary)' }}>
+                {locale === 'pt' ? 'Distrito' : 'District'}
+              </label>
+              <select
+                id="district"
+                value={form.district}
+                onChange={(e) => setForm({ ...form, district: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '10px 14px',
+                  fontSize: '14px',
+                  fontFamily: 'var(--font-sans)',
+                  backgroundColor: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-md)',
+                  outline: 'none',
+                }}
+              >
+                <option value="">{locale === 'pt' ? 'Escolhe o distrito…' : 'Choose a district…'}</option>
+                {districts.map((d) => (
+                  <option key={d.key} value={d.key}>{locale === 'pt' ? d.labelPT : d.labelEN}</option>
+                ))}
+              </select>
+            </div>
+
             <Input
-              label={t('location')}
-              value={form.location}
-              onChange={(e) => setForm({ ...form, location: e.target.value })}
-              placeholder="Porto, Portugal"
+              label={locale === 'pt' ? 'Localidade (opcional)' : 'Town (optional)'}
+              value={form.locality}
+              maxLength={80}
+              onChange={(e) => setForm({ ...form, locality: e.target.value })}
+              placeholder={locale === 'pt' ? 'Ex: Matosinhos' : 'E.g.: Matosinhos'}
               icon={<MapPin size={16} />}
             />
 
@@ -543,7 +586,7 @@ export default function NewRequestPage() {
               </Button>
               <Button
                 onClick={() => setStep(4)}
-                disabled={!form.fixedPrice || parseFloat(form.fixedPrice) <= 0 || !form.location}
+                disabled={!form.fixedPrice || parseFloat(form.fixedPrice) <= 0 || !form.district}
                 icon={<ArrowRight size={16} />}
               >
                 {tc('next')}
@@ -594,7 +637,11 @@ export default function NewRequestPage() {
               <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '4px' }}>{form.title}</div>
               <div style={{ display: 'flex', gap: '16px', fontSize: '13px', color: 'var(--text-secondary)' }}>
                 <span>€{form.fixedPrice}</span>
-                <span>{form.location}</span>
+                <span>
+                  {[form.locality, locale === 'pt' ? getDistrict(form.district)?.labelPT : getDistrict(form.district)?.labelEN]
+                    .filter(Boolean)
+                    .join(', ')}
+                </span>
                 {form.urgency === 'Urgent' && (
                   <span style={{ color: 'var(--accent-warm)', fontWeight: 600 }}>
                     🔥 {locale === 'pt' ? 'Urgente' : 'Urgent'}

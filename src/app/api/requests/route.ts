@@ -4,7 +4,11 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import RequestModel from '@/lib/models/Request';
 import Proposal from '@/lib/models/Proposal';
-import { getCategoryType } from '@/lib/categories';
+import { z } from 'zod';
+import { getCategoryType, isValidSubcategory } from '@/lib/categories';
+import { DISTRICT_KEYS, getDistrict } from '@/lib/districts';
+import { notifyMatchingPros } from '@/lib/notifications';
+import { euros, parseBody, text, uploadedImageUrl } from '@/lib/validation';
 
 // GET: List/filter requests (with geospatial queries)
 export async function GET(request: Request) {
@@ -13,14 +17,17 @@ export async function GET(request: Request) {
 
         const { searchParams } = new URL(request.url);
         const category = searchParams.get('category');
-        const status = searchParams.get('status') || 'open';
+        const statusParam = searchParams.get('status') || 'open';
+        const status = ['open', 'accepted', 'in_progress', 'closed'].includes(statusParam) ? statusParam : 'open';
+        const district = searchParams.get('district');
         const mine = searchParams.get('mine');
         const lng = searchParams.get('lng');
         const lat = searchParams.get('lat');
         const radius = searchParams.get('radius'); // in km
         const q = searchParams.get('q')?.trim();
-        const page = parseInt(searchParams.get('page') || '1');
-        const limit = parseInt(searchParams.get('limit') || '20');
+        // Clamp paging: an unbounded ?limit= lets anyone pull the whole collection in one call.
+        const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1);
+        const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '20') || 20));
         const skip = (page - 1) * limit;
 
         // Build query
@@ -37,7 +44,11 @@ export async function GET(request: Request) {
         }
 
         if (category) {
-            query.category = category;
+            query.category = String(category);
+        }
+
+        if (district) {
+            query.district = String(district);
         }
 
         // Free-text search across the fields a browsing pro would actually scan.
@@ -58,7 +69,7 @@ export async function GET(request: Request) {
         }
 
         // Geospatial query: find requests near a point
-        if (lng && lat && radius) {
+        if (lng && lat && radius && [lng, lat, radius].every((v) => Number.isFinite(parseFloat(v)))) {
             query.location = {
                 $nearSphere: {
                     $geometry: {
@@ -120,7 +131,28 @@ export async function GET(request: Request) {
     }
 }
 
-// POST: Create a new request
+// POST: Create a new request — the only way a request is ever written. The
+// concierge only pre-fills the form (src/lib/categorize.ts); it no longer saves.
+const createRequestSchema = z
+    .object({
+        title: text(120, 3),
+        description: text(2000, 10),
+        category: z.string(),
+        subcategory: z.string(),
+        budget: euros,
+        urgency: z.enum(['Normal', 'High', 'Urgent']).default('Normal'),
+        intentConfirmed: z.literal(true, { error: 'You must confirm your commitment' }),
+        district: z.enum(DISTRICT_KEYS, { error: 'Choose a district' }),
+        locationLabel: text(80, 0).optional(),
+        itemCondition: z.enum(['new', 'used', 'any']).optional(),
+        acceptsTrades: z.boolean().optional(),
+        images: z.array(uploadedImageUrl).max(5, 'At most 5 photos').default([]),
+    })
+    .refine((b) => isValidSubcategory(b.category, b.subcategory), {
+        message: 'Unknown category/subcategory',
+        path: ['subcategory'],
+    });
+
 export async function POST(request: Request) {
     try {
         const session = await getServerSession(authOptions);
@@ -128,58 +160,34 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
+        const { data, error } = await parseBody(request, createRequestSchema);
+        if (error) return error;
+
         await dbConnect();
 
-        const body = await request.json();
-        const {
-            title,
-            description,
-            category,
-            subcategory,
-            budget,
-            fixedPrice,
-            urgency,
-            intentConfirmed,
-            location,
-            locationLabel,
-            itemCondition,
-            acceptsTrades,
-            images,
-        } = body;
-
-        if (!title || !description || !category || !subcategory || budget === undefined || !location) {
-            return NextResponse.json(
-                { error: 'Missing required fields' },
-                { status: 400 }
-            );
-        }
-
-        if (typeof budget !== 'number' || !Number.isFinite(budget) || budget <= 0) {
-            return NextResponse.json(
-                { error: 'Price must be greater than €0' },
-                { status: 400 }
-            );
-        }
-
         const userId = (session.user as { id: string }).id;
+        const district = getDistrict(data.district)!;
 
         const newRequest = await RequestModel.create({
-            title,
-            description,
-            category,
-            subcategory,
-            budget,
-            fixedPrice: fixedPrice ?? budget,
-            type: getCategoryType(category),
-            urgency: urgency || 'Normal',
-            intentConfirmed: intentConfirmed === true,
-            location,
-            locationLabel: locationLabel || '',
+            title: data.title,
+            description: data.description,
+            category: data.category,
+            subcategory: data.subcategory,
+            budget: data.budget,
+            fixedPrice: data.budget,
+            type: getCategoryType(data.category),
+            urgency: data.urgency,
+            intentConfirmed: true,
+            district: district.key,
+            location: { type: 'Point', coordinates: district.coords },
+            locationLabel: data.locationLabel || district.labelPT,
             userId,
-            itemCondition: itemCondition || undefined,
-            acceptsTrades: acceptsTrades !== undefined ? acceptsTrades : undefined,
-            images: Array.isArray(images) ? images.filter((i) => typeof i === 'string').slice(0, 5) : [],
+            itemCondition: data.itemCondition,
+            acceptsTrades: data.acceptsTrades,
+            images: data.images,
         });
+
+        await notifyMatchingPros(newRequest);
 
         return NextResponse.json(
             { message: 'Request created', request: newRequest },

@@ -35,13 +35,10 @@ export const authOptions: AuthOptions = {
                 await dbConnect();
 
                 const user = await User.findOne({ email });
-                if (!user || user.isDeleted) {
-                    throw new Error('No account found with this email');
-                }
-
-                const isValid = await bcrypt.compare(credentials.password, user.password);
-                if (!isValid) {
-                    throw new Error('Invalid password');
+                // Same message for "no such account" and "wrong password", so the login
+                // form can't be used to discover who has an account.
+                if (!user || user.isDeleted || !(await bcrypt.compare(credentials.password, user.password))) {
+                    throw new Error('Invalid email or password');
                 }
 
                 return {

@@ -52,7 +52,7 @@ const LANGUAGE_OPTIONS: { value: 'pt' | 'en'; label: string; flag: string }[] = 
 type PrefKey = 'proposals' | 'messages' | 'newRequests' | 'reviews';
 
 // proOnly marks categories only ever sent to professionals — `new_request` goes to
-// pros whose category matches (ai-match), and `new_review` to the pro being reviewed.
+// pros whose category matches (notifyMatchingPros), and `new_review` to the pro being reviewed.
 // Showing those toggles to a client would be a dead control.
 const NOTIFICATION_OPTIONS: {
   key: PrefKey;
@@ -211,10 +211,10 @@ export default function SettingsPage() {
       setPwError(locale === 'pt' ? 'As passwords novas não coincidem.' : 'New passwords do not match.');
       return;
     }
-    if (pwForm.next.length < 6) {
+    if (pwForm.next.length < 8) {
       setPwError(locale === 'pt'
-        ? 'A password deve ter pelo menos 6 caracteres.'
-        : 'Password must be at least 6 characters.');
+        ? 'A password deve ter pelo menos 8 caracteres.'
+        : 'Password must be at least 8 characters.');
       return;
     }
 

@@ -2,7 +2,19 @@ import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
+import { z } from 'zod';
 import { rateLimit } from '@/lib/rateLimit';
+import { email, parseBody, password, phone, text } from '@/lib/validation';
+
+const registerSchema = z.object({
+    name: text(80, 2),
+    email,
+    password,
+    phone: phone.optional(),
+    role: z.enum(['client', 'pro']).default('client'),
+    locationLabel: text(80, 0).optional(),
+    agreedToTerms: z.literal(true, { error: 'You must agree to the Terms of Service and Privacy Policy' }),
+});
 
 export async function POST(request: Request) {
     try {
@@ -14,29 +26,14 @@ export async function POST(request: Request) {
             );
         }
 
-        const body = await request.json();
-        const { name, email, password, phone, role, locationLabel, agreedToTerms } = body;
-
-        if (!name || !email || !password) {
-            return NextResponse.json(
-                { error: 'Name, email and password are required' },
-                { status: 400 }
-            );
-        }
-
-        if (agreedToTerms !== true) {
-            return NextResponse.json(
-                { error: 'You must agree to the Terms of Service and Privacy Policy' },
-                { status: 400 }
-            );
-        }
-
-        const assignedRole = role === 'pro' ? 'pro' : 'client';
+        const { data, error } = await parseBody(request, registerSchema);
+        if (error) return error;
+        const { name, email, password, phone, role: assignedRole, locationLabel } = data;
 
         await dbConnect();
 
         // Check if user exists
-        const existing = await User.findOne({ email: email.toLowerCase() });
+        const existing = await User.findOne({ email });
         if (existing) {
             return NextResponse.json(
                 { error: 'An account with this email already exists' },
@@ -50,7 +47,7 @@ export async function POST(request: Request) {
         // Create user
         const user = await User.create({
             name,
-            email: email.toLowerCase(),
+            email,
             password: hashedPassword,
             role: assignedRole,
             phone: phone || '',
