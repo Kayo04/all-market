@@ -38,51 +38,6 @@ interface UserProfile {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Mock enrichment data for mock pro IDs (demo mode)
-// ─────────────────────────────────────────────────────────────────────────────
-
-const MOCK_ENRICHMENT: Record<string, Partial<UserProfile> & { responseTime: string; jobsCompleted: number }> = {
-  'mock-plumb-1': {
-    name: 'AquaFix Pro', bio: 'Professional plumbing services with over 12 years of experience. Specialized in emergency repairs, pipe installations, and bathroom renovations. Licensed and insured. Available 24/7 for urgent calls in the Porto metropolitan area.',
-    skills: ['Emergency Repairs', 'Pipe Installation', 'Bathroom Renovation', 'Leak Detection', 'Water Heater'],
-    locationLabel: 'Porto', proCategory: 'Plumbers', rating: 4.9, isVerified: true, hasSponsoredSpot: true,
-    responseTime: '~8 min', jobsCompleted: 247,
-    ratings: [
-      { userId: 'u1', score: 5, comment: 'Fixed a burst pipe in under an hour at 11PM. Lifesaver!', createdAt: '2026-05-20T10:00:00Z' },
-      { userId: 'u2', score: 5, comment: 'Very professional. Clean work, fair price. Highly recommend.', createdAt: '2026-04-15T14:00:00Z' },
-      { userId: 'u3', score: 4, comment: 'Good work on my bathroom renovation. Slightly over budget but quality was excellent.', createdAt: '2026-03-10T09:00:00Z' },
-    ],
-  },
-  'mock-plumb-2': {
-    name: 'Carlos Canalização', bio: 'Family-run plumbing business in Gaia since 2009. We treat every home like our own. Fair pricing, honest service, and we always clean up after ourselves.',
-    skills: ['Residential Plumbing', 'Drain Cleaning', 'Fixture Installation', 'Water Filtration'],
-    locationLabel: 'Gaia', proCategory: 'Plumbers', rating: 4.6, isVerified: true,
-    responseTime: '~15 min', jobsCompleted: 183,
-    ratings: [
-      { userId: 'u4', score: 5, comment: 'Carlos came the same day. Fixed the issue and charged exactly what he quoted.', createdAt: '2026-06-01T11:00:00Z' },
-      { userId: 'u5', score: 4, comment: 'Solid work. Would call again.', createdAt: '2026-05-10T16:00:00Z' },
-    ],
-  },
-  'mock-elec-1': {
-    name: 'Electro Solutions', bio: 'Certified electricians serving Porto and surrounding areas. From residential wiring to commercial installations. 24/7 emergency service. All work guaranteed for 2 years.',
-    skills: ['Emergency Electrical', 'Wiring', 'Fuse Box Upgrade', 'Smart Home', 'EV Charger Install'],
-    locationLabel: 'Porto', proCategory: 'Electricians', rating: 4.9, isVerified: true, hasSponsoredSpot: true,
-    responseTime: '~5 min', jobsCompleted: 312,
-    ratings: [
-      { userId: 'u6', score: 5, comment: 'Arrived 20 minutes after my call. Sparking socket fixed safely.', createdAt: '2026-06-10T20:00:00Z' },
-      { userId: 'u7', score: 5, comment: 'Upgraded our entire fuse box. Clean work, very knowledgeable.', createdAt: '2026-05-25T08:00:00Z' },
-    ],
-  },
-};
-
-// Fallback for any mock pro not explicitly enriched
-const DEFAULT_MOCK: { responseTime: string; jobsCompleted: number; bio: string; skills: string[] } = {
-  responseTime: '~12 min', jobsCompleted: 85,
-  bio: 'Verified professional on the Needer platform. Available for new projects.',
-  skills: ['Professional Service'],
-};
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Stars component
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -118,31 +73,8 @@ export default function PublicProfilePage() {
   const id = params.id as string;
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const isMock = id.startsWith('mock-');
 
   useEffect(() => {
-    if (isMock) {
-      // For mock IDs, build a synthetic profile from enrichment data
-      const enrichment = MOCK_ENRICHMENT[id];
-      const defaults = DEFAULT_MOCK;
-      setUser({
-        _id: id,
-        name: enrichment?.name ?? id,
-        role: 'pro',
-        isVerified: enrichment?.isVerified ?? true,
-        bio: enrichment?.bio ?? defaults.bio,
-        skills: enrichment?.skills ?? defaults.skills,
-        locationLabel: enrichment?.locationLabel ?? 'Porto',
-        proCategory: enrichment?.proCategory ?? 'Professional',
-        hasSponsoredSpot: enrichment?.hasSponsoredSpot ?? false,
-        rating: enrichment?.rating ?? 4.5,
-        ratings: (enrichment?.ratings ?? []) as ReviewData[],
-        createdAt: '2024-03-15T00:00:00Z',
-      });
-      setLoading(false);
-      return;
-    }
-
     async function fetchUser() {
       try {
         const res = await fetch(`/api/users/${id}`);
@@ -157,12 +89,9 @@ export default function PublicProfilePage() {
       }
     }
     fetchUser();
-  }, [id, isMock]);
+  }, [id]);
 
   // Derived data
-  const enrichment = isMock ? (MOCK_ENRICHMENT[id] ?? DEFAULT_MOCK) : null;
-  const responseTime = enrichment?.responseTime ?? '~12 min';
-  const jobsCompleted = enrichment?.jobsCompleted ?? 0;
   const isPro = user?.role === 'pro';
   const avgRating = user?.rating ?? 0;
   const reviewCount = user?.ratings?.length ?? 0;
@@ -335,12 +264,12 @@ export default function PublicProfilePage() {
             {
               icon: <Briefcase size={16} />,
               label: locale === 'pt' ? 'Trabalhos concluídos' : 'Jobs completed',
-              value: isMock ? jobsCompleted.toString() : '—',
+              value: '—',
             },
             {
               icon: <Clock size={16} />,
               label: locale === 'pt' ? 'Tempo de resposta' : 'Response time',
-              value: isMock ? responseTime : '—',
+              value: '—',
             },
             {
               icon: <Calendar size={16} />,

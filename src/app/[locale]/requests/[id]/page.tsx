@@ -50,40 +50,6 @@ interface DraftItem {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Mock proposal enrichment for demo (mock proId fields)
-// ─────────────────────────────────────────────────────────────────────────────
-
-const MOCK_PRO_DATA: Record<string, { name: string; isVerified: boolean; rating: number }> = {
-  'mock-plumb-1': { name: 'AquaFix Pro', isVerified: true, rating: 4.9 },
-  'mock-plumb-2': { name: 'Carlos Canalização', isVerified: true, rating: 4.6 },
-  'mock-plumb-3': { name: 'Rui & Filhos', isVerified: false, rating: 4.4 },
-  'mock-elec-1': { name: 'Electro Solutions', isVerified: true, rating: 4.9 },
-  'mock-elec-2': { name: 'José Ramos', isVerified: true, rating: 4.7 },
-  'mock-elec-3': { name: 'G&M Electricidade', isVerified: false, rating: 4.5 },
-  'mock-clean-1': { name: 'CleanHome Elite', isVerified: true, rating: 4.9 },
-  'mock-clean-2': { name: 'Brilho Total', isVerified: true, rating: 4.7 },
-  'mock-mech-1': { name: 'AutoTech Premium', isVerified: true, rating: 4.9 },
-  'mock-mech-2': { name: 'Oficina Central', isVerified: true, rating: 4.6 },
-};
-
-function enrichProposal(p: ProposalData): ProposalData {
-  // If proId is a string (mock), build a synthetic proId object
-  if (typeof p.proId === 'string') {
-    const mock = MOCK_PRO_DATA[p.proId as string];
-    return {
-      ...p,
-      proId: {
-        _id: p.proId as string,
-        name: mock?.name ?? 'Professional',
-        isVerified: mock?.isVerified ?? false,
-        ratings: mock ? [{ score: mock.rating }] : [],
-      },
-    };
-  }
-  return p;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // Proposal Card
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -313,7 +279,7 @@ export default function RequestDetailPage() {
       const res = await fetch(`/api/proposals?requestId=${id}`);
       if (res.ok) {
         const data = await res.json();
-        setProposals((data.proposals ?? []).map(enrichProposal));
+        setProposals(data.proposals ?? []);
       }
     } catch (err) {
       console.error('Error loading proposals:', err);
@@ -801,8 +767,8 @@ export default function RequestDetailPage() {
           </h3>
           <p style={{ fontSize: '13px', color: 'var(--text-tertiary)', lineHeight: 1.7 }}>
             {locale === 'pt'
-              ? 'Os profissionais estão a ser notificados. Em média, a primeira proposta chega em ~8 minutos.'
-              : 'Professionals are being notified. On average, the first proposal arrives in ~8 minutes.'}
+              ? 'Avisámos os profissionais desta categoria. Recebes uma notificação quando chegar a primeira proposta.'
+              : 'We notified the professionals in this category. You\'ll get a notification when the first proposal arrives.'}
           </p>
           <div style={{
             display: 'flex', gap: '6px', justifyContent: 'center', marginTop: '16px',
