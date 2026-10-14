@@ -4,9 +4,10 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { Link, useRouter } from '@/i18n/navigation';
 import { useLocale } from 'next-intl';
-import { Mail, Lock, User, Eye, EyeOff, Phone, Briefcase, Search } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, Phone } from 'lucide-react';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
+import { safeCallbackUrl } from '@/lib/redirect';
 
 export default function RegisterPage() {
   const locale = useLocale();
@@ -18,7 +19,6 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<'client' | 'pro'>('client');
   const [agreed, setAgreed] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,7 +47,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, phone, password, role, agreedToTerms: agreed }),
+        body: JSON.stringify({ name, email, phone, password, agreedToTerms: agreed }),
       });
 
       const data = await res.json();
@@ -60,7 +60,11 @@ export default function RegisterPage() {
       if (signInResult?.error) {
         router.push('/auth/login');
       } else {
-        router.push(role === 'pro' ? '/dashboard/pro/onboarding' : '/dashboard');
+        // Everyone signs up as a client; becoming a pro is a separate, reviewed step
+        // on /pro, which sends people here with ?callbackUrl=/pt/pro to come back to.
+        const callbackUrl = safeCallbackUrl(new URLSearchParams(window.location.search).get('callbackUrl'));
+        if (callbackUrl) window.location.href = callbackUrl;
+        else router.push('/dashboard');
       }
     } catch {
       setError(locale === 'pt' ? 'Algo correu mal' : 'Something went wrong');
@@ -96,47 +100,6 @@ export default function RegisterPage() {
           <p style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
             {locale === 'pt' ? 'Rápido, gratuito e sem complicações.' : 'Quick, free, and no fuss.'}
           </p>
-        </div>
-
-        {/* Role Toggle */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
-          {[
-            { value: 'client' as const, icon: Search, labelEN: 'I need help', labelPT: 'Preciso de ajuda' },
-            { value: 'pro' as const, icon: Briefcase, labelEN: "I'm a professional", labelPT: 'Sou profissional' },
-          ].map(opt => {
-            const Icon = opt.icon;
-            const isActive = role === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => setRole(opt.value)}
-                style={{
-                  flex: 1,
-                  padding: '12px 10px',
-                  borderRadius: 'var(--radius-md)',
-                  border: `2px solid ${isActive ? 'var(--accent)' : 'var(--border)'}`,
-                  background: isActive ? 'rgba(29,191,115,0.08)' : 'transparent',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.15s ease',
-                  fontFamily: 'var(--font-sans)',
-                }}
-              >
-                <Icon size={18} color={isActive ? 'var(--accent)' : 'var(--text-tertiary)'} />
-                <span style={{
-                  fontSize: '12px',
-                  fontWeight: isActive ? 700 : 500,
-                  color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                }}>
-                  {locale === 'pt' ? opt.labelPT : opt.labelEN}
-                </span>
-              </button>
-            );
-          })}
         </div>
 
         {/* Error */}

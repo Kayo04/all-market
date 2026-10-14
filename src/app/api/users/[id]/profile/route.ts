@@ -4,7 +4,7 @@ import { avatarUrl, isObjectId, parseBody, phone, skills, text } from '@/lib/val
 import { isValidProCategory } from '@/lib/categories';
 
 // Whitelist of self-editable fields. zod strips everything else, so this can't be
-// used to set role (beyond the one allowed upgrade), isVerified, rating, etc.
+// used to set role, isVerified, rating, etc.
 const profileSchema = z.object({
     bio: text(1000, 0).optional(),
     skills: skills.optional(),
@@ -12,8 +12,6 @@ const profileSchema = z.object({
     locationLabel: text(80, 0).optional(),
     phone: phone.optional(),
     avatar: avatarUrl.optional(),
-    // Self-service role change is only ever an upgrade to 'pro' (see /pro page).
-    role: z.literal('pro').optional(),
 });
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';

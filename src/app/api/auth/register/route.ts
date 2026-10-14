@@ -11,7 +11,8 @@ const registerSchema = z.object({
     email,
     password,
     phone: phone.optional(),
-    role: z.enum(['client', 'pro']).default('client'),
+    // No role field: every account starts as a client. Becoming a pro is an
+    // application reviewed by an admin, never a sign-up choice.
     locationLabel: text(80, 0).optional(),
     agreedToTerms: z.literal(true, { error: 'You must agree to the Terms of Service and Privacy Policy' }),
 });
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
 
         const { data, error } = await parseBody(request, registerSchema);
         if (error) return error;
-        const { name, email, password, phone, role: assignedRole, locationLabel } = data;
+        const { name, email, password, phone, locationLabel } = data;
 
         await dbConnect();
 
@@ -48,7 +49,7 @@ export async function POST(request: Request) {
             name,
             email,
             password: hashedPassword,
-            role: assignedRole,
+            role: 'client',
             phone: phone || '',
             locationLabel: locationLabel || '',
             location: { type: 'Point', coordinates: [0, 0] },

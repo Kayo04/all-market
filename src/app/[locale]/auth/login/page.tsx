@@ -9,12 +9,7 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Card from '@/components/ui/Card';
-
-// Only follow same-site relative paths — never an absolute/protocol-relative URL (open-redirect guard)
-function safeCallbackUrl(url: string | null): string | null {
-  if (!url || !url.startsWith('/') || url.startsWith('//')) return null;
-  return url;
-}
+import { safeCallbackUrl } from '@/lib/redirect';
 
 export default function LoginPage() {
   const t = useTranslations('auth');
@@ -25,6 +20,11 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Someone sent here from a page (e.g. /pro) who needs an account instead should
+  // still land back on that page after registering.
+  const returnTo = safeCallbackUrl(searchParams.get('callbackUrl'));
+  const registerHref = returnTo ? `/auth/register?callbackUrl=${encodeURIComponent(returnTo)}` : '/auth/register';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,16 +63,16 @@ export default function LoginPage() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '100px 24px 60px',
+        padding: '80px 16px 32px',
       }}
     >
       <Card
         variant="default"
         hover={false}
-        style={{ width: '100%', maxWidth: '400px', padding: '32px' }}
+        style={{ width: '100%', maxWidth: '400px', padding: '24px' }}
       >
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <h1
             style={{
               fontFamily: 'var(--font-display)',
@@ -162,7 +162,7 @@ export default function LoginPage() {
         >
           {t('noAccount')}{' '}
           <Link
-            href="/auth/register"
+            href={registerHref}
             style={{ color: 'var(--accent)', fontWeight: 600, textDecoration: 'none' }}
           >
             {t('registerBtn')}
