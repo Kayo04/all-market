@@ -9,6 +9,7 @@ import { getCategoryType, isValidSubcategory } from '@/lib/categories';
 import { DISTRICT_KEYS, getDistrict } from '@/lib/districts';
 import { notifyMatchingPros } from '@/lib/notifications';
 import { euros, parseBody, text, uploadedImageUrl } from '@/lib/validation';
+import { HOUR, rateLimit, tooManyRequests } from '@/lib/rateLimit';
 
 // GET: List/filter requests (with geospatial queries)
 export async function GET(request: Request) {
@@ -162,6 +163,11 @@ export async function POST(request: Request) {
 
         const { data, error } = await parseBody(request, createRequestSchema);
         if (error) return error;
+
+        // Counted after validation, so a form rejected for bad input doesn't use up the quota.
+        if (!(await rateLimit(`create-request:${(session.user as { id: string }).id}`, 10, HOUR))) {
+            return NextResponse.json(tooManyRequests, { status: 429 });
+        }
 
         await dbConnect();
 

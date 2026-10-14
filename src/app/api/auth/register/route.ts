@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
 import { z } from 'zod';
-import { rateLimit } from '@/lib/rateLimit';
+import { clientIp, MINUTE, rateLimit } from '@/lib/rateLimit';
 import { email, parseBody, password, phone, text } from '@/lib/validation';
 
 const registerSchema = z.object({
@@ -18,8 +18,7 @@ const registerSchema = z.object({
 
 export async function POST(request: Request) {
     try {
-        const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
-        if (!rateLimit(`register:${ip}`, 5, 15 * 60 * 1000)) {
+        if (!(await rateLimit(`register:${clientIp(request.headers)}`, 5, 15 * MINUTE))) {
             return NextResponse.json(
                 { error: 'Too many accounts created from this address. Please try again later.' },
                 { status: 429 }

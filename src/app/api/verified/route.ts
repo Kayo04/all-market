@@ -5,6 +5,7 @@ import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
 import { z } from 'zod';
 import { isValidNif, parseBody, text } from '@/lib/validation';
+import { HOUR, rateLimit, tooManyRequests } from '@/lib/rateLimit';
 
 const verificationSchema = z.object({
     businessName: text(120, 2),
@@ -54,6 +55,12 @@ export async function POST(request: Request) {
 
         const { data, error } = await parseBody(request, verificationSchema);
         if (error) return error;
+
+        // Counted after validation, so a form rejected for bad input doesn't use up the quota.
+        if (!(await rateLimit(`verification:${(session.user as { id: string }).id}`, 5, HOUR))) {
+            return NextResponse.json(tooManyRequests, { status: 429 });
+        }
+
         const { businessName, taxId, website } = data;
 
         await dbConnect();

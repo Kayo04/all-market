@@ -9,6 +9,7 @@ import Proposal from '@/lib/models/Proposal';
 import { createNotification } from '@/lib/notifications';
 import { z } from 'zod';
 import { objectId, parseBody, text } from '@/lib/validation';
+import { MINUTE, rateLimit, tooManyRequests } from '@/lib/rateLimit';
 
 const sendMessageSchema = z.object({
     receiverId: objectId,
@@ -118,6 +119,12 @@ export async function POST(request: Request) {
         const user = session.user as { id: string; name?: string };
         const { data, error } = await parseBody(request, sendMessageSchema);
         if (error) return error;
+
+        // Counted after validation, so a form rejected for bad input doesn't use up the quota.
+        if (!(await rateLimit(`message:${(session.user as { id: string }).id}`, 60, 10 * MINUTE))) {
+            return NextResponse.json(tooManyRequests, { status: 429 });
+        }
+
         const { receiverId, requestId, content } = data;
 
         await dbConnect();

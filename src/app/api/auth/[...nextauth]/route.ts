@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
 import { JWT } from 'next-auth/jwt';
-import { rateLimit } from '@/lib/rateLimit';
+import { clientIp, MINUTE, rateLimit } from '@/lib/rateLimit';
 
 interface ExtendedUser extends NextAuthUser {
     role: string;
@@ -19,16 +19,21 @@ export const authOptions: AuthOptions = {
                 email: { label: 'Email', type: 'email' },
                 password: { label: 'Password', type: 'password' },
             },
-            async authorize(credentials) {
+            async authorize(credentials, req) {
                 if (!credentials?.email || !credentials?.password) {
                     throw new Error('Email and password are required');
                 }
 
-                // Per-account lockout against credential stuffing/brute force. Keyed on the
-                // email being attempted (not IP — NextAuth v4's authorize() doesn't reliably
-                // expose the caller's real IP across all deployment targets).
+                // Two limits: per account (brute-forcing one password) and per IP (one
+                // machine trying many accounts). The IP comes from the platform proxy's
+                // x-forwarded-for; where it's missing everyone shares 'unknown', so that
+                // limit is generous.
                 const email = credentials.email.toLowerCase();
-                if (!rateLimit(`login:${email}`, 10, 15 * 60 * 1000)) {
+                const ip = clientIp(req?.headers ?? {});
+                if (
+                    !(await rateLimit(`login:${email}`, 10, 15 * MINUTE)) ||
+                    !(await rateLimit(`login-ip:${ip}`, 50, 15 * MINUTE))
+                ) {
                     throw new Error('Too many login attempts. Please try again in a few minutes.');
                 }
 

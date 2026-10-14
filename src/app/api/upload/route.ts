@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { UTApi } from 'uploadthing/server';
+import { HOUR, rateLimit, tooManyRequests } from '@/lib/rateLimit';
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -17,6 +18,10 @@ export async function POST(request: Request) {
         const session = await getServerSession(authOptions);
         if (!session?.user) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        if (!(await rateLimit(`upload:${(session.user as { id: string }).id}`, 30, HOUR))) {
+            return NextResponse.json(tooManyRequests, { status: 429 });
         }
 
         const formData = await request.formData();

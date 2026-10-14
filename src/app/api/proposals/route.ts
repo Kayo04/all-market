@@ -7,6 +7,7 @@ import RequestModel from '@/lib/models/Request';
 import { z } from 'zod';
 import { createNotification } from '@/lib/notifications';
 import { euros, objectId, parseBody, text } from '@/lib/validation';
+import { HOUR, rateLimit, tooManyRequests } from '@/lib/rateLimit';
 
 const createProposalSchema = z.object({
     requestId: objectId,
@@ -75,6 +76,12 @@ export async function POST(request: Request) {
 
         const { data, error } = await parseBody(request, createProposalSchema);
         if (error) return error;
+
+        // Counted after validation, so a form rejected for bad input doesn't use up the quota.
+        if (!(await rateLimit(`proposal:${(session.user as { id: string }).id}`, 30, HOUR))) {
+            return NextResponse.json(tooManyRequests, { status: 429 });
+        }
+
         const { requestId, message, price } = data;
 
         await dbConnect();

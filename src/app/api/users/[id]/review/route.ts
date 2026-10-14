@@ -7,6 +7,7 @@ import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
 import RequestModel from '@/lib/models/Request';
 import { createNotification } from '@/lib/notifications';
+import { HOUR, rateLimit, tooManyRequests } from '@/lib/rateLimit';
 
 const reviewSchema = z.object({
     requestId: objectId,
@@ -42,6 +43,12 @@ export async function POST(
 
         const { data, error } = await parseBody(request, reviewSchema);
         if (error) return error;
+
+        // Counted after validation, so a form rejected for bad input doesn't use up the quota.
+        if (!(await rateLimit(`review:${(session.user as { id: string }).id}`, 20, HOUR))) {
+            return NextResponse.json(tooManyRequests, { status: 429 });
+        }
+
         const { requestId, score } = data;
         const comment = data.comment ?? '';
 

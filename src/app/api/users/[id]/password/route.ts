@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import User from '@/lib/models/User';
-import { rateLimit } from '@/lib/rateLimit';
+import { MINUTE, rateLimit } from '@/lib/rateLimit';
 
 const MIN_LENGTH = PASSWORD_MIN; // same rule as registration (src/lib/validation.ts)
 
@@ -30,7 +30,7 @@ export async function PUT(
 
         // Throttled like login: this endpoint also verifies a password, so without a
         // limit it's an oracle for guessing the current one from a hijacked session.
-        if (!rateLimit(`password-change:${id}`, 10, 15 * 60 * 1000)) {
+        if (!(await rateLimit(`password-change:${id}`, 10, 15 * MINUTE))) {
             return NextResponse.json(
                 { error: 'Too many attempts. Please try again in a few minutes.' },
                 { status: 429 }
