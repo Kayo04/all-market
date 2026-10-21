@@ -6,6 +6,7 @@ import { Briefcase, CheckCircle, ShieldCheck } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { Link } from '@/i18n/navigation';
+import NeederPro from '@/components/features/NeederPro';
 
 // Becoming a pro is never instant: it will be an application (professional details
 // + proof of qualification) that an admin reviews. Until that form exists, this
@@ -45,7 +46,11 @@ export default function BecomeProPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '100px 24px 60px' }}>
+    // The pitch (what a pro gets) sits above the application card; the navbar is
+    // fixed, so the section starts below it.
+    <div style={{ paddingTop: '64px' }}>
+    <NeederPro showCta={false} />
+    <div style={{ display: 'flex', justifyContent: 'center', padding: '48px 24px 80px' }}>
       <Card variant="default" hover={false} style={{ width: '100%', maxWidth: '460px', padding: '36px' }}>
         <div style={{ textAlign: 'center', marginBottom: '24px' }}>
           <div style={{ width: '52px', height: '52px', borderRadius: '50%', background: 'var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
@@ -89,6 +94,7 @@ export default function BecomeProPage() {
           </div>
         )}
       </Card>
+    </div>
     </div>
   );
 }

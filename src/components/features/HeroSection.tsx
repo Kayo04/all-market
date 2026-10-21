@@ -117,7 +117,9 @@ export default function HeroSection() {
         <section
             style={{
                 position: 'relative',
-                minHeight: '100vh',
+                // About half a screen: categories and live requests must be visible
+                // without scrolling, like any marketplace homepage.
+                minHeight: 'min(62vh, 600px)',
                 display: 'flex',
                 flexDirection: 'column',
                 overflow: 'hidden',
@@ -166,7 +168,7 @@ export default function HeroSection() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    padding: '120px 24px 80px',
+                    padding: '96px 24px 40px',
                 }}
             >
                 <div style={{ maxWidth: '700px', width: '100%', textAlign: 'center' }}>
@@ -181,7 +183,7 @@ export default function HeroSection() {
                             border: '1px solid rgba(255,255,255,0.13)',
                             borderRadius: '99px',
                             backdropFilter: 'blur(12px)',
-                            marginBottom: '28px',
+                            marginBottom: '16px',
                         }}
                     >
                         <span
@@ -221,7 +223,7 @@ export default function HeroSection() {
                             color: 'rgba(255,255,255,0.55)',
                             lineHeight: 1.7,
                             maxWidth: '520px',
-                            margin: '0 auto 36px',
+                            margin: '0 auto 24px',
                         }}
                     >
                         {locale === 'pt'
@@ -315,11 +317,11 @@ export default function HeroSection() {
                             gap: '8px',
                             flexWrap: 'wrap',
                             justifyContent: 'center',
-                            marginBottom: '40px',
+                            marginBottom: '20px',
                         }}
                     >
                         <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.38)', alignSelf: 'center', marginRight: '2px' }}>
-                            {locale === 'pt' ? 'Tendência:' : 'Trending:'}
+                            {locale === 'pt' ? 'Exemplos:' : 'Examples:'}
                         </span>
                         {suggestions.map((s) => (
                             <button

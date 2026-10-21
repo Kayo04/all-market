@@ -6,7 +6,9 @@ import { Link } from '@/i18n/navigation';
 
 const FEATURE_ICONS = [Users, ShieldCheck, LineChart, CreditCard];
 
-export default function NeederPro() {
+// Lives on /pro (the pitch for professionals), not on the homepage. `showCta` is
+// off there because the application card right below it is the call to action.
+export default function NeederPro({ showCta = true }: { showCta?: boolean }) {
   const t = useTranslations('proSection');
 
   return (
@@ -43,9 +45,11 @@ export default function NeederPro() {
           </div>
 
           {/* CTA */}
-          <Link href="/pro" className="np-cta">
-            {t('apply')} <ArrowRight size={16} />
-          </Link>
+          {showCta && (
+            <Link href="/pro" className="np-cta">
+              {t('apply')} <ArrowRight size={16} />
+            </Link>
+          )}
         </div>
 
         {/* RIGHT: an honest preview of the real public profile feature —

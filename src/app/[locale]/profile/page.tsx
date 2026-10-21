@@ -9,6 +9,7 @@ import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import Badge from '@/components/ui/Badge';
+import BecomeProCard from '@/components/features/BecomeProCard';
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
@@ -163,6 +164,8 @@ export default function ProfilePage() {
           </Badge>
         )}
       </div>
+
+      <BecomeProCard style={{ marginBottom: '20px' }} />
 
       {role === 'pro' && userId && (
         <Card variant="glass" hover={false} style={{ padding: '18px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '14px', flexWrap: 'wrap' }}>

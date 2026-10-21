@@ -60,12 +60,12 @@ export default function LiveNeedsFeed() {
         return locale === 'pt' ? cat.labelPT : cat.labelEN;
     };
 
-    // An empty feed on a marketing page looks broken, so render nothing at all
-    // rather than an empty "Pedidos recentes" heading with a void beneath it.
-    if (!loading && items.length === 0) return null;
+    // The feed sits right under the hero, so it must never vanish: when there are
+    // no open requests, say so honestly and invite the visitor to post the first.
+    const isEmpty = !loading && items.length === 0;
 
     return (
-        <section style={{ padding: '72px 0', background: 'var(--bg-primary)' }}>
+        <section style={{ padding: '40px 0 56px', background: 'var(--bg-primary)' }}>
             {/* `shimmer` is not a global keyframe — globals.css only defines fadeIn
                 and spin — so the skeleton needs its own or it animates nothing. */}
             <style>{`
@@ -126,6 +126,33 @@ export default function LiveNeedsFeed() {
                         <ArrowRight size={14} />
                     </Link>
                 </div>
+
+                {isEmpty && (
+                    <div style={{
+                        padding: '32px 20px', textAlign: 'center',
+                        borderRadius: 'var(--radius-lg)',
+                        background: 'var(--bg-card)',
+                        border: '1px dashed var(--border)',
+                    }}>
+                        <p style={{ fontSize: '15px', color: 'var(--text-secondary)', marginBottom: '16px' }}>
+                            {locale === 'pt'
+                                ? 'Ainda não há pedidos abertos. Precisas de alguma coisa?'
+                                : 'No open requests yet. Need something?'}
+                        </p>
+                        <Link
+                            href="/concierge"
+                            style={{
+                                display: 'inline-flex', alignItems: 'center', gap: '6px',
+                                padding: '10px 18px', borderRadius: 'var(--radius-md)',
+                                background: 'var(--accent)', color: '#fff',
+                                fontSize: '14px', fontWeight: 600, textDecoration: 'none',
+                            }}
+                        >
+                            {locale === 'pt' ? 'Sê o primeiro a pedir' : 'Be the first to ask'}
+                            <ArrowRight size={14} />
+                        </Link>
+                    </div>
+                )}
 
                 {/* Cards */}
                 <div style={{

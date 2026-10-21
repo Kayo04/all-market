@@ -11,6 +11,7 @@ import {
 import Card from '@/components/ui/Card';
 import Badge from '@/components/ui/Badge';
 import { categories } from '@/lib/categories';
+import BecomeProCard from '@/components/features/BecomeProCard';
 
 interface RequestItem {
   _id: string;
@@ -248,39 +249,8 @@ export default function ClientDashboard() {
         </div>
       )}
 
-      {/* Become a Professional nudge */}
-      <Card
-        variant="glass"
-        hover={false}
-        style={{
-          marginTop: '36px', padding: '22px 28px',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          gap: '16px', flexWrap: 'wrap',
-          borderLeft: '3px solid var(--accent)',
-        }}
-      >
-        <div>
-          <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 700, marginBottom: '4px' }}>
-            {t('Do you offer services?', 'Ofereces serviços?')}
-          </h3>
-          <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-            {t(
-              'Become a Professional and start receiving requests from clients.',
-              'Torna-te Profissional e começa a receber pedidos de clientes.'
-            )}
-          </p>
-        </div>
-        <Link href="/pro" style={{ textDecoration: 'none', flexShrink: 0 }}>
-          <button style={{
-            padding: '10px 20px', borderRadius: '10px',
-            border: '1px solid var(--border)', background: 'transparent',
-            color: 'var(--text-primary)', fontSize: '13px', fontWeight: 600,
-            cursor: 'pointer', fontFamily: 'var(--font-sans)',
-          }}>
-            {t('Become a Professional', 'Tornar-me Profissional')}
-          </button>
-        </Link>
-      </Card>
+      {/* Become a Professional nudge — same card as on /profile */}
+      <BecomeProCard style={{ marginTop: '36px' }} />
 
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
