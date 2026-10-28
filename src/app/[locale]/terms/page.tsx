@@ -2,163 +2,213 @@
 
 import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { LEGAL } from '@/lib/legal';
 
-const LAST_UPDATED = '2026-07-30';
+const LAST_UPDATED = '2026-10-28';
 
 interface Section {
   heading: string;
   body: string[];
+  links?: { href: string; label: string }[];
 }
+
+const { operatorName, nif, address, email, minAge } = LEGAL;
 
 const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Section[] }> = {
   en: {
     title: 'Terms of Service',
-    intro:
-      'These terms govern your use of needer.com, operated by Needer International Ltd. ("Needer", "we"). By creating an account or using the platform, you agree to them. If you do not agree, please do not use the service.',
+    intro: `Needer is operated by ${operatorName}, tax number (NIF) ${nif}, address ${address} ("Needer", "we"). Contact: ${email}. By creating an account or using the platform you accept these terms. If you do not agree, please do not use the service.`,
     sections: [
       {
         heading: '1. What Needer is',
         body: [
-          'Needer is a reverse marketplace: clients describe a need (a service or a product they want to buy), and independent professionals or sellers respond with proposals. Needer is a technology platform that connects the two sides — we are not a party to the agreement a client and a professional ultimately make with each other, and we do not employ, supervise, or guarantee the work of any professional on the platform.',
+          `Needer is a reverse marketplace: clients describe a need (a service, or a product they want to buy) and professionals or sellers reply with proposals. Needer is a technology platform that puts the two sides in contact. We are not a party to the agreement a client and a professional make with each other, and we do not employ, supervise or guarantee the work of any professional.`,
+          `Needer does not process payments today. Payment is arranged directly between the client and the professional, outside the platform.`,
         ],
       },
       {
-        heading: '2. Eligibility and accounts',
+        heading: '2. Who can use Needer',
         body: [
-          'You must be at least 16 years old to create an account. You are responsible for keeping your password confidential and for all activity under your account. Provide accurate information when you register — impersonation or fake listings are prohibited.',
+          `You must be at least ${minAge} years old to create an account. By accepting these terms you declare that you are.`,
+          `Use one account per person, with accurate information. You are responsible for keeping your password confidential and for what happens in your account. Impersonating someone else is prohibited.`,
         ],
       },
       {
         heading: '3. Posting a request',
         body: [
-          'When you post a request, you give a reference budget. Professionals answer with proposals, each with its own price, and you are only committed to the proposal you accept, on the terms of that proposal. Needer does not process payment on your behalf today — payment happens directly between you and the professional, outside the platform, unless and until we introduce in-platform payments under separate terms.',
-          'You must have a genuine intent to hire when you post a request. Posting fake or bad-faith requests to waste professionals\' time is prohibited and may result in account suspension.',
+          `When you post a request you give a reference budget. Professionals answer with proposals, each with its own price, and you are only committed to the proposal you accept, on the terms of that proposal.`,
+          `Requests are public. Do not put personal data such as your phone number or full address in the description: share them only with the professional you choose, through messages.`,
+          `Post only requests you genuinely intend to follow up on. Fake or bad-faith requests are prohibited and may lead to the account being suspended.`,
         ],
       },
       {
-        heading: '4. Submitting a proposal (professionals)',
+        heading: '4. Professionals (Pro)',
         body: [
-          'If you submit a proposal as a professional, you are representing that you can and intend to perform the work at the price you quote. Claims of verification, certification, or business identity you submit to us must be accurate — we may suspend accounts found to have misrepresented these.',
+          `Becoming a Pro is free and is not automatic: you apply with your professional details and proof of qualification, and our team reviews the application. For regulated activities (for example travel agencies, real estate brokerage or health professions) we may ask for the corresponding licence or registration number.`,
+          `Approval means we checked the documents you submitted at that time. It is not a guarantee of the quality of your work.`,
+          `When you send a proposal you declare that you can and intend to do the work, or deliver the product, at the price you quote. You are solely responsible for complying with the rules of your activity towards the client, including invoicing, consumer rights and any licence your activity requires. False information about your identity, qualifications or business may lead to suspension.`,
         ],
       },
       {
-        heading: '5. Prohibited conduct',
+        heading: '5. Prohibited content and conduct',
         body: [
-          'You may not: use the platform for anything unlawful; harass, threaten, or defraud other users; scrape or bulk-collect data from the platform; attempt to bypass the platform to avoid its terms or safety features in bad faith; or upload content you do not have the rights to (including images).',
+          `You may not use Needer to: offer or request anything illegal (including weapons, drugs, counterfeit goods, stolen goods or prescription medicines); defraud, harass, threaten or discriminate against other users; publish spam or content you do not have the rights to (including photos); collect data from the platform in bulk; or interfere with how the platform works.`,
         ],
       },
       {
-        heading: '6. Content you submit',
+        heading: '6. Reporting illegal content and moderation',
         body: [
-          'You keep ownership of the text and photos you submit (request descriptions, proposal messages, review comments, uploaded images). By submitting them, you grant Needer a license to display them on the platform to the extent needed to operate the service.',
+          `Anyone can report content they consider illegal or contrary to these terms by writing to ${email}. Please include: the link to the content, why you consider it illegal, your name and email, and a statement that the report is made in good faith. We review reports diligently and tell you what we decided.`,
+          `If we remove your content or restrict your account, we tell you why. You can contest the decision by replying to that message or writing to ${email}, and the case will be reviewed again.`,
+          `${email} is also Needer's single point of contact for users and for authorities under the EU Digital Services Act. We answer in Portuguese or English.`,
         ],
       },
       {
-        heading: '7. Fees',
+        heading: '7. Content you submit',
         body: [
-          'Posting a request and receiving proposals is free for clients today. Certain premium features referenced on the platform (such as sponsored placement or early access to new requests) are not yet purchasable; if and when they become available, they will be governed by additional terms presented at the time of purchase.',
+          `You keep ownership of the texts and photos you submit. By submitting them you give Needer permission to display them on the platform, to the extent needed to run the service.`,
         ],
       },
       {
-        heading: '8. Disclaimers and limitation of liability',
+        heading: '8. Prices and paid features',
         body: [
-          'Needer provides the platform "as is." We do not guarantee the quality, safety, legality, or outcome of any service or product exchanged between users, and we are not liable for disputes, damages, or losses arising from interactions between a client and a professional. Use judgment before hiring anyone or making a payment, the same way you would with any marketplace.',
-          'To the maximum extent permitted by law, Needer\'s liability for any claim relating to the platform is limited to the amount (if any) you paid to Needer directly in the twelve months before the claim arose.',
+          `Posting requests, receiving proposals and applying to become a Pro are free. In the future, Pros may be able to buy optional features that give them more visibility. Their price and conditions will be shown before any purchase, and paid visibility will always be identified as such. Buying a paid feature never means Needer verified that professional any further.`,
         ],
       },
       {
-        heading: '9. Suspension and termination',
+        heading: '9. Liability',
         body: [
-          'We may suspend or terminate an account that violates these terms. You may stop using the service and delete your account at any time from your Settings page, or by contacting support@needer.com.',
+          `We work to keep the platform available and secure, but we do not guarantee the quality, safety, legality or outcome of services or products exchanged between users, and we are not responsible for disputes between a client and a professional. Use good judgement before hiring anyone or making a payment.`,
+          `Nothing in these terms excludes liability for wilful misconduct or gross negligence, or limits the rights that consumer protection law gives you.`,
         ],
       },
       {
-        heading: '10. Governing law',
+        heading: '10. Suspension and deleting your account',
         body: [
-          'These terms are governed by the laws of Portugal, without prejudice to any mandatory consumer-protection rights you have under the law of the EU member state where you reside.',
-          '(Needer\'s formal company registration — including registered address and tax identification number — is pending and will be added here before public launch.)',
+          `We may suspend or close accounts that break these terms, always telling you why. You can delete your account at any time in Settings, or by writing to ${email}.`,
         ],
       },
       {
-        heading: '11. Changes to these terms',
+        heading: '11. Complaints and dispute resolution',
         body: [
-          `These terms were last updated on ${LAST_UPDATED}. Continued use of the platform after a change means you accept the updated terms.`,
+          `You can submit a complaint through the Electronic Complaints Book (Livro de Reclamações Eletrónico) or by writing to ${email}.`,
+          `In the event of a consumer dispute, you may turn to an Alternative Dispute Resolution (ADR) entity. In Portugal, CNIACC (Centro Nacional de Informação e Arbitragem de Conflitos de Consumo) handles disputes nationwide. More information is available on the Consumer Portal.`,
+        ],
+        links: [
+          { href: LEGAL.complaintsBookUrl, label: 'Livro de Reclamações Eletrónico' },
+          { href: 'https://www.cniacc.pt', label: 'CNIACC' },
+          { href: LEGAL.ralListUrl, label: 'Portal do Consumidor' },
+        ],
+      },
+      {
+        heading: '12. Governing law',
+        body: [
+          `These terms are governed by Portuguese law, without prejudice to the mandatory consumer protection rules of the EU country where you live.`,
+        ],
+      },
+      {
+        heading: '13. Changes to these terms',
+        body: [
+          `These terms were last updated on ${LAST_UPDATED}. We will give reasonable advance notice of important changes, on the site or by email. Continuing to use Needer after a change takes effect means you accept the updated terms.`,
         ],
       },
     ],
   },
   pt: {
     title: 'Termos de Serviço',
-    intro:
-      'Estes termos regem a tua utilização do needer.com, operado pela Needer International Ltd. ("Needer", "nós"). Ao criar uma conta ou usar a plataforma, aceitas estes termos. Se não concordares, não uses o serviço.',
+    intro: `O Needer é explorado por ${operatorName}, NIF ${nif}, com morada em ${address} ("Needer", "nós"). Contacto: ${email}. Ao criares uma conta ou usares a plataforma, aceitas estes termos. Se não concordares, não uses o serviço.`,
     sections: [
       {
-        heading: '1. O que é a Needer',
+        heading: '1. O que é o Needer',
         body: [
-          'A Needer é um mercado inverso: clientes descrevem uma necessidade (um serviço ou produto que querem comprar), e profissionais ou vendedores independentes respondem com propostas. A Needer é uma plataforma tecnológica que liga as duas partes — não somos parte no acordo que um cliente e um profissional acabam por fazer entre si, e não empregamos, supervisionamos ou garantimos o trabalho de nenhum profissional na plataforma.',
+          `O Needer é um mercado inverso: os clientes descrevem uma necessidade (um serviço, ou um produto que querem comprar) e profissionais ou vendedores respondem com propostas. O Needer é uma plataforma tecnológica que põe as duas partes em contacto. Não somos parte no acordo que o cliente e o profissional fazem entre si, e não empregamos, supervisionamos nem garantimos o trabalho de nenhum profissional.`,
+          `O Needer não processa pagamentos atualmente. O pagamento é combinado diretamente entre o cliente e o profissional, fora da plataforma.`,
         ],
       },
       {
-        heading: '2. Elegibilidade e contas',
+        heading: '2. Quem pode usar o Needer',
         body: [
-          'Tens de ter pelo menos 16 anos para criar uma conta. És responsável por manter a tua password confidencial e por toda a atividade na tua conta. Fornece informação exata ao registares-te — personificação ou anúncios falsos são proibidos.',
+          `Tens de ter pelo menos ${minAge} anos para criar uma conta. Ao aceitares estes termos, declaras que tens.`,
+          `Usa uma conta por pessoa, com informação verdadeira. És responsável por manter a tua palavra-passe confidencial e pelo que acontece na tua conta. É proibido fazeres-te passar por outra pessoa.`,
         ],
       },
       {
         heading: '3. Publicar um pedido',
         body: [
-          'Ao publicares um pedido, indicas um orçamento de referência. Os profissionais respondem com propostas, cada uma com o seu preço, e só ficas comprometido com a proposta que aceitares, nas condições dessa proposta. A Needer não processa pagamentos em teu nome atualmente — o pagamento acontece diretamente entre ti e o profissional, fora da plataforma, a menos e até introduzirmos pagamentos dentro da plataforma sob termos separados.',
-          'Tens de ter intenção genuína de contratar ao publicares um pedido. Publicar pedidos falsos ou de má-fé para desperdiçar o tempo de profissionais é proibido e pode resultar na suspensão da conta.',
+          `Ao publicares um pedido, indicas um orçamento de referência. Os profissionais respondem com propostas, cada uma com o seu preço, e só ficas comprometido com a proposta que aceitares, nas condições dessa proposta.`,
+          `Os pedidos são públicos. Não ponhas dados pessoais, como o teu telefone ou a morada completa, na descrição: partilha-os só com o profissional que escolheres, pelas mensagens.`,
+          `Publica apenas pedidos a que tencionas mesmo dar seguimento. Pedidos falsos ou de má-fé são proibidos e podem levar à suspensão da conta.`,
         ],
       },
       {
-        heading: '4. Enviar uma proposta (profissionais)',
+        heading: '4. Profissionais (Pro)',
         body: [
-          'Se enviares uma proposta como profissional, estás a declarar que podes e pretendes realizar o trabalho pelo preço que propuseste. As afirmações de verificação, certificação ou identidade empresarial que nos submetas têm de ser exatas — podemos suspender contas que se verifique terem falseado esta informação.',
+          `Ser Pro é gratuito e não é automático: candidatas-te com os teus dados profissionais e comprovativos da tua qualificação, e a nossa equipa analisa a candidatura. Para atividades reguladas (por exemplo agências de viagens, mediação imobiliária ou profissões de saúde) podemos pedir o número da licença ou registo correspondente.`,
+          `A aprovação significa que verificámos os documentos que enviaste nessa data. Não é uma garantia da qualidade do teu trabalho.`,
+          `Ao enviares uma proposta, declaras que podes e pretendes fazer o trabalho, ou entregar o produto, pelo preço que propões. És o único responsável por cumprir as regras da tua atividade perante o cliente, incluindo faturação, direitos do consumidor e qualquer licença que a tua atividade exija. Informação falsa sobre a tua identidade, qualificações ou empresa pode levar à suspensão.`,
         ],
       },
       {
-        heading: '5. Conduta proibida',
+        heading: '5. Conteúdos e condutas proibidos',
         body: [
-          'Não podes: usar a plataforma para fins ilegais; assediar, ameaçar ou defraudar outros utilizadores; extrair ou recolher dados em massa da plataforma; tentar contornar a plataforma para evitar os seus termos ou funcionalidades de segurança de má-fé; ou carregar conteúdo sobre o qual não tenhas direitos (incluindo imagens).',
+          `Não podes usar o Needer para: oferecer ou pedir algo ilegal (incluindo armas, drogas, contrafações, bens roubados ou medicamentos sujeitos a receita); burlar, assediar, ameaçar ou discriminar outros utilizadores; publicar spam ou conteúdos sobre os quais não tens direitos (incluindo fotos); recolher dados da plataforma em massa; ou interferir com o funcionamento da plataforma.`,
         ],
       },
       {
-        heading: '6. Conteúdo que submetes',
+        heading: '6. Denúncias de conteúdo ilegal e moderação',
         body: [
-          'Mantens a propriedade do texto e fotos que submetes (descrições de pedidos, mensagens de propostas, comentários de avaliações, imagens carregadas). Ao submeti-los, concedes à Needer uma licença para os exibir na plataforma na medida necessária para operar o serviço.',
+          `Qualquer pessoa pode denunciar conteúdos que considere ilegais ou contrários a estes termos, escrevendo para ${email}. Indica: o link do conteúdo, porque o consideras ilegal, o teu nome e email, e uma declaração de que a denúncia é feita de boa-fé. Analisamos as denúncias com diligência e dizemos-te o que decidimos.`,
+          `Se removermos um conteúdo teu ou restringirmos a tua conta, dizemos-te porquê. Podes contestar a decisão respondendo a essa mensagem ou escrevendo para ${email}, e o caso volta a ser analisado.`,
+          `O ${email} é também o ponto de contacto único do Needer para utilizadores e autoridades, nos termos do Regulamento dos Serviços Digitais da UE. Respondemos em português ou inglês.`,
         ],
       },
       {
-        heading: '7. Taxas',
+        heading: '7. Conteúdo que submetes',
         body: [
-          'Publicar um pedido e receber propostas é gratuito para clientes atualmente. Certas funcionalidades premium referidas na plataforma (como posicionamento patrocinado ou acesso antecipado a novos pedidos) ainda não podem ser compradas; se e quando ficarem disponíveis, serão regidas por termos adicionais apresentados no momento da compra.',
+          `Os textos e fotos que submetes continuam a ser teus. Ao submetê-los, autorizas o Needer a mostrá-los na plataforma, na medida necessária para o serviço funcionar.`,
         ],
       },
       {
-        heading: '8. Isenções de responsabilidade',
+        heading: '8. Preços e funcionalidades pagas',
         body: [
-          'A Needer fornece a plataforma "tal como está". Não garantimos a qualidade, segurança, legalidade ou resultado de qualquer serviço ou produto trocado entre utilizadores, e não somos responsáveis por litígios, danos ou perdas resultantes de interações entre um cliente e um profissional. Usa bom senso antes de contratar alguém ou fazer um pagamento, tal como farias em qualquer mercado.',
-          'Na máxima medida permitida por lei, a responsabilidade da Needer por qualquer reclamação relacionada com a plataforma está limitada ao montante (se algum) que pagaste diretamente à Needer nos doze meses anteriores à reclamação.',
+          `Publicar pedidos, receber propostas e candidatar-te a Pro é gratuito. No futuro, os Pros poderão comprar funcionalidades opcionais que lhes dão mais visibilidade. O preço e as condições serão mostrados antes de qualquer compra, e a visibilidade paga será sempre identificada como tal. Comprar uma funcionalidade paga nunca significa que o Needer verificou mais esse profissional.`,
         ],
       },
       {
-        heading: '9. Suspensão e encerramento',
+        heading: '9. Responsabilidade',
         body: [
-          'Podemos suspender ou encerrar uma conta que viole estes termos. Podes deixar de usar o serviço e eliminar a tua conta a qualquer momento na página de Definições, ou contactando support@needer.com.',
+          `Trabalhamos para manter a plataforma disponível e segura, mas não garantimos a qualidade, segurança, legalidade ou resultado dos serviços ou produtos trocados entre utilizadores, e não somos responsáveis por litígios entre um cliente e um profissional. Usa bom senso antes de contratar alguém ou fazer um pagamento.`,
+          `Nada nestes termos exclui a responsabilidade por dolo ou culpa grave, nem limita os direitos que a lei de defesa do consumidor te dá.`,
         ],
       },
       {
-        heading: '10. Lei aplicável',
+        heading: '10. Suspensão e eliminação da conta',
         body: [
-          'Estes termos são regidos pela lei portuguesa, sem prejuízo de quaisquer direitos de proteção do consumidor de caráter imperativo que tenhas ao abrigo da lei do Estado-Membro da UE onde resides.',
-          '(O registo formal da empresa Needer — incluindo morada e número de identificação fiscal — está pendente e será adicionado aqui antes do lançamento público.)',
+          `Podemos suspender ou encerrar contas que violem estes termos, dizendo-te sempre porquê. Podes eliminar a tua conta a qualquer momento nas Definições, ou escrevendo para ${email}.`,
         ],
       },
       {
-        heading: '11. Alterações a estes termos',
+        heading: '11. Reclamações e resolução de litígios',
         body: [
-          `Estes termos foram atualizados pela última vez em ${LAST_UPDATED}. A utilização continuada da plataforma após uma alteração significa que aceitas os termos atualizados.`,
+          `Podes apresentar uma reclamação no Livro de Reclamações Eletrónico ou escrevendo para ${email}.`,
+          `Em caso de litígio de consumo, podes recorrer a uma entidade de Resolução Alternativa de Litígios (RAL). Em Portugal, o CNIACC (Centro Nacional de Informação e Arbitragem de Conflitos de Consumo) trata litígios de âmbito nacional. Mais informações no Portal do Consumidor.`,
+        ],
+        links: [
+          { href: LEGAL.complaintsBookUrl, label: 'Livro de Reclamações Eletrónico' },
+          { href: 'https://www.cniacc.pt', label: 'CNIACC' },
+          { href: LEGAL.ralListUrl, label: 'Portal do Consumidor' },
+        ],
+      },
+      {
+        heading: '12. Lei aplicável',
+        body: [
+          `Estes termos regem-se pela lei portuguesa, sem prejuízo das normas imperativas de defesa do consumidor do país da UE onde vives.`,
+        ],
+      },
+      {
+        heading: '13. Alterações a estes termos',
+        body: [
+          `Estes termos foram atualizados pela última vez em ${LAST_UPDATED}. Avisamos com antecedência razoável, no site ou por email, as alterações importantes. Continuar a usar o Needer depois de uma alteração entrar em vigor significa que aceitas os termos atualizados.`,
         ],
       },
     ],
@@ -202,6 +252,15 @@ export default function TermsPage() {
               {para}
             </p>
           ))}
+          {section.links && (
+            <p style={{ fontSize: '14px', display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+              {section.links.map((l) => (
+                <a key={l.href} href={l.href} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>
+                  {l.label}
+                </a>
+              ))}
+            </p>
+          )}
         </div>
       ))}
 

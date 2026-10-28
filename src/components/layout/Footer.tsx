@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
+import { LEGAL } from '@/lib/legal';
 
 export default function Footer() {
   const t = useTranslations('footer');
@@ -88,10 +89,10 @@ export default function Footer() {
             {t('colSupport')}
           </h4>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <a href="mailto:support@needer.com" style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none' }}>{t('supportLinks.help')}</a>
-            <a href="mailto:support@needer.com" style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none' }}>{t('supportLinks.contact')}</a>
+                        <a href={`mailto:${LEGAL.email}`} style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none' }}>{t('supportLinks.contact')}</a>
             <Link href="/terms" style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none' }}>{t('supportLinks.terms')}</Link>
             <Link href="/privacy" style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none' }}>{t('supportLinks.privacy')}</Link>
+            <a href={LEGAL.complaintsBookUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: '14px', color: 'var(--text-secondary)', textDecoration: 'none' }}>{t('supportLinks.complaints')}</a>
           </div>
         </div>
       </div>
@@ -122,7 +123,7 @@ export default function Footer() {
             <span>needer</span>
           </div>
           <span style={{ fontSize: '14px', color: 'var(--text-tertiary)' }}>
-            © {new Date().getFullYear()} Needer International Ltd.
+            © {new Date().getFullYear()} Needer
           </span>
         </div>
 
