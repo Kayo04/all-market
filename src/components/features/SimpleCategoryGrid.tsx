@@ -35,7 +35,7 @@ const CASES = [
     labelPT: 'Grande Compra',
     queryEN: 'Looking for a BMW\nSeries 1, under €15k.',
     queryPT: 'Quero um BMW\nSérie 1, até 15.000€.',
-    href: '/requests/new?category=automotive',
+    href: '/requests/new?category=vehicles',
   },
 ];
 

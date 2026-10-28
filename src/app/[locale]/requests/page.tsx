@@ -5,31 +5,13 @@ import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
-import {
-  Search, MapPin, Clock, Zap, Star,
-  Wrench, Monitor, BookOpen, PartyPopper, Heart, Gamepad2,
-  Briefcase, Palette, PenTool, Sparkles, Car, Scissors,
-} from 'lucide-react';
+import { Search, MapPin, Clock, Zap, Star } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { categories } from '@/lib/categories';
+import { categoryIcon } from '@/lib/categoryIcons';
 
 // Category → visual tile (icon + tint) — stands in for a photo until listings support image uploads
-const CATEGORY_ICONS: Record<string, React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>> = {
-  'home-repairs': Wrench,
-  'tech-digital': Monitor,
-  'tutoring': BookOpen,
-  'events': PartyPopper,
-  'wellness': Heart,
-  'equipment': Gamepad2,
-  'business': Briefcase,
-  'design': Palette,
-  'writing': PenTool,
-  'cleaning': Sparkles,
-  'automotive': Car,
-  'beauty': Scissors,
-};
-
 const CATEGORY_TINTS: Record<string, string> = {
   'home-repairs': '#f97316',
   'tech-digital': '#3b82f6',
@@ -254,7 +236,7 @@ export default function BrowseRequestsPage() {
             const isUrgent = req.urgency === 'Urgent';
             // Sniper window: this request is still within its 1-hour head start
             const isFresh = !!(req.publicReleaseDate && new Date(req.publicReleaseDate).getTime() > Date.now());
-            const Icon = CATEGORY_ICONS[req.category];
+            const Icon = categoryIcon(req.category);
             const tint = CATEGORY_TINTS[req.category] || 'var(--accent)';
 
             return (

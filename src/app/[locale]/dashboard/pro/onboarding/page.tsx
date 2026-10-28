@@ -44,8 +44,9 @@ export default function ProOnboardingPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const serviceCategories = categories.filter(c => c.type === 'service');
-  const activeCategory = serviceCategories.find(c => c.key === selectedCategory);
+  // Every category, products included: sellers (car stands, phone shops…) are pros too,
+  // and proCategory decides which new requests they get notified about.
+  const activeCategory = categories.find(c => c.key === selectedCategory);
   const suggestedSkills = SKILL_SUGGESTIONS[selectedSubcategory] || DEFAULT_SKILLS;
 
   const toggleSkill = (skill: string) => {
@@ -127,7 +128,7 @@ export default function ProOnboardingPage() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {serviceCategories.map(cat => {
+            {categories.map(cat => {
               const isOpen = selectedCategory === cat.key;
               return (
                 <div key={cat.key}>

@@ -43,6 +43,7 @@ export interface Category {
     labelPT: string;
     subcategories: SubCategory[];
     type: 'service' | 'product';
+    image?: string; // 3D card art under /public/categories; absent -> show the icon
 }
 
 // ─── Request ────────────────────────────────────────────

@@ -5,6 +5,7 @@ import { Link } from '@/i18n/navigation';
 import { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { categories } from '@/lib/categories';
+import { categoryIcon } from '@/lib/categoryIcons';
 
 const CARD_WIDTH = 220;
 const CARD_GAP = 16;
@@ -65,6 +66,7 @@ export default function PopularCategories() {
         <div ref={scrollRef} className="pc-track">
           {categories.map((cat) => {
             const label = locale === 'pt' ? cat.labelPT : cat.labelEN;
+            const Icon = categoryIcon(cat.key);
             return (
               <Link
                 key={cat.key}
@@ -75,17 +77,22 @@ export default function PopularCategories() {
                 <div className="pc-card-header">
                   <span className="pc-card-title">{label}</span>
                 </div>
-                {/* Image inset — slightly lighter green with dark green frame around it */}
+                {/* Image inset — slightly lighter green with dark green frame around it.
+                    Categories without 3D art yet show their icon in the same frame. */}
                 <div
                   className="pc-card-img-section"
                   style={{ background: IMAGE_SECTION_BG }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={`/categories/${cat.key}-3d.png`}
-                    alt={label}
-                    className="pc-card-img"
-                  />
+                  {cat.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={cat.image}
+                      alt={label}
+                      className="pc-card-img"
+                    />
+                  ) : (
+                    <Icon size={64} strokeWidth={1.25} color="var(--accent)" aria-hidden />
+                  )}
                 </div>
               </Link>
             );
