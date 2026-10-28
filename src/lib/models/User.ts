@@ -19,6 +19,11 @@ const UserSchema = new Schema(
             newRequests: { type: Boolean, default: true },
             reviews: { type: Boolean, default: true },
         },
+        // "Forgot password": only the SHA-256 of the emailed token is stored (a leaked
+        // database can't be used to reset anyone's password), with a 1-hour expiry.
+        // Cleared when used. See api/auth/forgot-password and api/auth/reset-password.
+        passwordResetTokenHash: { type: String, select: false },
+        passwordResetExpires: { type: Date, select: false },
         isVerified: { type: Boolean, default: false },
         location: {
             type: { type: String, enum: ['Point'], default: 'Point' },

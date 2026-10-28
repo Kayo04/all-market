@@ -171,8 +171,8 @@ export default function NewRequestPage() {
       </h1>
       <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '32px' }}>
         {locale === 'pt'
-          ? 'Define o preço. O primeiro profissional verificado a aceitar fica com o trabalho.'
-          : 'Set your price. The first verified pro to accept gets the job.'}
+          ? 'Diz o que precisas e quanto queres gastar. Os profissionais enviam-te propostas e tu escolhes a que preferires.'
+          : 'Say what you need and how much you want to spend. Professionals send you proposals and you pick the one you prefer.'}
       </p>
 
       {/* Progress */}
@@ -500,12 +500,12 @@ export default function NewRequestPage() {
           </div>
         )}
 
-        {/* ─── Step 3: Fixed Price & Location ─── */}
+        {/* ─── Step 3: Budget & Location ─── */}
         {step === 3 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
               <h2 style={{ fontSize: '18px', fontWeight: 700, marginBottom: '4px' }}>
-                {locale === 'pt' ? 'Preço Fixo & Localização' : 'Fixed Price & Location'}
+                {locale === 'pt' ? 'Orçamento & Localização' : 'Budget & Location'}
               </h2>
               <div
                 style={{
@@ -523,13 +523,13 @@ export default function NewRequestPage() {
               >
                 <Zap size={14} />
                 {locale === 'pt'
-                  ? 'Este é o preço que pagas. O primeiro profissional a aceitar fica com o trabalho — sem negociação.'
-                  : 'This is the price you pay. The first pro to accept gets the job — no negotiation.'}
+                  ? 'É o valor que contas gastar. Cada profissional propõe o seu preço — só aceitas a proposta que quiseres.'
+                  : 'This is what you expect to spend. Each professional proposes their own price — you only accept the proposal you want.'}
               </div>
             </div>
 
             <Input
-              label={locale === 'pt' ? 'Preço Fixo (€)' : 'Fixed Price (€)'}
+              label={locale === 'pt' ? 'Orçamento (€)' : 'Budget (€)'}
               type="number"
               min="1"
               step="1"
@@ -680,8 +680,8 @@ export default function NewRequestPage() {
               <span style={{ fontSize: '14px', lineHeight: 1.5, color: 'var(--text-primary)' }}>
                 <strong>{locale === 'pt' ? 'Confirmo' : 'I confirm'}</strong>{' '}
                 {locale === 'pt'
-                  ? `que tenho os €${form.fixedPrice || '—'} disponíveis e que pagarei ao primeiro profissional verificado que aceitar este trabalho.`
-                  : `that I have €${form.fixedPrice || '—'} available and will pay the first verified professional who accepts this job.`}
+                  ? `que este pedido é real e que tenho cerca de €${form.fixedPrice || '—'} disponíveis para ele.`
+                  : `that this request is genuine and that I have about €${form.fixedPrice || '—'} available for it.`}
               </span>
             </label>
 

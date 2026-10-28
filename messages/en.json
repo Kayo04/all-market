@@ -19,9 +19,9 @@
   "howItWorks": {
     "title": "How It Works",
     "step1Title": "Describe What You Need",
-    "step1Desc": "Post a service or product need in plain language — no forms, no categories to browse.",
-    "step2Title": "Get Matched Instantly",
-    "step2Desc": "Our AI understands your request and notifies verified pros or sellers who can help.",
+    "step1Desc": "Post what you need — a service or a product — in your own words, with your budget.",
+    "step2Title": "Get Proposals",
+    "step2Desc": "We notify the confirmed professionals in that field, who send you proposals with their own price.",
     "step3Title": "Compare & Choose",
     "step3Desc": "Review proposals, prices, and ratings — then pick the one that's right for you."
   },
@@ -53,6 +53,7 @@
     "proBtn": "Join as a Professional"
   },
   "auth": {
+    "forgotPassword": "Forgot your password?",
     "loginTitle": "Welcome Back",
     "loginSubtitle": "Sign in to your account",
     "registerTitle": "Create Account",
@@ -222,8 +223,8 @@
       "desc": "Reviews, skills, and completed jobs, all on one link you can share anywhere."
     },
     "feat2": {
-      "title": "Get verified",
-      "desc": "A trust badge that boosts credibility and gets you priority in results."
+      "title": "Confirmed by the Needer team",
+      "desc": "Every Pro is confirmed before they start, so clients know you're qualified."
     },
     "feat3": {
       "title": "Reusable proposal templates",

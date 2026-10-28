@@ -31,7 +31,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
       {
         heading: '3. Posting a request',
         body: [
-          'When you post a request with a fixed price, you are committing to pay that price to the first verified professional who accepts it, as described on the posting form. Needer does not process payment on your behalf today — payment happens directly between you and the professional, outside the platform, unless and until we introduce in-platform payments under separate terms.',
+          'When you post a request, you give a reference budget. Professionals answer with proposals, each with its own price, and you are only committed to the proposal you accept, on the terms of that proposal. Needer does not process payment on your behalf today — payment happens directly between you and the professional, outside the platform, unless and until we introduce in-platform payments under separate terms.',
           'You must have a genuine intent to hire when you post a request. Posting fake or bad-faith requests to waste professionals\' time is prohibited and may result in account suspension.',
         ],
       },
@@ -107,7 +107,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
       {
         heading: '3. Publicar um pedido',
         body: [
-          'Ao publicares um pedido com preço fixo, estás a comprometer-te a pagar esse preço ao primeiro profissional verificado que o aceitar, conforme descrito no formulário de publicação. A Needer não processa pagamentos em teu nome atualmente — o pagamento acontece diretamente entre ti e o profissional, fora da plataforma, a menos e até introduzirmos pagamentos dentro da plataforma sob termos separados.',
+          'Ao publicares um pedido, indicas um orçamento de referência. Os profissionais respondem com propostas, cada uma com o seu preço, e só ficas comprometido com a proposta que aceitares, nas condições dessa proposta. A Needer não processa pagamentos em teu nome atualmente — o pagamento acontece diretamente entre ti e o profissional, fora da plataforma, a menos e até introduzirmos pagamentos dentro da plataforma sob termos separados.',
           'Tens de ter intenção genuína de contratar ao publicares um pedido. Publicar pedidos falsos ou de má-fé para desperdiçar o tempo de profissionais é proibido e pode resultar na suspensão da conta.',
         ],
       },

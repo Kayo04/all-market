@@ -19,9 +19,9 @@
     "howItWorks": {
         "title": "Como Funciona",
         "step1Title": "Descreve o Que Precisas",
-        "step1Desc": "Publica um pedido de serviço ou produto em linguagem simples — sem formulários, sem categorias para percorrer.",
-        "step2Title": "Recebe Matches Instantaneamente",
-        "step2Desc": "A nossa IA percebe o teu pedido e notifica profissionais ou vendedores verificados que podem ajudar.",
+        "step1Desc": "Publica o que precisas — um serviço ou um produto — por palavras tuas, com o teu orçamento.",
+        "step2Title": "Recebe Propostas",
+        "step2Desc": "Avisamos os profissionais confirmados dessa área, que te enviam propostas com o preço deles.",
         "step3Title": "Compara e Escolhe",
         "step3Desc": "Revê propostas, preços e avaliações — depois escolhe a que for melhor para ti."
     },
@@ -53,6 +53,7 @@
         "proBtn": "Registar como Profissional"
     },
     "auth": {
+        "forgotPassword": "Esqueceste-te da password?",
         "loginTitle": "Bem-vindo de Volta",
         "loginSubtitle": "Entra na tua conta",
         "registerTitle": "Criar Conta",
@@ -222,8 +223,8 @@
             "desc": "Avaliações, competências e trabalhos concluídos, tudo num link que podes partilhar em qualquer lugar."
         },
         "feat2": {
-            "title": "Torna-te verificado",
-            "desc": "Um selo de confiança que aumenta a credibilidade e dá-te prioridade nos resultados."
+            "title": "Confirmado pela equipa Needer",
+            "desc": "Cada Pro é confirmado antes de começar, por isso os clientes sabem que estás qualificado."
         },
         "feat3": {
             "title": "Modelos de proposta reutilizáveis",

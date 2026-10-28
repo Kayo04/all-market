@@ -32,17 +32,17 @@ const faqs: FAQ[] = [
     questionEN: 'Who are the professionals on Needer?',
     questionPT: 'Quem são os profissionais no Needer?',
     answerEN:
-      'Our professionals are verified experts in their fields — from plumbers and electricians to web developers, designers, tutors, and more. Each professional has a rating and review history.',
+      'Professionals in their fields — from plumbers and electricians to web developers, designers, tutors and more. Every one of them is confirmed by the Needer team before they can send proposals, and their reviews only come from clients whose job they finished.',
     answerPT:
-      'Os nossos profissionais são especialistas verificados nas suas áreas — desde canalizadores e eletricistas a programadores web, designers, explicadores e muito mais. Cada profissional tem um histórico de avaliações.',
+      'Profissionais das suas áreas — desde canalizadores e eletricistas a programadores web, designers, explicadores e muito mais. Cada um é confirmado pela equipa Needer antes de poder enviar propostas, e as avaliações só vêm de clientes com quem concluiu um trabalho.',
   },
   {
     questionEN: 'How do I become a professional on Needer?',
     questionPT: 'Como me torno um profissional no Needer?',
     answerEN:
-      'Register an account, select the "Professional" role, complete your profile, and submit your verification. Once approved, you can start browsing and responding to requests.',
+      'Create an account and apply to become a Pro — it is free. You tell us your field and send proof of your qualifications; once the Needer team confirms them, you can start answering requests.',
     answerPT:
-      'Cria uma conta, seleciona o papel de "Profissional", completa o teu perfil e submete a tua verificação. Após aprovação, podes começar a navegar e responder a pedidos.',
+      'Cria uma conta e candidata-te a Pro — é gratuito. Indicas a tua área e envias provas da tua qualificação; depois de a equipa Needer as confirmar, podes começar a responder a pedidos.',
   },
   {
     questionEN: 'Can I request both services and products?',

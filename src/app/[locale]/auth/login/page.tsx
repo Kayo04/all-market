@@ -146,6 +146,15 @@ export default function LoginPage() {
             </button>
           </div>
 
+          <div style={{ textAlign: 'right', marginTop: '-6px' }}>
+            <Link
+              href="/auth/forgot-password"
+              style={{ fontSize: '13px', color: 'var(--text-secondary)', textDecoration: 'none' }}
+            >
+              {t('forgotPassword')}
+            </Link>
+          </div>
+
           <Button type="submit" fullWidth size="md" loading={loading} style={{ marginTop: '8px' }}>
             {t('loginBtn')}
           </Button>
