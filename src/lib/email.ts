@@ -1,4 +1,4 @@
-// Transactional email (password reset now; proposal/approval notices later).
+// Transactional email: password reset, notification emails, Pro application notices.
 // Sent through Resend's HTTP API with plain fetch — no SDK dependency. Without
 // RESEND_API_KEY (local development) the email is printed to the server console
 // instead, so flows like "forgot password" can be tested without an account.
@@ -49,4 +49,27 @@ export function appUrl(path: string): string {
 
 export function escapeHtml(value: string): string {
     return value.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+}
+
+// The one layout every notice email uses: greeting, a few paragraphs, one button,
+// optional small print. `paragraphs` are plain text and get escaped here.
+export function noticeEmail(opts: {
+    pt: boolean;
+    name: string;
+    paragraphs: string[];
+    link: string;
+    cta: string;
+    footer?: string;
+}): { html: string; text: string } {
+    const { pt, name, paragraphs, link, cta, footer } = opts;
+    const hi = pt ? `Olá ${name},` : `Hi ${name},`;
+    const sign = pt ? 'Equipa Needer' : 'The Needer team';
+    const text = [hi, ...paragraphs, `${cta}: ${link}`, ...(footer ? [footer] : []), sign].join('\n\n');
+    const html =
+        `<p>${escapeHtml(hi)}</p>` +
+        paragraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join('') +
+        `<p><a href="${link}" style="display:inline-block;padding:10px 18px;background:#2f9e5c;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">${escapeHtml(cta)}</a></p>` +
+        (footer ? `<p style="color:#666;font-size:13px">${escapeHtml(footer)}</p>` : '') +
+        `<p>${sign}</p>`;
+    return { html, text };
 }

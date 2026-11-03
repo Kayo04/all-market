@@ -8,6 +8,8 @@ const UserSchema = new Schema(
         role: { type: String, enum: ['client', 'pro', 'admin'], default: 'client', required: true },
         // Consent record for accountability (GDPR Art. 5(2)) — set once, at registration
         termsAcceptedAt: { type: Date },
+        // Language for emails; set at sign-up from the page the person registered on.
+        locale: { type: String, enum: ['pt', 'en'], default: 'pt' },
         // Set by DELETE /api/users/[id] — see that route for what "deleted" means here
         isDeleted: { type: Boolean, default: false },
         // Per-category opt-outs, enforced in createNotification() (src/lib/notifications.ts).
