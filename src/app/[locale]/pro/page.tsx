@@ -1,17 +1,18 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useLocale } from 'next-intl';
-import { Briefcase, CheckCircle, ShieldCheck } from 'lucide-react';
+import { AlertCircle, Briefcase, CheckCircle, Clock } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { Link } from '@/i18n/navigation';
 import NeederPro from '@/components/features/NeederPro';
 
-// Becoming a pro is never instant: it will be an application (professional details
-// + proof of qualification) that an admin reviews. Until that form exists, this
-// page only routes people to an account and explains the process — accounts are
-// created as clients on /auth/register, which brings them back here afterwards.
+// Becoming a pro is never instant: it is an application (/pro/apply) that an admin
+// reviews. This page explains it, sends logged-out visitors to an account first
+// (/auth/register brings them back here), and shows a client where their
+// application stands.
 export default function BecomeProPage() {
   const { data: session, status } = useSession();
   const locale = useLocale();
@@ -22,6 +23,15 @@ export default function BecomeProPage() {
   const isAlreadyPro = user?.role === 'pro';
   // Login/register redirect with window.location, so the path needs its locale prefix.
   const returnTo = encodeURIComponent(`/${locale}/pro`);
+
+  const [application, setApplication] = useState<{ status: string; adminMessage?: string; submittedAt?: string } | null | undefined>(undefined);
+  useEffect(() => {
+    if (!isLoggedIn || isAlreadyPro) return;
+    fetch('/api/pro-application')
+      .then((r) => (r.ok ? r.json() : { application: null }))
+      .then((d) => setApplication(d.application ?? null))
+      .catch(() => setApplication(null));
+  }, [isLoggedIn, isAlreadyPro]);
 
   if (status === 'loading') return null;
 
@@ -67,15 +77,8 @@ export default function BecomeProPage() {
         </div>
 
         {isLoggedIn ? (
-          // ── Logged-in client: application form not built yet ──
-          <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}>
-            <ShieldCheck size={20} color="var(--accent)" style={{ flexShrink: 0, marginTop: '2px' }} />
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-              {pt
-                ? 'As candidaturas a profissional abrem em breve. Vais preencher os teus dados profissionais e enviar provas da tua qualificação; depois de confirmarmos, a tua conta passa a profissional.'
-                : 'Professional applications open soon. You\'ll fill in your professional details and send proof of your qualifications; once we confirm them, your account becomes a professional one.'}
-            </p>
-          </div>
+          // ── Logged-in client: start the application, or see where it stands ──
+          <ApplicationStatus application={application} pt={pt} />
         ) : (
           // ── Not logged in: create an account (or sign in) first, then come back ──
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -96,5 +99,81 @@ export default function BecomeProPage() {
       </Card>
     </div>
     </div>
+  );
+}
+
+function ApplicationStatus({
+  application,
+  pt,
+}: {
+  application: { status: string; adminMessage?: string; submittedAt?: string } | null | undefined;
+  pt: boolean;
+}) {
+  if (application === undefined) return null;
+
+  const box = (icon: React.ReactNode, text: React.ReactNode) => (
+    <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', padding: '16px', borderRadius: 'var(--radius-md)', background: 'var(--bg-secondary)', border: '1px solid var(--border)', marginBottom: '16px' }}>
+      {icon}
+      <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{text}</div>
+    </div>
+  );
+  const button = (label: string) => (
+    <Link href="/pro/apply" style={{ textDecoration: 'none' }}>
+      <Button fullWidth>{label}</Button>
+    </Link>
+  );
+  const message = application?.adminMessage ? (
+    <p style={{ marginTop: '6px' }}>
+      <strong>{pt ? 'Mensagem da equipa:' : 'Message from the team:'}</strong> {application.adminMessage}
+    </p>
+  ) : null;
+
+  if (!application) {
+    return (
+      <>
+        {box(
+          <Briefcase size={20} color="var(--accent)" style={{ flexShrink: 0, marginTop: '2px' }} />,
+          pt
+            ? 'Preenche os teus dados profissionais (cerca de 5 minutos). A equipa Needer analisa a candidatura e responde-te por email.'
+            : 'Fill in your professional details (about 5 minutes). The Needer team reviews the application and replies by email.'
+        )}
+        {button(pt ? 'Começar candidatura' : 'Start application')}
+      </>
+    );
+  }
+  if (application.status === 'pending') {
+    const since = application.submittedAt ? new Date(application.submittedAt).toLocaleDateString(pt ? 'pt-PT' : 'en-GB') : '';
+    return box(
+      <Clock size={20} color="var(--accent)" style={{ flexShrink: 0, marginTop: '2px' }} />,
+      pt
+        ? `A tua candidatura está em análise${since ? ` desde ${since}` : ''}. Vais receber a resposta por email.`
+        : `Your application is under review${since ? ` since ${since}` : ''}. You will get the answer by email.`
+    );
+  }
+  if (application.status === 'needs_info') {
+    return (
+      <>
+        {box(
+          <AlertCircle size={20} color="var(--accent)" style={{ flexShrink: 0, marginTop: '2px' }} />,
+          <>
+            {pt ? 'Precisamos de mais informação para decidir.' : 'We need more information to decide.'}
+            {message}
+          </>
+        )}
+        {button(pt ? 'Atualizar candidatura' : 'Update application')}
+      </>
+    );
+  }
+  return (
+    <>
+      {box(
+        <AlertCircle size={20} color="var(--text-tertiary)" style={{ flexShrink: 0, marginTop: '2px' }} />,
+        <>
+          {pt ? 'A tua candidatura não foi aprovada.' : 'Your application was not approved.'}
+          {message}
+        </>
+      )}
+      {button(pt ? 'Candidatar-me de novo' : 'Apply again')}
+    </>
   );
 }
