@@ -58,7 +58,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
       {
         heading: '6. Reporting illegal content and moderation',
         body: [
-          `Anyone can report content they consider illegal or contrary to these terms by writing to ${email}. Please include: the link to the content, why you consider it illegal, your name and email, and a statement that the report is made in good faith. We review reports diligently and tell you what we decided.`,
+          `Anyone can report content they consider illegal or contrary to these terms with the "Report" button on requests, proposals and profiles, or by writing to ${email}. By email, please include: the link to the content, why you consider it illegal, your name and email, and a statement that the report is made in good faith. We review reports diligently and tell you what we decided.`,
           `If we remove your content or restrict your account, we tell you why. You can contest the decision by replying to that message or writing to ${email}, and the case will be reviewed again.`,
           `${email} is also Needer's single point of contact for users and for authorities under the EU Digital Services Act. We answer in Portuguese or English.`,
         ],
@@ -157,7 +157,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
       {
         heading: '6. Denúncias de conteúdo ilegal e moderação',
         body: [
-          `Qualquer pessoa pode denunciar conteúdos que considere ilegais ou contrários a estes termos, escrevendo para ${email}. Indica: o link do conteúdo, porque o consideras ilegal, o teu nome e email, e uma declaração de que a denúncia é feita de boa-fé. Analisamos as denúncias com diligência e dizemos-te o que decidimos.`,
+          `Qualquer pessoa pode denunciar conteúdos que considere ilegais ou contrários a estes termos com o botão "Denunciar" nos pedidos, propostas e perfis, ou escrevendo para ${email}. Por email, indica: o link do conteúdo, porque o consideras ilegal, o teu nome e email, e uma declaração de que a denúncia é feita de boa-fé. Analisamos as denúncias com diligência e dizemos-te o que decidimos.`,
           `Se removermos um conteúdo teu ou restringirmos a tua conta, dizemos-te porquê. Podes contestar a decisão respondendo a essa mensagem ou escrevendo para ${email}, e o caso volta a ser analisado.`,
           `O ${email} é também o ponto de contacto único do Needer para utilizadores e autoridades, nos termos do Regulamento dos Serviços Digitais da UE. Respondemos em português ou inglês.`,
         ],
