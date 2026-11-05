@@ -8,6 +8,7 @@ import { ShieldCheck, Building, Hash, Globe, Check, X } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import ProApplicationsReview from '@/components/features/ProApplicationsReview';
+import ReportsReview from '@/components/features/ReportsReview';
 
 interface PendingVerification {
   _id: string;
@@ -95,6 +96,7 @@ export default function AdminPage() {
   return (
     <div style={{ maxWidth: '760px', margin: '0 auto', padding: '100px 24px 80px' }}>
       <ProApplicationsReview pt={locale === 'pt'} />
+      <ReportsReview pt={locale === 'pt'} />
 
       <h1 style={{
         fontFamily: 'var(--font-display)', fontSize: '28px', fontWeight: 800, marginBottom: '8px',
