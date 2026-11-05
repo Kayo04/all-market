@@ -31,7 +31,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
         body: [
           `Account: name, email, password (stored only in encrypted form, never readable), phone number (optional) and account type.`,
           `What you publish: requests (title, description, category, reference budget, district and town, photos), proposals, messages exchanged with other users, and reviews.`,
-          `Professional profile: bio, skills, service category and, when you apply to become a Pro, the business details and documents you submit (for example business name, NIF and website).`,
+          `Professional profile: bio, skills, service category and, when you apply to become a Pro, your full name, date of birth, phone, district, NIF, business details and the documents you submit.`,
           `Technical: IP address and browser data in hosting logs, IP address and email in temporary security counters (to block abuse such as repeated login attempts), and the session cookie that keeps you signed in.`,
         ],
       },
@@ -63,7 +63,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
         heading: '6. How long we keep it',
         body: [
           `Account: while your account is active. When you delete it, we immediately erase your name, email, phone, photo, bio and professional data; your open requests are closed and pending proposals are withdrawn. Messages and reviews you exchanged with others remain, shown as "Deleted User", because they are part of the other person's history. If you want them erased too, write to ${email}.`,
-          `Pro application documents: for as long as the review lasts and, if you are approved, while you are a Pro.`,
+          `Pro application: the details you fill in (including date of birth and NIF) are kept while your account exists, so we can show that a Pro was checked. Proof documents, once uploads are available, are deleted as soon as we decide on the application.`,
           `Security counters: erased automatically at the end of their window (at most 1 hour). Password recovery links: valid for 1 hour and usable only once.`,
           `Hosting logs: for the short period defined by the hosting provider.`,
         ],
@@ -112,7 +112,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
         body: [
           `Conta: nome, email, palavra-passe (guardada apenas de forma encriptada, nunca legível), telefone (opcional) e tipo de conta.`,
           `O que publicas: pedidos (título, descrição, categoria, orçamento de referência, distrito e localidade, fotos), propostas, mensagens trocadas com outros utilizadores e avaliações.`,
-          `Perfil profissional: biografia, competências, categoria de serviço e, quando te candidatas a Pro, os dados da tua atividade e os documentos que enviares (por exemplo nome comercial, NIF e website).`,
+          `Perfil profissional: biografia, competências, categoria de serviço e, quando te candidatas a Pro, o teu nome completo, data de nascimento, telefone, distrito, NIF, dados da atividade e os documentos que enviares.`,
           `Dados técnicos: endereço IP e dados do navegador nos registos do alojamento, endereço IP e email em contadores de segurança temporários (para travar abusos, como tentativas repetidas de login), e o cookie de sessão que te mantém com sessão iniciada.`,
         ],
       },
@@ -144,7 +144,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
         heading: '6. Durante quanto tempo os guardamos',
         body: [
           `Conta: enquanto a tua conta estiver ativa. Quando a eliminas, apagamos de imediato o teu nome, email, telefone, foto, biografia e dados profissionais; os teus pedidos abertos são fechados e as propostas pendentes retiradas. As mensagens e avaliações que trocaste com outras pessoas ficam, associadas a uma conta anónima ("Deleted User"), porque fazem parte do histórico da outra pessoa. Se quiseres que também sejam apagadas, escreve para ${email}.`,
-          `Documentos da candidatura a Pro: enquanto durar a análise e, se fores aprovado, enquanto fores Pro.`,
+          `Candidatura a Pro: os dados que preenches (incluindo data de nascimento e NIF) ficam guardados enquanto a conta existir, para podermos mostrar que o Pro foi verificado. Os documentos comprovativos, quando o envio estiver disponível, são apagados assim que decidimos a candidatura.`,
           `Contadores de segurança: apagados automaticamente no fim da sua janela (no máximo 1 hora). Links de recuperação da palavra-passe: válidos durante 1 hora e só podem ser usados uma vez.`,
           `Registos do alojamento: pelo curto período definido pelo prestador de alojamento.`,
         ],
