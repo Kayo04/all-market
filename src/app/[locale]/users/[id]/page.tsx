@@ -3,6 +3,7 @@
 import { useLocale } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
+import ReportButton from '@/components/features/ReportButton';
 import { Link } from '@/i18n/navigation';
 import {
   CheckCircle, MapPin, Calendar, Star, Tag, Clock,
@@ -205,6 +206,7 @@ export default function PublicProfilePage() {
               }}>
                 {user.name}
               </h1>
+              <ReportButton targetType="user" targetId={id} ownerId={id} />
               {user.isVerified && (
                 <div style={{
                   display: 'inline-flex', alignItems: 'center', gap: '4px',

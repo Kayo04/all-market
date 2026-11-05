@@ -5,6 +5,7 @@ import { useLocale } from 'next-intl';
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Link } from '@/i18n/navigation';
+import ReportButton from '@/components/features/ReportButton';
 import {
   MapPin, Euro, Clock, User, CheckCircle, Zap,
   XCircle, Star, MessageSquare, ArrowLeft, Sparkles,
@@ -199,6 +200,7 @@ function ProposalCard({
                 {locale === 'pt' ? 'Pendente' : 'Pending'}
               </span>
             ) : null}
+            {isOwner && <ReportButton targetType="proposal" targetId={proposal._id} ownerId={pro?._id} />}
           </div>
         </div>
       </div>
@@ -566,6 +568,9 @@ export default function RequestDetailPage() {
           {request.userId?.name && (
             <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><User size={13} /> {request.userId.name}</span>
           )}
+        </div>
+        <div style={{ marginTop: '14px' }}>
+          <ReportButton targetType="request" targetId={request._id} ownerId={request.userId?._id} />
         </div>
       </div>
 
