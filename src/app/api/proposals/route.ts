@@ -44,7 +44,7 @@ export async function GET(request: Request) {
         }
         const isOwner = (reqDoc as { userId: { toString(): string } }).userId.toString() === currentUserId;
 
-        const filter = isOwner ? { requestId } : { requestId, proId: currentUserId };
+        const filter = isOwner ? { requestId, removedAt: null } : { requestId, proId: currentUserId, removedAt: null };
 
         const proposals = await Proposal.find(filter)
             .sort({ createdAt: -1 })

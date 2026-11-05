@@ -11,6 +11,7 @@ const ProposalSchema = new Schema(
             enum: ['pending', 'accepted', 'rejected'],
             default: 'pending',
         },
+        removedAt: { type: Date }, // removed by a moderator after a report
     },
     { timestamps: true }
 );

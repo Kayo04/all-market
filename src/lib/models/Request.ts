@@ -31,6 +31,9 @@ const RequestSchema = new Schema(
             enum: ['open', 'accepted', 'in_progress', 'closed'],
             default: 'open',
         },
+        // Set when a moderator removes the request after a report: hidden everywhere
+        // except from its owner and admins.
+        removedAt: { type: Date },
         // v2.0 urgency — replaces old 'urgent'/'standard' values
         urgency: {
             type: String,

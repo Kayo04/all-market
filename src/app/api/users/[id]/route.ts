@@ -31,10 +31,10 @@ export async function GET(
         }
 
         const user = await User.findById(id)
-            .select('name role isVerified bio skills location locationLabel avatar ratings rating proCategory hasSponsoredSpot createdAt')
+            .select('name role isVerified bio skills location locationLabel avatar ratings rating proCategory hasSponsoredSpot createdAt suspendedAt')
             .lean();
 
-        if (!user) {
+        if (!user || (user as { suspendedAt?: Date }).suspendedAt) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 

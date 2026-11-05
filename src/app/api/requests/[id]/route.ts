@@ -29,6 +29,14 @@ export async function GET(
         if (!doc) {
             return NextResponse.json({ error: 'Request not found' }, { status: 404 });
         }
+        if ((doc as { removedAt?: Date }).removedAt) {
+            const session = await getServerSession(authOptions);
+            const viewer = session?.user as { id?: string; role?: string } | undefined;
+            const ownerId = String((doc as { userId?: { _id?: unknown } }).userId?._id ?? '');
+            if (viewer?.role !== 'admin' && viewer?.id !== ownerId) {
+                return NextResponse.json({ error: 'Request not found' }, { status: 404 });
+            }
+        }
 
         return NextResponse.json({ request: doc });
     } catch (error) {

@@ -42,6 +42,7 @@ export async function GET(request: Request) {
             }
         } else {
             query.status = status;
+            query.removedAt = null; // also matches requests without the field
         }
 
         if (category) {

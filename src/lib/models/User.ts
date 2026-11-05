@@ -12,6 +12,8 @@ const UserSchema = new Schema(
         locale: { type: String, enum: ['pt', 'en'], default: 'pt' },
         // Set by DELETE /api/users/[id] — see that route for what "deleted" means here
         isDeleted: { type: Boolean, default: false },
+        // Set by a moderator: the account can't sign in and its public profile is hidden.
+        suspendedAt: { type: Date },
         // Per-category opt-outs, enforced in createNotification() (src/lib/notifications.ts).
         // 'system' notifications (verification outcome, account state) are deliberately not
         // toggleable — a user shouldn't be able to silence being told their account changed.

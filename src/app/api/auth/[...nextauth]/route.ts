@@ -46,6 +46,10 @@ export const authOptions: AuthOptions = {
                 if (!user || user.isDeleted || !(await bcrypt.compare(credentials.password, user.password))) {
                     throw new Error('Invalid email or password');
                 }
+                // Checked after the password, so it reveals nothing to someone guessing.
+                if (user.suspendedAt) {
+                    throw new Error('This account has been suspended. Contact us if you think this is a mistake.');
+                }
 
                 return {
                     id: user._id.toString(),
@@ -77,8 +81,8 @@ export const authOptions: AuthOptions = {
             // valid for up to 30 days. Role is re-read too, so an approved Pro application
             // takes effect without logging out.
             await dbConnect();
-            const dbUser = await User.findById(token.id).select('isDeleted role isVerified sessionVersion').lean();
-            if (!dbUser || dbUser.isDeleted) {
+            const dbUser = await User.findById(token.id).select('isDeleted suspendedAt role isVerified sessionVersion').lean();
+            if (!dbUser || dbUser.isDeleted || dbUser.suspendedAt) {
                 throw new Error('Account no longer exists');
             }
             // Password changed since this token was issued: sign this session out.
