@@ -24,6 +24,9 @@ const UserSchema = new Schema(
         // "Forgot password": only the SHA-256 of the emailed token is stored (a leaked
         // database can't be used to reset anyone's password), with a 1-hour expiry.
         // Cleared when used. See api/auth/forgot-password and api/auth/reset-password.
+        // Bumped whenever the password changes; a JWT minted with an older value is
+        // refused, which signs out every existing session (stolen ones included).
+        sessionVersion: { type: Number, default: 0 },
         passwordResetTokenHash: { type: String, select: false },
         passwordResetExpires: { type: Date, select: false },
         isVerified: { type: Boolean, default: false },

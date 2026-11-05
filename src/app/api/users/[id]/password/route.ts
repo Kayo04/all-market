@@ -74,6 +74,7 @@ export async function PUT(
         }
 
         user.password = await bcrypt.hash(newPassword, 12);
+        user.sessionVersion = (user.sessionVersion ?? 0) + 1;
         await user.save();
 
         return NextResponse.json({ message: 'Password updated' });

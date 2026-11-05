@@ -229,7 +229,8 @@ export default function SettingsPage() {
       if (res.ok) {
         setPwForm({ current: '', next: '', confirm: '' });
         setPwSuccess(true);
-        setTimeout(() => setPwSuccess(false), 4000);
+        // The new password signs out every session, this one included.
+        setTimeout(() => signOut({ callbackUrl: `/${locale}/auth/login` }), 2500);
       } else {
         setPwError(data.error || (locale === 'pt' ? 'Algo correu mal.' : 'Something went wrong.'));
       }
@@ -540,7 +541,7 @@ export default function SettingsPage() {
                     display: 'flex', alignItems: 'center', gap: '6px',
                   }}>
                     <Check size={14} />
-                    {locale === 'pt' ? 'Password alterada.' : 'Password changed.'}
+                    {locale === 'pt' ? 'Password alterada. Por segurança, todas as sessões foram terminadas: entra de novo.' : 'Password changed. For security, all sessions were signed out: please sign in again.'}
                   </div>
                 )}
 

@@ -9,6 +9,7 @@ import { clientIp, MINUTE, rateLimit } from '@/lib/rateLimit';
 interface ExtendedUser extends NextAuthUser {
     role: string;
     isVerified: boolean;
+    sessionVersion: number;
 }
 
 export const authOptions: AuthOptions = {
@@ -52,6 +53,7 @@ export const authOptions: AuthOptions = {
                     email: user.email,
                     role: user.role,
                     isVerified: user.isVerified,
+                    sessionVersion: user.sessionVersion ?? 0,
                 };
             },
         }),
@@ -66,16 +68,22 @@ export const authOptions: AuthOptions = {
                 token.role = (user as ExtendedUser).role;
                 token.isVerified = (user as ExtendedUser).isVerified;
                 token.id = user.id;
+                token.sv = (user as ExtendedUser).sessionVersion ?? 0;
                 return token;
             }
 
             // Re-checked on every session read (not just at login) so a self-deleted
             // account's existing JWT stops working immediately instead of staying
-            // valid for up to 30 days.
+            // valid for up to 30 days. Role is re-read too, so an approved Pro application
+            // takes effect without logging out.
             await dbConnect();
-            const dbUser = await User.findById(token.id).select('isDeleted role isVerified').lean();
+            const dbUser = await User.findById(token.id).select('isDeleted role isVerified sessionVersion').lean();
             if (!dbUser || dbUser.isDeleted) {
                 throw new Error('Account no longer exists');
+            }
+            // Password changed since this token was issued: sign this session out.
+            if ((dbUser.sessionVersion ?? 0) !== ((token.sv as number | undefined) ?? 0)) {
+                throw new Error('Session expired');
             }
             token.role = dbUser.role;
             token.isVerified = dbUser.isVerified;

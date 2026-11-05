@@ -35,6 +35,7 @@ export async function POST(request: Request) {
         }
 
         user.password = await bcrypt.hash(data.password, 12);
+        user.sessionVersion = (user.sessionVersion ?? 0) + 1;
         user.passwordResetTokenHash = undefined;
         user.passwordResetExpires = undefined;
         await user.save();
