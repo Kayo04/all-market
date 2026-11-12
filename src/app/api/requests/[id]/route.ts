@@ -6,8 +6,9 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import dbConnect from '@/lib/db';
 import RequestModel from '@/lib/models/Request';
 import { createNotification } from '@/lib/notifications';
+import { newExpiryDate } from '@/lib/requestExpiry';
 
-const requestActionSchema = z.object({ action: z.literal('complete') });
+const requestActionSchema = z.object({ action: z.enum(['complete', 'renew']) });
 
 // GET /api/requests/[id] — fetch a single request by ID
 export async function GET(
@@ -71,7 +72,7 @@ export async function PATCH(
             return NextResponse.json({ error: 'Request not found' }, { status: 404 });
         }
 
-        const reqData = doc as { userId: { toString(): string }; status: string; acceptedByProId?: { toString(): string } };
+        const reqData = doc as { userId: { toString(): string }; status: string; acceptedByProId?: { toString(): string }; removedAt?: Date };
         const currentUserId = (session.user as { id: string }).id;
 
         if (reqData.userId.toString() !== currentUserId) {
@@ -96,6 +97,20 @@ export async function PATCH(
             }
 
             return NextResponse.json({ success: true, message: 'Job marked as complete' });
+        }
+
+        if (action === 'renew') {
+            // Keeps an open request alive for another full lifetime, or reopens an expired one.
+            // Pros are not pinged again: they were told when it was first posted.
+            if (reqData.removedAt || !['open', 'expired'].includes(reqData.status)) {
+                return NextResponse.json({ error: 'Only open or expired requests can be renewed' }, { status: 400 });
+            }
+            const expiresAt = newExpiryDate();
+            await RequestModel.updateOne(
+                { _id: id, status: { $in: ['open', 'expired'] } },
+                { status: 'open', expiresAt, $unset: { expiryWarnedAt: 1 } },
+            );
+            return NextResponse.json({ success: true, expiresAt });
         }
 
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });

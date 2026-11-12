@@ -19,7 +19,7 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const category = searchParams.get('category');
         const statusParam = searchParams.get('status') || 'open';
-        const status = ['open', 'accepted', 'in_progress', 'closed'].includes(statusParam) ? statusParam : 'open';
+        const status = ['open', 'accepted', 'in_progress', 'closed', 'expired'].includes(statusParam) ? statusParam : 'open';
         const district = searchParams.get('district');
         const mine = searchParams.get('mine');
         const lng = searchParams.get('lng');
