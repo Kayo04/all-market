@@ -33,18 +33,21 @@ const notice = (type: 'request_expiring' | 'request_expired', r: ExpiringRequest
 
 // Daily job: backfill, warn, expire. Every write is conditional, so two overlapping
 // runs never send the same notice twice.
-export async function runRequestExpiry(now = new Date()) {
+// `scope` narrows every query (e.g. to test records) without changing the logic.
+export async function runRequestExpiry(now = new Date(), scope: Record<string, unknown> = {}) {
     await dbConnect();
     const warnBefore = new Date(now.getTime() + WARN_DAYS_BEFORE * DAY_MS);
 
     // Requests created before expiry existed: 30 days from creation, but never
     // sooner than WARN_DAYS_BEFORE from now, so every client gets the warning first.
     const backfill = await RequestModel.updateMany(
-        { status: 'open', expiresAt: { $exists: false } },
+        { ...scope, status: 'open', expiresAt: { $exists: false } },
         [{ $set: { expiresAt: { $max: [{ $add: ['$createdAt', REQUEST_LIFETIME_DAYS * DAY_MS] }, warnBefore] } } }],
+        { updatePipeline: true },
     );
 
     const toWarn = await RequestModel.find({
+        ...scope,
         status: 'open',
         removedAt: null,
         expiryWarnedAt: null,
@@ -64,7 +67,7 @@ export async function runRequestExpiry(now = new Date()) {
         }
     }
 
-    const toExpire = await RequestModel.find({ status: 'open', expiresAt: { $lte: now } })
+    const toExpire = await RequestModel.find({ ...scope, status: 'open', expiresAt: { $lte: now } })
         .select('title userId removedAt')
         .populate('userId', 'locale')
         .limit(BATCH)
