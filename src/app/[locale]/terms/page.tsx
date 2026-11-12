@@ -38,6 +38,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
         body: [
           `When you post a request you give a reference budget. Professionals answer with proposals, each with its own price, and you are only committed to the proposal you accept, on the terms of that proposal.`,
           `Requests are public. Do not put personal data such as your phone number or full address in the description: share them only with the professional you choose, through messages.`,
+          `A request stays open for 30 days. We email you 5 days before it closes, and you can renew it, or reopen it after it closes, for another 30 days.`,
           `Post only requests you genuinely intend to follow up on. Fake or bad-faith requests are prohibited and may lead to the account being suspended.`,
         ],
       },
@@ -137,6 +138,7 @@ const CONTENT: Record<'en' | 'pt', { title: string; intro: string; sections: Sec
         body: [
           `Ao publicares um pedido, indicas um orçamento de referência. Os profissionais respondem com propostas, cada uma com o seu preço, e só ficas comprometido com a proposta que aceitares, nas condições dessa proposta.`,
           `Os pedidos são públicos. Não ponhas dados pessoais, como o teu telefone ou a morada completa, na descrição: partilha-os só com o profissional que escolheres, pelas mensagens.`,
+          `Um pedido fica aberto durante 30 dias. Avisamos-te por email 5 dias antes de fechar e podes renová-lo, ou reabri-lo depois de fechado, por mais 30 dias.`,
           `Publica apenas pedidos a que tencionas mesmo dar seguimento. Pedidos falsos ou de má-fé são proibidos e podem levar à suspensão da conta.`,
         ],
       },
