@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { Bell, Check, MessageSquare, FileText, Star, X, Sparkles } from 'lucide-react';
+import { Bell, Check, MessageSquare, FileText, Star, X, Sparkles, Hourglass } from 'lucide-react';
 
 interface NotificationItem {
   _id: string;
@@ -24,6 +24,8 @@ const typeIcons: Record<string, typeof Bell> = {
   new_review: Star,
   system: Bell,
   new_request: Sparkles,
+  request_expiring: Hourglass,
+  request_expired: Hourglass,
 };
 
 const typeColors: Record<string, string> = {
@@ -35,6 +37,8 @@ const typeColors: Record<string, string> = {
   new_review: 'var(--verified)',
   system: 'var(--text-secondary)',
   new_request: 'var(--warning)',
+  request_expiring: 'var(--warning)',
+  request_expired: 'var(--text-tertiary)',
 };
 
 export default function NotificationBell() {

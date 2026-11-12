@@ -28,9 +28,13 @@ const RequestSchema = new Schema(
         images: [{ type: String }],
         status: {
             type: String,
-            enum: ['open', 'accepted', 'in_progress', 'closed'],
+            enum: ['open', 'accepted', 'in_progress', 'closed', 'expired'],
             default: 'open',
         },
+        // Open requests expire after REQUEST_LIFETIME_DAYS (src/lib/requestExpiry.ts); the
+        // owner is warned a few days before and can renew. Run daily by /api/cron/expire-requests.
+        expiresAt: { type: Date, default: () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) },
+        expiryWarnedAt: { type: Date },
         // Set when a moderator removes the request after a report: hidden everywhere
         // except from its owner and admins.
         removedAt: { type: Date },
@@ -70,6 +74,7 @@ RequestSchema.index({ location: '2dsphere' });
 RequestSchema.index({ category: 1, status: 1 });
 RequestSchema.index({ district: 1, status: 1 });
 RequestSchema.index({ userId: 1 });
+RequestSchema.index({ status: 1, expiresAt: 1 });           // daily expiry job
 RequestSchema.index({ isFeatured: -1, createdAt: -1 });
 RequestSchema.index({ urgency: 1, createdAt: -1 });
 RequestSchema.index({ publicReleaseDate: 1, status: 1 }); // Sniper bidding filter

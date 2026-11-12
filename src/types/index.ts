@@ -47,7 +47,7 @@ export interface Category {
 }
 
 // ─── Request ────────────────────────────────────────────
-export type RequestStatus = 'open' | 'in_progress' | 'closed';
+export type RequestStatus = 'open' | 'accepted' | 'in_progress' | 'closed' | 'expired';
 export type ItemCondition = 'new' | 'used' | 'any';
 export type RequestType = 'service' | 'product';
 

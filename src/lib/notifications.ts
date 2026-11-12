@@ -13,7 +13,9 @@ type NotificationType =
     | 'request_closed'
     | 'new_review'
     | 'system'
-    | 'new_request';
+    | 'new_request'
+    | 'request_expiring'
+    | 'request_expired';
 
 type PrefKey = 'proposals' | 'messages' | 'newRequests' | 'reviews';
 
@@ -112,6 +114,25 @@ const EMAIL_FOR_TYPE: Partial<Record<NotificationType, {
         body: ['Um cliente deixou uma avaliação no teu perfil.', 'A client left a review on your profile.'],
         cta: ['Ver avaliação', 'View review'],
         path: (id) => `/users/${id}`,
+    },
+    // Not governed by a preference toggle: they are about the client's own request.
+    request_expiring: {
+        subject: ['O teu pedido fecha daqui a 5 dias', 'Your request closes in 5 days'],
+        body: [
+            'O teu pedido "{title}" fecha automaticamente daqui a 5 dias. Ainda precisas? Renova-o por mais 30 dias com um clique.',
+            'Your request "{title}" closes automatically in 5 days. Still need it? Renew it for another 30 days with one click.',
+        ],
+        cta: ['Renovar pedido', 'Renew request'],
+        path: (id) => `/requests/${id}`,
+    },
+    request_expired: {
+        subject: ['O teu pedido fechou', 'Your request has closed'],
+        body: [
+            'O teu pedido "{title}" fechou ao fim de 30 dias e deixou de receber propostas. Se ainda precisas, podes reabri-lo.',
+            'Your request "{title}" closed after 30 days and no longer receives proposals. If you still need it, you can reopen it.',
+        ],
+        cta: ['Ver pedido', 'View request'],
+        path: (id) => `/requests/${id}`,
     },
 };
 
