@@ -9,7 +9,7 @@ import ReportButton from '@/components/features/ReportButton';
 import {
   MapPin, Euro, Clock, User, CheckCircle, Zap,
   XCircle, Star, MessageSquare, ArrowLeft, Sparkles,
-  ThumbsUp, Send as SendIcon, FileText,
+  ThumbsUp, Send as SendIcon, FileText, Hourglass,
 } from 'lucide-react';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -29,6 +29,7 @@ interface RequestDetail {
   urgency?: string;
   isFeatured: boolean;
   createdAt: string;
+  expiresAt?: string;
   userId?: { _id?: string; name: string };
   acceptedByProId?: { name: string } | null;
   images?: string[];
@@ -256,6 +257,9 @@ export default function RequestDetailPage() {
   const isOpen = request?.status === 'open';
   const isAccepted = request?.status === 'accepted';
   const isClosed = request?.status === 'closed';
+  const isExpired = request?.status === 'expired';
+  // Days until an open request expires (the daily job warns at 5 and closes at 0).
+  const daysLeft = request?.expiresAt ? Math.max(0, Math.ceil((new Date(request.expiresAt).getTime() - Date.now()) / 86400000)) : null;
   const isUrgent = request?.urgency === 'Urgent' || request?.urgency === 'urgent';
   const displayPrice = request?.fixedPrice ?? request?.budget ?? 0;
   const userRole = (session?.user as { role?: string })?.role;
@@ -360,6 +364,31 @@ export default function RequestDetailPage() {
       setCompleteError(genericError);
     } finally {
       setCompleteLoading(false);
+    }
+  };
+
+  // Renew an open request for another 30 days, or reopen an expired one.
+  const [renewLoading, setRenewLoading] = useState(false);
+  const [renewError, setRenewError] = useState('');
+  const handleRenew = async () => {
+    setRenewLoading(true);
+    setRenewError('');
+    try {
+      const res = await fetch(`/api/requests/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'renew' }),
+      });
+      if (res.ok) {
+        await loadRequest();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        setRenewError(data.error || genericError);
+      }
+    } catch {
+      setRenewError(genericError);
+    } finally {
+      setRenewLoading(false);
     }
   };
 
@@ -648,6 +677,77 @@ export default function RequestDetailPage() {
               : 'This job has been marked as complete. Thank you for using Needer!'}
           </p>
           {messageButtons}
+        </div>
+      )}
+
+      {/* ── Expired State ── */}
+      {isExpired && (
+        <div style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border)',
+          borderRadius: '16px',
+          padding: '24px', marginBottom: '20px', textAlign: 'center',
+        }}>
+          <Hourglass size={32} color="var(--text-tertiary)" style={{ marginBottom: '10px' }} />
+          <h2 style={{ fontSize: '17px', fontWeight: 800, marginBottom: '6px', fontFamily: 'var(--font-display)' }}>
+            {locale === 'pt' ? 'Este pedido expirou' : 'This request has expired'}
+          </h2>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: isOwner ? '16px' : 0 }}>
+            {locale === 'pt'
+              ? 'Os pedidos fecham ao fim de 30 dias e deixam de receber propostas.'
+              : 'Requests close after 30 days and stop receiving proposals.'}
+          </p>
+          {isOwner && (
+            <button
+              onClick={handleRenew}
+              disabled={renewLoading}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                padding: '10px 22px', background: 'var(--accent)', color: '#fff',
+                border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: 700,
+                cursor: renewLoading ? 'wait' : 'pointer', opacity: renewLoading ? 0.7 : 1,
+                fontFamily: 'var(--font-sans)',
+              }}
+            >
+              <Hourglass size={15} />
+              {renewLoading ? (locale === 'pt' ? 'A renovar...' : 'Renewing...') : (locale === 'pt' ? 'Reabrir por 30 dias' : 'Reopen for 30 days')}
+            </button>
+          )}
+          {renewError && <p role="alert" style={{ fontSize: '13px', color: '#dc2626', marginTop: '10px' }}>{renewError}</p>}
+        </div>
+      )}
+
+      {/* ── Expiry notice (owner, open) ── */}
+      {isOpen && isOwner && daysLeft !== null && (
+        <div style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap',
+          background: daysLeft <= 5 ? 'rgba(245,158,11,0.08)' : 'transparent',
+          border: `1px solid ${daysLeft <= 5 ? 'rgba(245,158,11,0.3)' : 'var(--border)'}`,
+          borderRadius: '12px', padding: '12px 16px', marginBottom: '20px',
+        }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
+            <Hourglass size={14} />
+            {locale === 'pt'
+              ? `Aberto até ${new Date(request.expiresAt!).toLocaleDateString('pt-PT')}${daysLeft <= 5 ? ` (faltam ${daysLeft} ${daysLeft === 1 ? 'dia' : 'dias'})` : ''}`
+              : `Open until ${new Date(request.expiresAt!).toLocaleDateString('en-GB')}${daysLeft <= 5 ? ` (${daysLeft} ${daysLeft === 1 ? 'day' : 'days'} left)` : ''}`}
+          </span>
+          {daysLeft <= 5 && (
+            <button
+              onClick={handleRenew}
+              disabled={renewLoading}
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: '8px',
+                padding: '10px 22px', background: 'var(--accent)', color: '#fff',
+                border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: 700,
+                cursor: renewLoading ? 'wait' : 'pointer', opacity: renewLoading ? 0.7 : 1,
+                fontFamily: 'var(--font-sans)',
+              }}
+            >
+              <Hourglass size={15} />
+              {renewLoading ? (locale === 'pt' ? 'A renovar...' : 'Renewing...') : (locale === 'pt' ? 'Renovar por 30 dias' : 'Renew for 30 days')}
+            </button>
+          )}
+          {renewError && <p role="alert" style={{ fontSize: '13px', color: '#dc2626', marginTop: '10px' }}>{renewError}</p>}
         </div>
       )}
 

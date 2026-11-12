@@ -81,6 +81,13 @@ export default function ClientDashboard() {
           icon: CheckCircle,
           color: 'var(--text-tertiary)',
         };
+      case 'expired':
+        return {
+          label: t('Expired', 'Expirado'),
+          variant: 'default' as const,
+          icon: Clock,
+          color: 'var(--text-tertiary)',
+        };
       default:
         return {
           label: status,
